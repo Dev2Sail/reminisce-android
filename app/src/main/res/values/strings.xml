@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="app_name">Reminisce</string>
+
+    <style name="testMessage">Test</style>
+
+    <string name="greeting_sign_up">회원가입</string>
+    <string name="greeting_sign_in">이미 계정이 있으신가요?</string>
+    <string name="greeting_find_password">비밀번호 찾기</string>
+
+    <string name="card_summary_title">남동 오피스파크</string>
+    <string name="card_summary_item_body">인천광역시 남동구 은청로 18 남동상공센타 2층</string>
+    <string name="card_date_separator">2023년-1월</string>
+
+    <string name="appbar_title">Title</string>
+
+    <string name="home_folder_item">Default Category</string>
+    <string name="home_header">Nav Title</string>
+    <string name="home_header_sub">action</string>
+    <string name="home_tag">Tag</string>
+    <string name="home_person_tag">누구와</string>
+
+    <string name="folder_detail_category">Category Name</string>
+    <string name="basic_category_item">인천광역시</string>
+
+    <string name="category_delete_dialog_message">폴더를 삭제하시겠어요? \n폴더 안에 저장된 모든 추억들이 함께 지워져요.</string>
+
+    <string name="writer_options_category">폴더</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

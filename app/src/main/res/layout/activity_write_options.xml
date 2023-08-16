@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <include
+        android:id="@+id/write_options_appbar"
+        layout="@layout/layout_appbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/write_options_visited_at_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:src="@drawable/round_calendar_month_16"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_appbar"
+        app:tint="@color/md_theme_light_primary" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/write_options_visited_at"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="2022-08-02"
+        android:textColor="@color/md_theme_light_primary"
+        android:textSize="@dimen/body_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/write_options_visited_at_icon"
+        app:layout_constraintTop_toBottomOf="@id/write_options_appbar" />
+
+    <ImageView
+        android:id="@+id/write_options_address_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:src="@drawable/round_location_on_16"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_visited_at"
+        app:tint="@color/md_theme_light_primary" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/write_options_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="인천광역시 미추홀구 숙골로 113"
+        android:textColor="@color/md_theme_light_primary"
+        android:textSize="@dimen/body_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/write_options_address_icon"
+        app:layout_constraintTop_toBottomOf="@id/write_options_visited_at" />
+
+    <ImageView
+        android:id="@+id/write_options_marker_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:src="@drawable/round_add_reaction_16"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_address"
+        app:tint="@color/md_theme_light_primary" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/write_options_marker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="💙"
+        android:textColor="@color/md_theme_light_primary"
+        android:textSize="@dimen/body_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/write_options_marker_icon"
+        app:layout_constraintTop_toBottomOf="@id/write_options_address_icon" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/write_options_divider"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="@dimen/margin_regular"
+        app:layout_constraintBottom_toTopOf="@id/write_options_category"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_marker" />
+
+    <include
+        android:id="@+id/write_options_category"
+        layout="@layout/layout_write_options_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_divider" />
+
+    <include
+        android:id="@+id/write_options_friend"
+        layout="@layout/layout_write_options_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_category" />
+
+    <include
+        android:id="@+id/write_options_tag"
+        layout="@layout/layout_write_options_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_friend" />
+</androidx.constraintlayout.widget.ConstraintLayout>

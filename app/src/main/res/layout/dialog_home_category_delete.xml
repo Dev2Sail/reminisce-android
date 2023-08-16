@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/dialog_home_category_delete_handle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_home_category_delete_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="Dialog Title"
+        android:textSize="@dimen/headline_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_home_category_delete_handle" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_home_category_delete_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:textSize="@dimen/body_medium"
+        android:fontFamily="@font/pretendard_regular"
+        android:layout_marginTop="@dimen/margin_regular"
+        android:text="@string/category_delete_dialog_message"
+        android:textColor="@color/md_theme_light_onSurfaceVariant"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_home_category_delete_title" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dialog_home_category_delete_cancel"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="취소"
+        android:textSize="@dimen/label_large"
+        app:layout_constraintEnd_toStartOf="@id/dialog_home_category_delete_remove"
+        app:layout_constraintTop_toBottomOf="@id/dialog_home_category_delete_body" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dialog_home_category_delete_remove"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="삭제"
+        android:textColor="@color/md_theme_light_error"
+        android:textSize="@dimen/label_large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_home_category_delete_body" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="font_weight_thin">100</integer>
+    <integer name="font_weight_extra_light">200</integer>
+    <integer name="font_weight_light">300</integer>
+    <integer name="font_weight_regular">400</integer>
+    <integer name="font_weight_medium">500</integer>
+    <integer name="font_weight_semi_bold">600</integer>
+    <integer name="font_weight_bold">700</integer>
+    <integer name="font_weight_extra_bold">800</integer>
+    <integer name="font_weight_black">900</integer>
+
+    <dimen name="body_small">12sp</dimen>
+    <dimen name="body_medium">14sp</dimen>
+    <dimen name="body_large">16sp</dimen>
+
+    <dimen name="label_small">11sp</dimen>
+    <dimen name="label_medium">12sp</dimen>
+    <dimen name="label_large">14sp</dimen>
+
+    <dimen name="title_small">14sp</dimen>
+    <dimen name="title_medium">16sp</dimen>
+    <dimen name="title_large">22sp</dimen>
+
+    <dimen name="headline_small">24sp</dimen>
+    <dimen name="headline_medium">28sp</dimen>
+    <dimen name="headline_large">32sp</dimen>
+
+    <dimen name="appbar_height">56dp</dimen>
+
+    <dimen name="launcher_hcmc_logo_width">120dp</dimen>
+    <dimen name="launcher_hcmc_logo_height">60dp</dimen>
+    <dimen name="greeting_logo_width">180dp</dimen>
+    <dimen name="greeting_logo_height">90dp</dimen>
+    <dimen name="greeting_bottom_margin">48dp</dimen>
+
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_regular">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_2xlarge">32dp</dimen>
+    <dimen name="margin_3xlarge">40dp</dimen>
+    <dimen name="margin_4xlarge">48dp</dimen>
+
+    <dimen name="card_elevation_standard">6dp</dimen>
+
+</resources>
