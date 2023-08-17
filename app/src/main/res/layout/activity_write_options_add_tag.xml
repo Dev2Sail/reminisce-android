@@ -58,7 +58,8 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:clipToPadding="false"
-            android:paddingHorizontal="@dimen/margin_large">
+            android:paddingHorizontal="@dimen/margin_large"
+            app:chipSpacingVertical="-4dp">
         </com.google.android.material.chip.ChipGroup>
     </ScrollView>
 
@@ -88,7 +89,8 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:clipToPadding="false"
-            android:paddingHorizontal="@dimen/margin_large">
+            android:paddingHorizontal="@dimen/margin_large"
+            app:chipSpacingVertical="-4dp">
         </com.google.android.material.chip.ChipGroup>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

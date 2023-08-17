@@ -13,33 +13,75 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <include
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/setting_account"
-        layout="@layout/layout_write_options_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_2xlarge"
         android:layout_marginTop="@dimen/margin_large"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="@string/setting_account"
+        android:textSize="@dimen/title_medium"
+        app:layout_constraintEnd_toStartOf="@id/setting_account_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setting_header" />
 
-    <include
+    <ImageView
+        android:id="@+id/setting_account_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_large"
+        android:layout_marginEnd="@dimen/margin_4xlarge"
+        android:src="@drawable/round_arrow_forward_ios_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setting_header"
+        app:tint="@color/md_theme_light_primary" />
+
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/setting_friend"
-        layout="@layout/layout_write_options_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_regular"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="@string/setting_friend"
+        android:textSize="@dimen/title_medium"
+        app:layout_constraintEnd_toStartOf="@id/setting_friend_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setting_account" />
 
-    <include
+    <ImageView
+        android:id="@+id/setting_friend_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_large"
+        android:layout_marginEnd="@dimen/margin_4xlarge"
+        android:src="@drawable/round_arrow_forward_ios_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setting_account"
+        app:tint="@color/md_theme_light_primary" />
+
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/setting_logout"
-        layout="@layout/layout_write_options_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_regular"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="@string/setting_logout"
+        android:textSize="@dimen/title_medium"
+        app:layout_constraintEnd_toStartOf="@id/setting_logout_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setting_friend" />
+
+    <ImageView
+        android:id="@+id/setting_logout_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_large"
+        android:layout_marginEnd="@dimen/margin_4xlarge"
+        android:src="@drawable/round_exit_to_app_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setting_friend"
+        app:tint="@color/md_theme_light_primary" />
 </androidx.constraintlayout.widget.ConstraintLayout>

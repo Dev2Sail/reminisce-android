@@ -1,34 +1,32 @@
 package studio.hcmc.reminisce.ui.activity.category
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
-import studio.hcmc.reminisce.databinding.ActivityAddCategoryDetailBinding
+import studio.hcmc.reminisce.databinding.ActivityAddCategoryBinding
+import studio.hcmc.reminisce.ui.activity.home.HomeActivity
+import studio.hcmc.reminisce.util.string
 
 class AddCategoryDetailActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityAddCategoryDetailBinding
+    private lateinit var viewBinding: ActivityAddCategoryBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityAddCategoryDetailBinding.inflate(layoutInflater)
+        viewBinding = ActivityAddCategoryBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.addCategoryDetailAppbar.appbarTitle.text = "홈"
-        viewBinding.addCategoryDetailAppbar.appbarActionButton1.isVisible = false
-        viewBinding.addCategoryDetailAppbar.appbarBack.setOnClickListener {
+        viewBinding.addCategoryAppbar.appbarTitle.text = "새로운 폴더"
+        viewBinding.addCategoryAppbar.appbarBack.setOnClickListener {
             finish()
         }
-
-        val inputContainer = viewBinding.addCategoryDetail.commonEditableHeaderInput
-        val saveButton = viewBinding.addCategoryDetail.commonEditableHeaderAction1
-        inputContainer.placeholderText = "새로운 폴더"
-        inputContainer.isCounterEnabled = true
-        inputContainer.counterMaxLength = 15
-        inputContainer.endIconMode = END_ICON_CLEAR_TEXT
-        saveButton.text = "저장"
-        saveButton.setOnClickListener {
-            finish()
+        viewBinding.addCategoryField.endIconMode = END_ICON_CLEAR_TEXT
+        viewBinding.addCategoryAppbar.appbarActionButton1.setOnClickListener {
+            if (viewBinding.addCategoryField.string.length <= 15) {
+                Intent(this, HomeActivity::class.java).apply {
+                    startActivity(this)
+                }
+            }
         }
     }
 }

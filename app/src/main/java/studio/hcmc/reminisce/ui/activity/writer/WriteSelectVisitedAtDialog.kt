@@ -5,7 +5,7 @@ import android.text.Editable
 import android.view.LayoutInflater
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
-import studio.hcmc.reminisce.databinding.DialogInputVisitedAtBinding
+import studio.hcmc.reminisce.databinding.DialogSelectVisitedAtBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
@@ -22,28 +22,28 @@ class WriteSelectVisitedAtDialog(
     }
 
     init {
-        val viewBinding = DialogInputVisitedAtBinding.inflate(LayoutInflater.from(activity))
+        val viewBinding = DialogSelectVisitedAtBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        viewBinding.dialogInputTitle.text = "방문일 선택"
+        viewBinding.dialogSelectVisitedAtTitle.text = "방문일 선택"
 
         dialog.show()
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
         var now = dateFormat.format(Date(System.currentTimeMillis()))
-        viewBinding.dialogInput.placeholderText = now
-        viewBinding.dialogInput.endIconMode = END_ICON_CLEAR_TEXT
+        viewBinding.dialogSelectVisitedAtField.placeholderText = now
+        viewBinding.dialogSelectVisitedAtField.endIconMode = END_ICON_CLEAR_TEXT
 
-        viewBinding.dialogInputCancel.setOnClickListener {
+        viewBinding.dialogSelectCancel.setOnClickListener {
             delegate.onSaveClick("")
             dialog.dismiss()
         }
 
-        viewBinding.dialogInput.editText!!.addTextChangedListener {
-            viewBinding.dialogInputSave.isEnabled = validateDate(formatInputDate(viewBinding.dialogInput.text))
+        viewBinding.dialogSelectVisitedAtField.editText!!.addTextChangedListener {
+            viewBinding.dialogSelectSave.isEnabled = validateDate(formatInputDate(viewBinding.dialogSelectVisitedAtField.text))
         }
 
-        viewBinding.dialogInputSave.setOnClickListener {
-            delegate.onSaveClick(viewBinding.dialogInput.string)
+        viewBinding.dialogSelectSave.setOnClickListener {
+            delegate.onSaveClick(viewBinding.dialogSelectVisitedAtField.string)
             dialog.dismiss()
         }
     }

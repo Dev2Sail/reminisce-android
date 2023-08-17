@@ -34,18 +34,22 @@ class WriteActivity : AppCompatActivity() {
         }
 
         viewBinding.writeMarkerEmoji.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_reaction_16)
+        viewBinding.writeMarkerEmoji.writeOptionsItemBody.text = ""
         viewBinding.writeMarkerEmoji.writeOptionsItemIcon.setOnClickListener {
             WriteSelectEmojiDialog(this, emojiDelegate)
         }
 
 
         viewBinding.writeLocation.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_location_alt_16)
+        viewBinding.writeLocation.writeOptionsItemBody.text = ""
 
 
         viewBinding.writeFriendTag.writeOptionsItemIcon.setImageResource(R.drawable.round_group_add_16)
+        viewBinding.writeFriendTag.writeOptionsItemBody.text = ""
 
 
         viewBinding.writeTag.writeOptionsItemIcon.setImageResource(R.drawable.round_tag_16)
+        viewBinding.writeTag.writeOptionsItemBody.text = ""
         viewBinding.writeTag.writeOptionsItemIcon.setOnClickListener {
             Intent(this, WriteOptionsAddTagActivity::class.java).apply {
                 startActivity(this)

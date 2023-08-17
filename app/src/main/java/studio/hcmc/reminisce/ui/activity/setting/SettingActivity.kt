@@ -15,24 +15,20 @@ class SettingActivity : AppCompatActivity() {
         viewBinding = ActivitySettingBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.settingHeader.commonHeaderTitle.text = "설정"
-//        viewBinding.settingHeader.commonHeaderTitle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.round_settings_24, 0, 0, 0)
+        viewBinding.settingHeader.commonHeaderTitle.text = R.string.setting_activity_header.toString()
         viewBinding.settingHeader.commonHeaderAction1.isVisible = false
-        viewBinding.settingAccount.writeOptionsCardTitle.text = "프로필 설정"
-        viewBinding.settingFriend.writeOptionsCardTitle.text = "친구 목록"
-        viewBinding.settingLogout.writeOptionsCardTitle.text = "로그아웃"
-        viewBinding.settingLogout.writeOptionsCardIcon.setImageResource(R.drawable.round_exit_to_app_24)
 
-        viewBinding.settingAccount.writeOptionsCardIcon.setOnClickListener {
-            val intent = Intent(this, AccountSettingActivity::class.java)
-            startActivity(intent)
+        viewBinding.settingAccountIcon.setOnClickListener {
+            Intent(this, AccountSettingActivity::class.java).apply {
+                startActivity(this)
+            }
         }
-
-        viewBinding.settingFriend.writeOptionsCardIcon.setOnClickListener {
+        viewBinding.settingFriendIcon.setOnClickListener {
             Intent(this, FriendSettingActivity::class.java).apply {
                 startActivity(this)
             }
         }
-
     }
 }
+
+//        viewBinding.settingHeader.commonHeaderTitle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.round_settings_24, 0, 0, 0)
