@@ -3,12 +3,12 @@ package studio.hcmc.reminisce.ui.activity.home
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.Toast
-import studio.hcmc.reminisce.databinding.DialogHomeCategoryDeleteBinding
+import studio.hcmc.reminisce.databinding.DialogDeleteHomeCategoryBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
 class DeleteCategoryDialog(context: Context) {
     init {
-        val viewBinding = DialogHomeCategoryDeleteBinding.inflate(LayoutInflater.from(context))
+        val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(context))
         val dialog = BottomSheetDialog(context, viewBinding)
         viewBinding.dialogHomeCategoryDeleteTitle.text = "폴더 삭제"
         viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener {
