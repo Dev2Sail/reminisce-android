@@ -13,7 +13,7 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class InputVisitedAtDialog(
+class WriteSelectVisitedAtDialog(
     activity: Activity,
     delegate: Delegate
 ) {

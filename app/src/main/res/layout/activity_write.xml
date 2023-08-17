@@ -12,7 +12,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- address & markerEmoji는 텍스트 필드(edittext)로 만들어야지!-->
             <include
                 android:id="@+id/write_appbar"
                 layout="@layout/layout_appbar"
@@ -20,86 +19,28 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/write_visited_at_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_2xlarge"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:src="@drawable/outline_calendar_month_16"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/write_appbar"
-                app:tint="@color/md_theme_light_primary" />
-
-            <com.google.android.material.textview.MaterialTextView
+            <include
                 android:id="@+id/write_visited_at"
+                layout="@layout/layout_write_options_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_small"
-                android:layout_marginEnd="@dimen/margin_large"
-                android:fontFamily="@font/pretendard_regular"
-                android:text="2022-08-02"
-                android:textColor="@color/md_theme_light_primary"
-                android:textSize="@dimen/body_medium"
+                android:layout_marginTop="@dimen/margin_regular"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/write_visited_at_icon"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/write_appbar" />
 
-            <ImageView
-                android:id="@+id/write_address_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_2xlarge"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:layout_marginTop="@dimen/margin_small"
-                android:src="@drawable/round_search_16"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/write_visited_at"
-                app:tint="@color/md_theme_light_primary" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/write_address"
+            <include
+                android:id="@+id/write_marker_emoji"
+                layout="@layout/layout_write_options_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_small"
-                android:layout_marginStart="@dimen/margin_small"
-                android:layout_marginEnd="@dimen/margin_large"
-                android:fontFamily="@font/pretendard_regular"
-                android:text="인천광역시 미추홀구 숙골로 113"
-                android:textColor="@color/md_theme_light_primary"
-                android:textSize="@dimen/body_medium"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/write_address_icon"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/write_visited_at" />
 
-            <ImageView
-                android:id="@+id/write_marker_emoji_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_2xlarge"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:layout_marginTop="@dimen/margin_small"
-                android:src="@drawable/outline_add_reaction_16"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/write_address"
-                app:tint="@color/md_theme_light_primary" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/write_marker_emoji"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_small"
-                android:layout_marginStart="@dimen/margin_small"
-                android:layout_marginEnd="@dimen/margin_large"
-                android:fontFamily="@font/pretendard_regular"
-                android:textColor="@color/md_theme_light_primary"
-                android:textSize="@dimen/body_medium"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/write_marker_emoji_icon"
-                app:layout_constraintTop_toBottomOf="@id/write_address" />
-
             <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/write_divider"
+                android:id="@+id/write_divider1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
@@ -119,16 +60,56 @@
                 app:counterMaxLength="1000"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/write_divider"
+                app:layout_constraintTop_toBottomOf="@id/write_divider1"
                 app:placeholderText="추억을 기록해보세요!">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/md_theme_light_surface"
-                    android:inputType="textMultiLine"
-                    android:paddingTop="-12dp" />
+                    android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/write_divider2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginBottom="@dimen/margin_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/write_text_container" />
+
+            <include
+                android:id="@+id/write_location"
+                layout="@layout/layout_write_options_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_regular"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/write_divider2" />
+
+            <include
+                android:id="@+id/write_friend_tag"
+                layout="@layout/layout_write_options_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/write_location" />
+
+            <include
+                android:id="@+id/write_tag"
+                layout="@layout/layout_write_options_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/write_friend_tag" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </FrameLayout>

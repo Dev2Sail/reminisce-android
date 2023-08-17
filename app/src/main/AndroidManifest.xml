@@ -16,6 +16,15 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
+            android:name=".ui.activity.writer.WriteOptionsAddTagActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.writer.WriteOptionsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.writer.WriteOptionVisitedAtActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.setting.AddFriendActivity"
             android:exported="false" />
         <activity
@@ -35,9 +44,6 @@
             android:exported="false" />
         <activity
             android:name=".ui.activity.setting.SettingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.writer.WriteSettingActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.writer.WriteActivity"

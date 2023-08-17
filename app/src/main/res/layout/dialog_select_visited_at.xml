@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-        android:id="@+id/dialog_input_handle"
+        android:id="@+id/dialog_select_visited_at_handle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/dialog_input_title"
+        android:id="@+id/dialog_select_visited_at_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
@@ -22,10 +22,10 @@
         android:textSize="@dimen/headline_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_input_handle" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_select_visited_at_handle" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/dialog_input"
+        android:id="@+id/dialog_select_visited_at_field"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_large"
@@ -34,7 +34,7 @@
         app:boxStrokeColor="@color/md_theme_light_primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_input_title"
+        app:layout_constraintTop_toBottomOf="@id/dialog_select_visited_at_title"
         app:placeholderText="@string/home_header">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -47,7 +47,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialog_input_cancel"
+        android:id="@+id/dialog_select_cancel"
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -57,11 +57,11 @@
         android:text="취소"
         android:textColor="@color/md_theme_light_error"
         android:textSize="@dimen/label_large"
-        app:layout_constraintEnd_toStartOf="@id/dialog_input_save"
-        app:layout_constraintTop_toBottomOf="@id/dialog_input" />
+        app:layout_constraintEnd_toStartOf="@id/dialog_select_save"
+        app:layout_constraintTop_toBottomOf="@id/dialog_select_visited_at_field" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialog_input_save"
+        android:id="@+id/dialog_select_save"
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -74,5 +74,5 @@
         android:textSize="@dimen/label_large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_input" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_select_visited_at_field" />
 </androidx.constraintlayout.widget.ConstraintLayout>
