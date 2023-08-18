@@ -18,39 +18,38 @@ class WriteActivity : AppCompatActivity() {
         viewBinding = ActivityWriteBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.writeAppbar.appbarBack.setOnClickListener {
-            finish()
-        }
-        viewBinding.writeAppbar.appbarActionButton1.text = "저장"
-        viewBinding.writeAppbar.appbarActionButton1.setOnClickListener {
-            Intent(this, WriteOptionsActivity::class.java).apply {
-                startActivity(this)
-            }
+        val appBar = viewBinding.writeAppbar
+        appBar.appbarBack.setOnClickListener { finish() }
+        appBar.appbarActionButton1.text = "저장"
+        appBar.appbarActionButton1.setOnClickListener {
+            startActivity(nextIntent)
         }
 
-        viewBinding.writeVisitedAt.writeOptionsItemBody.text = "방문 날짜"
-        viewBinding.writeVisitedAt.writeOptionsItemIcon.setOnClickListener {
+        val visitedAt = viewBinding.writeVisitedAt
+        visitedAt.writeOptionsItemBody.text = "방문 날짜"
+        visitedAt.writeOptionsItemIcon.setOnClickListener {
             WriteSelectVisitedAtDialog(this, visitedAtDelegate)
         }
 
-        viewBinding.writeMarkerEmoji.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_reaction_16)
-        viewBinding.writeMarkerEmoji.writeOptionsItemBody.text = ""
-        viewBinding.writeMarkerEmoji.writeOptionsItemIcon.setOnClickListener {
+        val marker = viewBinding.writeMarkerEmoji
+        marker.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_reaction_16)
+        marker.writeOptionsItemBody.text = "이모지 추가"
+        marker.writeOptionsItemIcon.setOnClickListener {
             WriteSelectEmojiDialog(this, emojiDelegate)
         }
 
+        val location = viewBinding.writeLocation
+        location.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_location_alt_16)
+        location.writeOptionsItemBody.text = "방문한 장소 추가"
 
-        viewBinding.writeLocation.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_location_alt_16)
-        viewBinding.writeLocation.writeOptionsItemBody.text = ""
+        val friendTag = viewBinding.writeFriendTag
+        friendTag.writeOptionsItemIcon.setImageResource(R.drawable.round_group_add_16)
+        friendTag.writeOptionsItemBody.text = "함께 다녀온 친구 추가"
 
-
-        viewBinding.writeFriendTag.writeOptionsItemIcon.setImageResource(R.drawable.round_group_add_16)
-        viewBinding.writeFriendTag.writeOptionsItemBody.text = ""
-
-
-        viewBinding.writeTag.writeOptionsItemIcon.setImageResource(R.drawable.round_tag_16)
-        viewBinding.writeTag.writeOptionsItemBody.text = ""
-        viewBinding.writeTag.writeOptionsItemIcon.setOnClickListener {
+        val hashtag = viewBinding.writeTag
+        hashtag.writeOptionsItemIcon.setImageResource(R.drawable.round_tag_16)
+        hashtag.writeOptionsItemBody.text = "해시태그 추가"
+        hashtag.writeOptionsItemIcon.setOnClickListener {
             Intent(this, WriteOptionsAddTagActivity::class.java).apply {
                 startActivity(this)
             }
@@ -74,12 +73,8 @@ class WriteActivity : AppCompatActivity() {
 
     private val emojiDelegate = object :WriteSelectEmojiDialog.Delegate {
         override fun onSaveClick(value: String) {
-            if (value != "") {
-                viewBinding.writeMarkerEmoji.writeOptionsItemBody.text = value
-                nextIntent.putExtra("emoji", value)
-            } else {
-                nextIntent.putExtra("emoji", "")
-            }
+            viewBinding.writeMarkerEmoji.writeOptionsItemBody.text = value
+            nextIntent.putExtra("emoji", value)
         }
     }
 }

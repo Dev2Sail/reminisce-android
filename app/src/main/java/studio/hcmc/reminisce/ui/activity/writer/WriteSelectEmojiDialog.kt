@@ -32,7 +32,6 @@ class WriteSelectEmojiDialog(
             viewBinding.dialogSelectSave.isEnabled = emoji.isEmoji()
         }
         viewBinding.dialogSelectCancel.setOnClickListener {
-            delegate.onSaveClick("")
             dialog.dismiss()
         }
         viewBinding.dialogSelectSave.setOnClickListener {

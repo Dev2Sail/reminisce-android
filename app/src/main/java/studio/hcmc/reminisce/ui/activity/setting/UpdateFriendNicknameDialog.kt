@@ -33,6 +33,7 @@ class UpdateFriendNicknameDialog(
         viewBinding.dialogUpdateFriendNicknameSave.setOnClickListener {
             val inputtedValue = inputField.string
             if (inputtedValue.length <= 20) {
+                dialog.dismiss()
                 delegate.onSaveClick(inputtedValue)
             }
         }

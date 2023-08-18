@@ -15,7 +15,7 @@ class SettingActivity : AppCompatActivity() {
         viewBinding = ActivitySettingBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.settingHeader.commonHeaderTitle.text = R.string.setting_activity_header.toString()
+        viewBinding.settingHeader.commonHeaderTitle.setText(R.string.setting_activity_header)
         viewBinding.settingHeader.commonHeaderAction1.isVisible = false
 
         viewBinding.settingAccountIcon.setOnClickListener {

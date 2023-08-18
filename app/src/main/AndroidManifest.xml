@@ -22,13 +22,7 @@
             android:name=".ui.activity.writer.WriteOptionsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.writer.WriteOptionVisitedAtActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.activity.setting.AddFriendActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.setting.FriendNicknameSettingActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.setting.FriendSettingActivity"
