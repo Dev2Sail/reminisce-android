@@ -7,8 +7,8 @@ class CategoryDetailEditableHeaderViewHolder (
     private val viewBinding: CardCategoryDetailHeaderBinding
 ) {
     fun bind() {
-        viewBinding.categoryDetailHeaderTitle.placeholderText = "original category name"
         viewBinding.categoryDetailHeaderAction1.text = "완료"
+//        viewBinding.categoryDetailHeaderAction1.text = viewBinding.root.context.getText(R.string.dialog_save)
 
         viewBinding.categoryDetailHeaderAction1.setOnClickListener {
             viewBinding.categoryDetailHeaderAction1.text = "편집"

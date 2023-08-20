@@ -12,7 +12,7 @@
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_3xlarge"
         android:fontFamily="@font/pretendard_regular"
-        android:text="@string/home_tag"
+        android:text="@string/card_home_tag_title"
         android:textSize="@dimen/title_large" />
 
     <com.google.android.material.chip.ChipGroup
@@ -21,10 +21,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_regular"
         android:clipToPadding="false"
-        android:paddingHorizontal="@dimen/margin_3xlarge"
+        android:paddingHorizontal="@dimen/margin_2xlarge"
         app:chipSpacing="0dp"
         app:chipSpacingVertical="-4dp"
         app:singleSelection="true">
-<!-- chip은 코드 상에서 삽입 -> 몇 개나 들어갈지 어케 앎? -->
     </com.google.android.material.chip.ChipGroup>
 </LinearLayout>

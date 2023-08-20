@@ -6,6 +6,7 @@ import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySignInBinding
 import studio.hcmc.reminisce.ui.activity.home.HomeActivity
 
@@ -17,7 +18,7 @@ class SignInActivity : AppCompatActivity() {
         viewBinding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.signInAppbar.appbarTitle.text = "로그인"
+        viewBinding.signInAppbar.appbarTitle.text = getText(R.string.sign_in_login)
         viewBinding.signInAppbar.appbarActionButton1.isVisible = false
 
         viewBinding.signInAppbar.appbarBack.setOnClickListener {
@@ -29,6 +30,8 @@ class SignInActivity : AppCompatActivity() {
         viewBinding.signInPassword.editText!!.addTextChangedListener {
             setNextEnabledState()
         }
+
+
         viewBinding.signInNextBtn.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)

@@ -10,8 +10,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_2xlarge"
         android:src="@drawable/outline_calendar_month_16"
+        app:layout_constraintBottom_toBottomOf="@id/write_options_item_body"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/write_options_item_body"
         app:tint="@color/md_theme_light_primary" />
 
     <com.google.android.material.textview.MaterialTextView

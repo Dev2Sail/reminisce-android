@@ -22,7 +22,6 @@ class CategoryViewHolder(
    )
 
      fun bind() {
-         viewBinding.homeCategoryText1.text = "100"
          for (category in delegate.categories) {
              viewBinding.homeCategoryTitle.text = category.title
 //             when(category.title) {

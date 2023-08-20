@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
-        android:text="폴더 선택"
+        android:text="@string/dialog_select_category_title"
         android:textSize="@dimen/headline_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

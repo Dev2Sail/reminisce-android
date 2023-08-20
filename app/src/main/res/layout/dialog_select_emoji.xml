@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
-        android:text="Dialog Title"
+        android:text="@string/dialog_select_emoji_title"
         android:textSize="@dimen/headline_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,10 +32,11 @@
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginEnd="@dimen/margin_2xlarge"
         app:boxStrokeColor="@color/md_theme_light_primary"
+        app:endIconMode="clear_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_select_emoji_title"
-        app:placeholderText="@string/home_header">
+        app:placeholderText="@string/dialog_select_emoji_placeholder_text">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"

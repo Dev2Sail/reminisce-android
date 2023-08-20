@@ -33,17 +33,19 @@
         android:layout_marginEnd="@dimen/margin_2xlarge"
         app:boxStrokeColor="@color/md_theme_light_primary"
         app:counterEnabled="true"
+        app:endIconMode="clear_text"
         app:counterMaxLength="20"
+        app:helperText="@string/dialog_update_friend_nickname_helper_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_update_friend_nickname_title"
-        app:placeholderText="@string/home_header">
+        app:placeholderText="@string/dialog_update_friend_nickname_placeholder_text">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="date"
             android:fontFamily="@font/pretendard_medium"
+            android:inputType="date"
             android:maxLength="10"
             android:textSize="@dimen/body_large" />
     </com.google.android.material.textfield.TextInputLayout>

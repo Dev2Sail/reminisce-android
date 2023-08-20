@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityAddCategoryBinding
 import studio.hcmc.reminisce.ui.activity.home.HomeActivity
 import studio.hcmc.reminisce.util.string
@@ -20,7 +20,7 @@ class AddCategoryDetailActivity : AppCompatActivity() {
 
         val appBar = viewBinding.addCategoryAppbar
         appBar.appbarActionButton1.isEnabled = false
-        appBar.appbarTitle.text = "새로운 폴더"
+        appBar.appbarTitle.text = getText(R.string.add_category_title)
         appBar.appbarBack.setOnClickListener { finish() }
         appBar.appbarActionButton1.setOnClickListener {
             if (viewBinding.addCategoryField.string.length <= 15) {
@@ -31,7 +31,6 @@ class AddCategoryDetailActivity : AppCompatActivity() {
         }
 
         val inputField = viewBinding.addCategoryField
-        inputField.endIconMode = END_ICON_CLEAR_TEXT
         inputField.editText!!.addTextChangedListener {
             appBar.appbarActionButton1.isEnabled = inputField.text.isNotEmpty() && inputField.text.length <= 15
         }

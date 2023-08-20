@@ -12,16 +12,16 @@
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_3xlarge"
         android:fontFamily="@font/pretendard_medium"
-        android:text="@string/home_person_tag"
+        android:text="@string/card_home_tag_friend_title"
         android:textSize="@dimen/title_large" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/home_person_tag_chip_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/margin_3xlarge"
         android:layout_marginTop="@dimen/margin_regular"
         android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/margin_2xlarge"
         app:chipSpacing="0dp"
         app:chipSpacingVertical="-4dp"
         app:singleSelection="true">

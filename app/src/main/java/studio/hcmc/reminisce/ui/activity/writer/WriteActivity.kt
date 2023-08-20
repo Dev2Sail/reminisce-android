@@ -20,7 +20,6 @@ class WriteActivity : AppCompatActivity() {
 
         val appBar = viewBinding.writeAppbar
         appBar.appbarBack.setOnClickListener { finish() }
-        appBar.appbarActionButton1.text = "저장"
         appBar.appbarActionButton1.setOnClickListener {
             startActivity(nextIntent)
         }

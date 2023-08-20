@@ -13,6 +13,7 @@ class WriteOptionsActivity : AppCompatActivity() {
         viewBinding = ActivityWriteOptionsBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        viewBinding.writeOptionsAppbar.appbarActionButton1.text = getText(R.string.appbar_button_text)
         viewBinding.writeOptionsAppbar.appbarBack.setOnClickListener { finish() }
         // 글 보여주는 화면으로 이동
 

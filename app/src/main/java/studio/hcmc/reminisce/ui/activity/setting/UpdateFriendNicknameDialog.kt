@@ -3,7 +3,6 @@ package studio.hcmc.reminisce.ui.activity.setting
 import android.app.Activity
 import android.view.LayoutInflater
 import androidx.core.widget.addTextChangedListener
-import com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
 import studio.hcmc.reminisce.databinding.DialogUpdateFriendNicknameBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 import studio.hcmc.reminisce.util.string
@@ -19,11 +18,7 @@ class UpdateFriendNicknameDialog(
     init {
         val viewBinding = DialogUpdateFriendNicknameBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-
         val inputField = viewBinding.dialogUpdateFriendNicknameField
-        inputField.placeholderText = "original friend nickname"
-        inputField.helperText = "friend email"
-        inputField.endIconMode = END_ICON_CLEAR_TEXT
 
         dialog.show()
 

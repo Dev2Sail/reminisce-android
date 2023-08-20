@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/appbar_height"
-    android:background="@color/md_theme_light_surface"
     android:minHeight="@dimen/appbar_height">
 
     <ImageView
@@ -12,9 +11,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_regular"
         android:src="@drawable/round_arrow_back_ios_new_24"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/appbar_title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/appbar_title" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/appbar_title"
@@ -58,7 +57,6 @@
             android:text="저장"
             android:textSize="@dimen/label_large" />
     </FrameLayout>
-    <!-- appbar의 액션 버튼들 -> 하단 플로팅 버튼 (edit) -->
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!-- action icon or text는 코드상으로 삽입 -->
+<!-- android:background="@color/md_theme_light_surface" -->

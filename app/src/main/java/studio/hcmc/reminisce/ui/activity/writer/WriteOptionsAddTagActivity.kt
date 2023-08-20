@@ -22,7 +22,7 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         val appBar = viewBinding.writeOptionsAddTagAppbar
-        appBar.appbarTitle.text = "해시태그 추가"
+        appBar.appbarTitle.text = getText(R.string.write_options_add_tag_title)
         appBar.appbarActionButton1.isEnabled = false
         appBar.appbarBack.setOnClickListener {
             finish()

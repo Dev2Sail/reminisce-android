@@ -22,11 +22,11 @@
         android:layout_marginEnd="@dimen/margin_2xlarge"
         app:boxStrokeColor="@color/md_theme_light_primary"
         app:endIconMode="clear_text"
-        app:helperText="내 이메일 : dev2sail@google.com"
+        app:helperText="@string/add_friend_helper_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_friend_appbar"
-        app:placeholderText="@string/home_header">
+        app:placeholderText="@string/add_friend_placeholder_text">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"

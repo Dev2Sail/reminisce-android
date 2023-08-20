@@ -19,7 +19,7 @@ class FriendSettingActivity : AppCompatActivity() {
         viewBinding = ActivitySettingFriendBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.settingFriendAppbar.appbarTitle.setText(R.string.setting_friend)
+        viewBinding.settingFriendAppbar.appbarTitle.text = getText(R.string.setting_friend)
         viewBinding.settingFriendAppbar.appbarActionButton1.isVisible = false
         viewBinding.settingFriendAppbar.appbarBack.setOnClickListener { finish() }
 

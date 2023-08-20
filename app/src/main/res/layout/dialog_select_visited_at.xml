@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
-        android:text="Dialog Title"
+        android:text="@string/dialog_select_visited_at_title"
         android:textSize="@dimen/headline_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,10 +32,10 @@
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginEnd="@dimen/margin_2xlarge"
         app:boxStrokeColor="@color/md_theme_light_primary"
+        app:endIconMode="clear_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_select_visited_at_title"
-        app:placeholderText="@string/home_header">
+        app:layout_constraintTop_toBottomOf="@id/dialog_select_visited_at_title">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -54,7 +54,7 @@
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginBottom="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
-        android:text="취소"
+        android:text="@string/dialog_cancel"
         android:textColor="@color/md_theme_light_error"
         android:textSize="@dimen/label_large"
         app:layout_constraintEnd_toStartOf="@id/dialog_select_save"
@@ -68,9 +68,9 @@
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginEnd="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_large"
-        android:fontFamily="@font/pretendard_medium"
-        android:text="저장"
         android:enabled="false"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="@string/dialog_save"
         android:textSize="@dimen/label_large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

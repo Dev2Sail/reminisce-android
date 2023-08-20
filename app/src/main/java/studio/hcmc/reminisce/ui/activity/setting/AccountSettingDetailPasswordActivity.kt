@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySettingAccountDetailPasswordBinding
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
@@ -17,13 +18,12 @@ class AccountSettingDetailPasswordActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         val appBar = viewBinding.settingAccountDetailPasswordAppbar
-        appBar.appbarTitle.text = "비밀번호 설정"
-        appBar.appbarActionButton1.text = "완료"
+        appBar.appbarTitle.text = getText(R.string.setting_account_detail_password_title)
+        appBar.appbarActionButton1.text = getText(R.string.appbar_button_text)
         appBar.appbarActionButton1.isEnabled = false
         appBar.appbarBack.setOnClickListener { finish() }
 
         val inputField = viewBinding.settingAccountDetailPasswordField
-        inputField.placeholderText = "5자 이상 입력해 주세요"
         inputField.editText!!.addTextChangedListener {
             appBar.appbarActionButton1.isEnabled = (inputField.text.isNotEmpty() && inputField.text.length >= 5)
         }

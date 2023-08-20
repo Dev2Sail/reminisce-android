@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityCategoryDetailBinding
 import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
 import studio.hcmc.reminisce.vo.location.LocationVO
@@ -20,7 +21,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
 //        viewBinding.categoryDetailAppbar.appbarTitle.text = intent.getStringExtra("categoryTitle")
-        viewBinding.categoryDetailAppbar.appbarTitle.text = "홈"
+        viewBinding.categoryDetailAppbar.appbarTitle.text = getText(R.string.header_view_holder_title)
         viewBinding.categoryDetailAppbar.appbarActionButton1.isVisible = false
         viewBinding.categoryDetailItems.adapter = CategoryDetailAdapter(summaryDelegate, categoryHeaderDelegate)
 

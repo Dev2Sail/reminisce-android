@@ -9,7 +9,7 @@ class AddFriendDialog(activity: Activity) {
     init {
         val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        viewBinding.dialogHomeCategoryDeleteTitle.text = "친구 추가"
+//        viewBinding.dialogHomeCategoryDeleteTitle.text =
         viewBinding.dialogHomeCategoryDeleteBody.text = "(닉네임)님을 친구로 등록할까요?"
         viewBinding.dialogHomeCategoryDeleteCancel.text = "아니요"
         viewBinding.dialogHomeCategoryDeleteRemove.text = "네"
@@ -25,3 +25,4 @@ class AddFriendDialog(activity: Activity) {
         }
     }
 }
+// dialog 따로 만들거나  getText 방법 찾아보셈

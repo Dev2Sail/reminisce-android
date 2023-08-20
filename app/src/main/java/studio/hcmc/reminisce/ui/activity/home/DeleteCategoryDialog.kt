@@ -10,7 +10,9 @@ class DeleteCategoryDialog(context: Context) {
     init {
         val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(context))
         val dialog = BottomSheetDialog(context, viewBinding)
-        viewBinding.dialogHomeCategoryDeleteTitle.text = "폴더 삭제"
+
+        dialog.show()
+
         viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener {
             dialog.dismiss()
         }
@@ -18,6 +20,5 @@ class DeleteCategoryDialog(context: Context) {
             Toast.makeText(it.context, "폴더가 삭제되었어요.", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-        dialog.show()
     }
 }

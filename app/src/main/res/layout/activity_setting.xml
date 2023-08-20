@@ -30,11 +30,11 @@
         android:id="@+id/setting_account_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_2xlarge"
         android:layout_marginEnd="@dimen/margin_4xlarge"
         android:src="@drawable/round_arrow_forward_ios_24"
+        app:layout_constraintBottom_toBottomOf="@id/setting_account"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/setting_header"
+        app:layout_constraintTop_toTopOf="@id/setting_account"
         app:tint="@color/md_theme_light_primary" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -54,11 +54,11 @@
         android:id="@+id/setting_friend_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_2xlarge"
         android:layout_marginEnd="@dimen/margin_4xlarge"
         android:src="@drawable/round_arrow_forward_ios_24"
+        app:layout_constraintBottom_toBottomOf="@id/setting_friend"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/setting_account"
+        app:layout_constraintTop_toTopOf="@id/setting_friend"
         app:tint="@color/md_theme_light_primary" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -78,10 +78,10 @@
         android:id="@+id/setting_logout_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_2xlarge"
         android:layout_marginEnd="@dimen/margin_4xlarge"
         android:src="@drawable/round_exit_to_app_24"
+        app:layout_constraintBottom_toBottomOf="@id/setting_logout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/setting_friend"
+        app:layout_constraintTop_toTopOf="@id/setting_logout"
         app:tint="@color/md_theme_light_primary" />
 </androidx.constraintlayout.widget.ConstraintLayout>
