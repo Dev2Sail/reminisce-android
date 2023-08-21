@@ -12,6 +12,7 @@
     <string name="greeting_sign_up">회원가입</string>
     <string name="greeting_sign_in">이미 계정이 있으신가요?</string>
 
+    <string name="sign_up_password">비밀번호(5자 이상 입력해 주세요)</string>
     <string name="sign_in_reset_password">비밀번호 찾기</string>
     <string name="sign_in_auto_login">자동 로그인</string>
     <string name="sign_in_login">로그인</string>

@@ -73,7 +73,7 @@
         app:layout_constraintTop_toBottomOf="@id/sign_in_password" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/sign_in_next_btn"
+        android:id="@+id/sign_in_next"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"

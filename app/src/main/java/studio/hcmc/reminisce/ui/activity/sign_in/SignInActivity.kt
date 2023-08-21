@@ -1,6 +1,5 @@
 package studio.hcmc.reminisce.ui.activity.sign_in
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
@@ -8,7 +7,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySignInBinding
-import studio.hcmc.reminisce.ui.activity.home.HomeActivity
+import studio.hcmc.reminisce.util.string
 
 class SignInActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySignInBinding
@@ -30,20 +29,21 @@ class SignInActivity : AppCompatActivity() {
         viewBinding.signInPassword.editText!!.addTextChangedListener {
             setNextEnabledState()
         }
+        viewBinding.signInNext.setOnClickListener {
 
 
-        viewBinding.signInNextBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+
+//            val intent = Intent(this, HomeActivity::class.java)
+//            startActivity(intent)
         }
 
     }
 
     private fun setNextEnabledState() {
-        val inputtedEmail = viewBinding.signInEmail.editText!!.text.toString()
+        val inputtedEmail = viewBinding.signInEmail.string
         val checkedState = Patterns.EMAIL_ADDRESS.matcher(inputtedEmail).matches()
-        val inputtedPassword = viewBinding.signInPassword.editText!!.text.toString()
-        viewBinding.signInNextBtn.isEnabled = checkedState && inputtedPassword.isNotEmpty()
+        val inputtedPassword = viewBinding.signInPassword.string
+        viewBinding.signInNext.isEnabled = checkedState && (inputtedPassword.isNotEmpty() && inputtedPassword.length >= 5)
     }
 
 }
