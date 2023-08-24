@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-        android:id="@+id/dialog_home_category_delete_handle"
+        android:id="@+id/dialog_sign_in_error_handle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -13,46 +13,34 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/dialog_home_category_delete_title"
+        android:id="@+id/dialog_sign_in_error_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
-        android:text="@string/dialog_delete_home_category_title"
+        android:text="@string/dialog_sign_in_error_title"
         android:textSize="@dimen/headline_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_home_category_delete_handle" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_sign_in_error_handle" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/dialog_home_category_delete_body"
+        android:id="@+id/dialog_sign_in_error_body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_2xlarge"
         android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginBottom="@dimen/margin_regular"
         android:fontFamily="@font/pretendard_regular"
-        android:text="@string/dialog_delete_home_category_body"
+        android:text="@string/dialog_sign_in_error_body"
         android:textColor="@color/md_theme_light_onSurfaceVariant"
         android:textSize="@dimen/body_medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_home_category_delete_title" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_sign_in_error_title" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialog_home_category_delete_cancel"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_regular"
-        android:layout_marginBottom="@dimen/margin_large"
-        android:fontFamily="@font/pretendard_medium"
-        android:text="@string/dialog_cancel"
-        android:textSize="@dimen/label_large"
-        app:layout_constraintEnd_toStartOf="@id/dialog_home_category_delete_remove"
-        app:layout_constraintTop_toBottomOf="@id/dialog_home_category_delete_body" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialog_home_category_delete_remove"
+        android:id="@+id/dialog_sign_in_error_ok"
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -60,10 +48,9 @@
         android:layout_marginEnd="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
-        android:text="@string/dialog_remove"
-        android:textColor="@color/md_theme_light_error"
+        android:text="@string/dialog_ok"
         android:textSize="@dimen/label_large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_home_category_delete_body" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_sign_in_error_body" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,28 +15,45 @@ import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
 
 object FriendIO {
     suspend fun post(userId: Int, dto: FriendDTO.Post) {
-        httpClient.post("/user/${userId}/friend") {
-            setBody(Gson().toJsonTree(dto))
-        }.bodyAsText()
+        httpClient
+            .post("/user/${userId}/friend") {
+                setBody(Gson().toJsonTree(dto))
+            }.bodyAsText()
     }
 
     suspend fun put(userId: Int, opponentId: Int, dto: FriendDTO.Put) {
-        httpClient.put("/user/${userId}/friend/${opponentId}") {
-            setBody(Gson().toJsonTree(dto))
-        }.bodyAsText()
+        httpClient
+            .put("/user/${userId}/friend/${opponentId}") {
+                setBody(Gson().toJsonTree(dto))
+            }.bodyAsText()
     }
 
     suspend fun delete(userId: Int, opponentId: Int) {
-        httpClient.delete("/user/${userId}/friend/${opponentId}").bodyAsText()
+        httpClient
+            .delete("/user/${userId}/friend/${opponentId}")
+            .bodyAsText()
     }
 
     suspend fun listByUserId(userId: Int): List<FriendVO> {
-        return httpClient.get("/user/${userId}/friend/list/all").body()
+        return httpClient
+            .get("/user/${userId}/friend/list/all")
+            .body()
     }
 
+    suspend fun listOpponentIdByUserId(userId: Int): List<FriendVO> {
+        return httpClient
+            .get("/location/friend/list/all") { parameter("userId", userId) }
+            .body()
+    }
+
+
+    /**
+     * locationFriend의 opponentId를 찾고, 해당 opponentId로
+     */
     suspend fun mostAddedOpponentIdByUserId(userId: Int): List<LocationFriendVO> {
-        return httpClient.get("/location/friend/list") {
-            parameter("userId", userId)
-        }.body()
+        return httpClient
+            .get("/location/friend/list") {
+                parameter("userId", userId)
+            }.body()
     }
 }

@@ -1,30 +1,21 @@
-package studio.hcmc.reminisce.ui.activity.sign_up
+package studio.hcmc.reminisce.ui.activity.sign_in
 
 import android.app.Activity
 import android.view.LayoutInflater
-import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.DialogSignInErrorBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
-class SignUpErrorDialog(
-    activity: Activity,
-    delegate: Delegate
+class SignInErrorDialog(
+    activity: Activity
 ) {
-    interface Delegate {
-        fun onDoneClick()
-    }
     init {
         val viewBinding = DialogSignInErrorBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-
-        viewBinding.dialogSignInErrorTitle.text = activity.getText(R.string.dialog_sign_up_error_title)
-        viewBinding.dialogSignInErrorBody.text = activity.getText(R.string.dialog_sign_up_error_body)
 
         dialog.show()
 
         viewBinding.dialogSignInErrorOk.setOnClickListener {
             dialog.dismiss()
-            delegate.onDoneClick()
         }
     }
 }

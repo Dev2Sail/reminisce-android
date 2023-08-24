@@ -5,16 +5,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.databinding.CardHomeTagFriendBinding
 import studio.hcmc.reminisce.databinding.ChipTagBinding
-import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
+import studio.hcmc.reminisce.vo.friend.FriendVO
+import studio.hcmc.reminisce.vo.user.UserVO
 
 class FriendTagViewHolder(
     private val viewBinding: CardHomeTagFriendBinding,
     private val delegate: Delegate
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
-        val friendTags: List<LocationFriendVO>
+        val friends: List<FriendVO>
 
-        fun onTagClick(friendTag: LocationFriendVO)
+        fun getUser(userId: Int): UserVO
+
+        fun onTagClick(friendTag: FriendVO)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -24,25 +27,15 @@ class FriendTagViewHolder(
 
     fun bind() {
         viewBinding.homePersonTagChipGroup.removeAllViews()
-//        for (personTag in delegate.friendTags) {
-//            viewBinding.homePersonTagChipGroup.addView(ChipConfig(viewBinding.root.context) {
-//
-//                text = "${personTag.opponentId}"
-//                isCheckable = false
-//                setOnClickListener {
-//                    delegate.onTagClick(personTag)
-//                }
-//            })
-//        }
-        for (friendTag in delegate.friendTags) {
+        for (friend in delegate.friends) {
             viewBinding.homePersonTagChipGroup.addView(LayoutInflater.from(viewBinding.root.context)
                 .let { ChipTagBinding.inflate(it, viewBinding.homePersonTagChipGroup, false) }
                 .root
                 .apply {
-                    text = "${friendTag.opponentId}"
+                    text = friend.nickname ?: delegate.getUser(friend.opponentId).nickname
                     isCheckable = false
                     isSelected = true
-                    setOnClickListener { delegate.onTagClick(friendTag) }
+                    setOnClickListener { delegate.onTagClick(friend) }
                 }
             )
         }

@@ -32,6 +32,8 @@
     <string name="folder_detail_category">Category Name</string>
     <string name="basic_category_item">인천광역시</string>
 
+    <string name="category_view_holder_title">한눈에 보기</string>
+
 
     <string name="writer_options_category">폴더</string>
     <string name="write_options_add_tag_title">해시태그 추가</string>
@@ -59,7 +61,16 @@
     <string name="friend_setting_activity_appbar_title">친구 목록</string>
 
 
+    <string name="dialog_sign_in_error_title">로그인 오류</string>
+    <string name="dialog_sign_in_error_body">로그인 정보를 확인해 주세요.</string>
 
+    <string name="dialog_sign_up_message_title">회원가입 성공</string>
+    <string name="dialog_sign_up_message_body">회원가입에 성공했어요! \n오늘부터 함께 추억을 쌓아 볼까요?</string>
+
+    <string name="dialog_sign_up_error_title">회원가입 실패</string>
+    <string name="dialog_sign_up_error_body">이미 가입된 이메일이에요.</string>
+
+    <string name="dialog_ok">확인</string>
     <string name="dialog_cancel">취소</string>
     <string name="dialog_remove">삭제</string>
     <string name="dialog_save">저장</string>
@@ -95,5 +106,6 @@
     <string name="card_category_detail_header_placeholder_text">original category name</string>
 
     <string name="header_view_holder_title">홈</string>
+    <string name="header_view_holder_action">추가</string>
     <string name="add_category_title">새로운 폴더</string>
 </resources>

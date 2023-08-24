@@ -1,12 +1,22 @@
 package studio.hcmc.reminisce.ui.activity.sign_in
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySignInBinding
+import studio.hcmc.reminisce.io.data_store.UserAuthVO
+import studio.hcmc.reminisce.io.ktor_client.UserIO
+import studio.hcmc.reminisce.ui.activity.home.HomeActivity
+import studio.hcmc.reminisce.ui.activity.launcher.LauncherActivity
 import studio.hcmc.reminisce.util.string
 
 class SignInActivity : AppCompatActivity() {
@@ -21,8 +31,17 @@ class SignInActivity : AppCompatActivity() {
         viewBinding.signInAppbar.appbarActionButton1.isVisible = false
 
         viewBinding.signInAppbar.appbarBack.setOnClickListener {
-            finish()
+            Intent(this, LauncherActivity::class.java).apply {
+                startActivity(this)
+            }
         }
+
+        viewBinding.signInGoHome.setOnClickListener {
+            Intent(this, HomeActivity::class.java).apply {
+                startActivity(this)
+            }
+        }
+
         viewBinding.signInEmail.editText!!.addTextChangedListener {
             setNextEnabledState()
         }
@@ -30,13 +49,20 @@ class SignInActivity : AppCompatActivity() {
             setNextEnabledState()
         }
         viewBinding.signInNext.setOnClickListener {
+            val email = viewBinding.signInEmail.string
+            val plainPassword = viewBinding.signInPassword.string
 
-
-
-//            val intent = Intent(this, HomeActivity::class.java)
-//            startActivity(intent)
+            CoroutineScope(Dispatchers.IO).launch {
+                runCatching { UserIO.login(UserAuthVO(email, plainPassword)) }
+                    .onSuccess {
+                        UserAuthVO(email, plainPassword).save(this@SignInActivity)
+                        Intent(this@SignInActivity, HomeActivity::class.java).apply {
+                            startActivity(this)
+                        }
+                    }
+                 .onFailure { onSignInError() }
+            }
         }
-
     }
 
     private fun setNextEnabledState() {
@@ -46,4 +72,11 @@ class SignInActivity : AppCompatActivity() {
         viewBinding.signInNext.isEnabled = checkedState && (inputtedPassword.isNotEmpty() && inputtedPassword.length >= 5)
     }
 
+    private fun onSignInError() = CoroutineScope(Dispatchers.Main).launch {
+        SignInErrorDialog(this@SignInActivity)
+    }
+
+    private fun exceptionHandler(): CoroutineExceptionHandler = CoroutineExceptionHandler {_, exception ->
+        Log.v("handle", "exception handled: $exception")
+    }
 }

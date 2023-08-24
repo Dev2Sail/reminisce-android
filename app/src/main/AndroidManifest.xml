@@ -43,7 +43,7 @@
             android:name=".ui.activity.writer.WriteActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.category.AddCategoryDetailActivity"
+            android:name=".ui.activity.home.AddCategoryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.category.CategoryDetailActivity"

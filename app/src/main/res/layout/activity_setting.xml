@@ -62,7 +62,7 @@
         app:tint="@color/md_theme_light_primary" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/setting_logout"
+        android:id="@+id/setting_sign_out"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_4xlarge"
@@ -70,18 +70,18 @@
         android:fontFamily="@font/pretendard_medium"
         android:text="@string/setting_logout"
         android:textSize="@dimen/title_medium"
-        app:layout_constraintEnd_toStartOf="@id/setting_logout_icon"
+        app:layout_constraintEnd_toStartOf="@id/setting_sign_out_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setting_friend" />
 
     <ImageView
-        android:id="@+id/setting_logout_icon"
+        android:id="@+id/setting_sign_out_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_4xlarge"
         android:src="@drawable/round_exit_to_app_24"
-        app:layout_constraintBottom_toBottomOf="@id/setting_logout"
+        app:layout_constraintBottom_toBottomOf="@id/setting_sign_out"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/setting_logout"
+        app:layout_constraintTop_toTopOf="@id/setting_sign_out"
         app:tint="@color/md_theme_light_primary" />
 </androidx.constraintlayout.widget.ConstraintLayout>

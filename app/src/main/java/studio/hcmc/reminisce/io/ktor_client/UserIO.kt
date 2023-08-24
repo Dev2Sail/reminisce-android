@@ -9,43 +9,51 @@ import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import studio.hcmc.kotlin.crypto.sha512
 import studio.hcmc.reminisce.dto.user.UserDTO
+import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
 object UserIO {
-    suspend fun signUp(dto: UserDTO.Post): Int {
-        return httpClient
-            .post("/user") {
-                setBody(Gson().toJsonTree(dto))
-            }.body()
+    suspend fun signUp(dto: UserDTO.Post) {
+        httpClient
+            .post("/user") { setBody(Gson().toJsonTree(dto)) }
+            .bodyAsText()
     }
 
-    suspend fun login(dto: UserDTO.Post): UserVO {
-        return httpClient
-            .post("/login") {
-            setBody(Gson().toJsonTree(dto))
-        }.body()
+    suspend fun login(dto: UserAuthVO): UserVO {
+        val loginDto = UserDTO.Post().apply {
+            email = dto.email
+            password = dto.password.sha512
+        }
+        val user = httpClient
+            .post("/user/signIn") { setBody(Gson().toJsonTree(loginDto)) }
+            .body<UserVO>()
+
+        return user
     }
 
     suspend fun patch(id: Int, dto: UserDTO.Patch) {
-        httpClient.patch("/user/${id}") {
-            setBody(Gson().toJsonTree(dto))
-        }.bodyAsText()
+        httpClient
+            .patch("/user/${id}") { setBody(Gson().toJsonTree(dto)) }
+            .bodyAsText()
     }
 
     suspend fun delete(id: Int) {
-        httpClient.delete("/user/${id}").bodyAsText()
+        httpClient
+            .delete("/user/${id}")
+            .bodyAsText()
     }
 
     suspend fun getById(id: Int): UserVO {
-        return httpClient.get("/user") {
-            parameter("id", id)
-        }.body()
+        return httpClient
+            .get("/user") { parameter("id", id) }
+            .body()
     }
 
     suspend fun getByEmail(email: String): UserVO {
-        return httpClient.get("/user") {
-            parameter("email", email)
-        }.body()
+        return httpClient
+            .get("/user") { parameter("email", email) }
+            .body()
     }
 }

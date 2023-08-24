@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,9 +13,10 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySignUpBinding
 import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
-import studio.hcmc.reminisce.ui.activity.launcher.LauncherActivity
+import studio.hcmc.reminisce.ui.activity.home.HomeActivity
 import studio.hcmc.reminisce.ui.activity.sign_in.SignInActivity
 import studio.hcmc.reminisce.util.string
+import studio.hcmc.reminisce.util.text
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySignUpBinding
@@ -44,25 +44,33 @@ class SignUpActivity : AppCompatActivity() {
             setNextEnabledState()
         }
         viewBinding.signUpNext.setOnClickListener {
-            val dto = UserDTO.Post().apply {
+            val signUpDTO = UserDTO.Post().apply {
                 email = viewBinding.signUpEmail.string
                 password = viewBinding.signUpPassword.string.sha512
                 nickname = viewBinding.signUpNickname.string
             }
 
+            // getByEmail 성공하면 (동일한 이메일이 등록돼있지 않다면) signUp 진행
+//            CoroutineScope(Dispatchers.IO).launch {
+//                runCatching { UserIO.signUp(dto) }
+//                    .onSuccess {
+//                        Intent(this@SignUpActivity, LauncherActivity::class.java).apply {
+//                            startActivity(this)
+//                        }
+//                    }
+//                    .onFailure { onFailureDialog() }
+//            }
+
             CoroutineScope(Dispatchers.IO).launch {
-                runCatching { UserIO.signUp(dto) }
-                    .onSuccess {
-                        Intent(viewBinding.root.context, LauncherActivity::class.java).apply {
-                            startActivity(this)
-                        }
+                runCatching { UserIO.getByEmail(signUpDTO.email) }
+                    .onSuccess { onSignUpError() }
+                    .onFailure {
+                        UserIO.signUp(signUpDTO)
+                        onSignUpMessage()
                     }
-                    .onFailure { onFailureDialog() }
             }
-
-            // email 중복 검사
-
         }
+
     }
 
     private fun setNextEnabledState() {
@@ -75,11 +83,27 @@ class SignUpActivity : AppCompatActivity() {
                 (inputtedNickname.isNotEmpty() && inputtedNickname.length <= 20)
     }
 
-    private fun onFailureDialog() = CoroutineScope(Dispatchers.Main).launch {
-        MaterialAlertDialogBuilder(this@SignUpActivity)
-            .setTitle("Failure")
-            .setMessage("회원가입 재실행")
-            .setPositiveButton("메롱") { _, _ -> }
-            .show()
+    private val signUpMessageDelegate = object : SignUpMessageDialog.Delegate {
+        override fun onDoneClick() {
+            Intent(this@SignUpActivity, HomeActivity::class.java).apply {
+                startActivity(this)
+            }
+        }
+    }
+
+    private val signUpErrorDelegate = object : SignUpErrorDialog.Delegate {
+        override fun onDoneClick() {
+            viewBinding.signUpEmail.text.clear()
+            viewBinding.signUpPassword.text.clear()
+            viewBinding.signUpNickname.text.clear()
+        }
+    }
+
+    private fun onSignUpMessage() = CoroutineScope(Dispatchers.IO).launch {
+        SignUpMessageDialog(this@SignUpActivity, signUpMessageDelegate)
+    }
+
+    private fun onSignUpError() = CoroutineScope(Dispatchers.IO).launch {
+        SignUpErrorDialog(this@SignUpActivity, signUpErrorDelegate)
     }
 }
