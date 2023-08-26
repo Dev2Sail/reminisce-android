@@ -3,30 +3,31 @@ package studio.hcmc.reminisce.ui.activity.category
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import studio.hcmc.reminisce.databinding.CardCommonHeaderBinding
+import studio.hcmc.reminisce.R
+import studio.hcmc.reminisce.databinding.CardCategoryDetailHeaderBinding
 
 class CategoryDetailHeaderViewHolder (
-    private val viewBinding: CardCommonHeaderBinding,
+    private val viewBinding: CardCategoryDetailHeaderBinding,
     private val delegate: Delegate
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
+        val title: String
         fun onClick()
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
-        viewBinding = CardCommonHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+        viewBinding = CardCategoryDetailHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         delegate = delegate
     )
 
     fun bind() {
-        viewBinding.commonHeaderTitle.text = "Editable Category"
+        if (delegate.title == "Default") {
+            viewBinding.cardCategoryDetailHeaderTitle.text = viewBinding.root.context.getText(R.string.category_view_holder_title)
+        } else {
+            viewBinding.cardCategoryDetailHeaderTitle.text = delegate.title
+        }
 
-
-//        viewBinding.commonHeaderTitle.text =
-//            intent.getStringExtra("categoryTitle")
-        viewBinding.commonHeaderAction1.text = "편집"
-
-        viewBinding.commonHeaderAction1.setOnClickListener {
+        viewBinding.cardCategoryDetailHeaderAction1.setOnClickListener {
             delegate.onClick()
         }
     }

@@ -51,6 +51,7 @@
     <string name="setting_account_detail_nickname_title">닉네임 설정</string>
     <string name="setting_account_detail_password_title">비밀번호 설정</string>
     <string name="setting_account_detail_password_placeholder_text">5자 이상 입력해 주세요.</string>
+    <string name="setting_account_service_withdraw">서비스 탈퇴하기</string>
 
 
     <string name="setting_friend">친구 관리</string>
@@ -74,6 +75,7 @@
     <string name="dialog_cancel">취소</string>
     <string name="dialog_remove">삭제</string>
     <string name="dialog_save">저장</string>
+    <string name="dialog_add">추가</string>
     <string name="dialog_withdraw">탈퇴</string>
 
     <string name="dialog_add_friend_title">친구 추가</string>
@@ -84,6 +86,11 @@
 
     <string name="dialog_delete_friend_title">친구 삭제</string>
     <string name="dialog_delete_friend_body">친구를 삭제하시겠어요? \n태그된 모든 추억에서도 함께 지워져요.</string>
+
+    <string name="dialog_stop_writing_title">그만 작성하기</string>
+    <string name="dialog_stop_writing_body">지금 작성하던 내용은 저장되지 않아요.</string>
+    <string name="dialog_stop_writing_ok">네</string>
+    <string name="dialog_stop_writing_cancel">아니요</string>
 
     <string name="dialog_select_category_title">폴더 선택</string>
     <string name="dialog_select_emoji_title">이모지 추가</string>
@@ -98,6 +105,9 @@
     <string name="dialog_withdraw_body">오늘추억을 탈퇴하시겠어요?\n\n- 기록된 모든 추억은 복구할 수 없어요.\n- 해당 이메일로 재가입이 어려워요.</string>
     <string name="dialog_withdraw_ok">탈퇴</string>
 
+    <string name="dialog_error_common_title">오류 발생</string>
+    <string name="dialog_error_common_body">오류가 발생했어요. 앱을 재실행 해주세요.</string>
+
     <string name="card_category_item_body">100</string>
     <string name="card_category_item_title">Category Name</string>
     <string name="card_home_tag_city_title">어디에서</string>
@@ -108,4 +118,5 @@
     <string name="header_view_holder_title">홈</string>
     <string name="header_view_holder_action">추가</string>
     <string name="add_category_title">새로운 폴더</string>
+    <string name="header_action">편집</string>
 </resources>

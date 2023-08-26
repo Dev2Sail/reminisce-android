@@ -2,17 +2,27 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySettingFriendBinding
 import studio.hcmc.reminisce.databinding.LayoutSettingFriendItemBinding
+import studio.hcmc.reminisce.ext.user.UserExtension
+import studio.hcmc.reminisce.io.ktor_client.FriendIO
+import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.vo.friend.FriendVO
+import studio.hcmc.reminisce.vo.user.UserVO
+import kotlin.collections.set
 
 class FriendSettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingFriendBinding
-    private val friendList = ArrayList<FriendVO>()
+//    private val friends = ArrayList<FriendVO>()
+    private lateinit var friends: List<FriendVO>
+    private val users = HashMap<Int /* userId*/, UserVO>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,60 +32,59 @@ class FriendSettingActivity : AppCompatActivity() {
         viewBinding.settingFriendAppbar.appbarTitle.text = getText(R.string.setting_friend)
         viewBinding.settingFriendAppbar.appbarActionButton1.isVisible = false
         viewBinding.settingFriendAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.settingFriendAdd.setOnClickListener { launchSearchFriend() }
+        viewBinding.settingFriendItems.removeAllViews()
 
-        viewBinding.settingFriendAdd.setOnClickListener {
-            Intent(this, AddFriendActivity::class.java).apply {
-                startActivity(this)
-            }
-        }
-
+        prepareFriends()
     }
 
-    private fun addFriend(value: String) {
-        val item = LayoutSettingFriendItemBinding.inflate(layoutInflater)
-        item.settingFriendItem.text = value
-        item.settingFriendItemIcon.setOnClickListener {
-            UpdateFriendNicknameDialog(this, updateFriendNicknameDelegate)
+    private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@FriendSettingActivity)
+        val userId = UserIO.getByEmail(user.email).id
+        runCatching { FriendIO.listByUserId(userId) }
+            .onSuccess {
+                friends = it
 
+                for (friend in friends) {
+                    if (friend.nickname == null) {
+                        val opponent = UserIO.getById(friend.opponentId)
+                        users[opponent.id] = opponent
+                    }
+                    withContext(Dispatchers.Main) { addFriendView(friend)}
+                }
+            }
+            .onFailure {
+                it.cause
+                it.message
+                it.stackTrace
+            }
+    }
+
+    private fun getFriend(userId: Int): UserVO { return users[userId]!! }
+
+    private fun addFriendView(friend: FriendVO) {
+        val cardView = LayoutSettingFriendItemBinding.inflate(layoutInflater)
+        cardView.settingFriendTitle.text = friend.nickname ?: getFriend(friend.opponentId).nickname
+        cardView.settingFriendItemIcon.setOnClickListener {
+            UpdateFriendNicknameDialog(
+                this,
+                this,
+                friend,
+                getFriend(friend.opponentId).nickname,
+                getFriend(friend.opponentId).email
+            )
         }
-        item.settingFriendItem.setOnLongClickListener {
-            DeleteFriendDialog(this, deleteFriendDelegate)
+        cardView.root.setOnLongClickListener {
+            DeleteFriendDialog(this, friend.opponentId)
 
             false
         }
+        viewBinding.settingFriendItems.addView(cardView.root)
     }
 
-    private val deleteFriendDelegate = object : DeleteFriendDialog.Delegate {
-        // onDoneClick()시 settingFriendItemsContainer
-        override fun onDoneClick() {
-
-            Toast.makeText(viewBinding.root.context, "친구가 삭제되었어요.", Toast.LENGTH_SHORT).show()
-
+    private fun launchSearchFriend() {
+        Intent(this, AddFriendActivity::class.java).apply {
+            startActivity(this)
         }
     }
-
-    private val updateFriendNicknameDelegate = object : UpdateFriendNicknameDialog.Delegate {
-        override fun onSaveClick(nickname: String) {
-            viewBinding.settingFriendItemsContainer.let {
-                LayoutSettingFriendItemBinding.inflate(layoutInflater, viewBinding.settingFriendItemsContainer, false) }
-                .settingFriendItem.text = nickname
-        }
-    }
-
-
 }
-
-/*
-for (tag in delegate.tags) {
-            viewBinding.homeTagChips.addView(LayoutInflater.from(viewBinding.root.context)
-                .let { ChipTagBinding.inflate(it, viewBinding.homeTagChips, false) }
-                .root
-                .apply {
-                    text = tag.body
-                    isCheckable = false
-                    isSelected = true
-                    setOnClickListener { delegate.onTagClick(tag) }
-                }
-            )
-        }
- */

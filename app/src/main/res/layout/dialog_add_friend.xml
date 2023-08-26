@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-        android:id="@+id/dialog_update_friend_nickname_handle"
+        android:id="@+id/dialog_add_friend_handle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -13,44 +13,33 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/dialog_update_friend_nickname_title"
+        android:id="@+id/dialog_add_friend_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
-        android:text="@string/dialog_update_friend_nickname"
+        android:text="@string/dialog_add_friend_title"
         android:textSize="@dimen/headline_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_update_friend_nickname_handle" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_add_friend_handle" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/dialog_update_friend_nickname_field"
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_add_friend_body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_2xlarge"
         android:layout_marginTop="@dimen/margin_regular"
-        app:boxStrokeColor="@color/md_theme_light_primary"
-        app:counterEnabled="true"
-        app:counterMaxLength="20"
-        app:endIconMode="clear_text"
-        app:helperText="@string/dialog_update_friend_nickname_helper_text"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="@string/dialog_add_friend_body"
+        android:textColor="@color/md_theme_light_onSurfaceVariant"
+        android:textSize="@dimen/body_medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_update_friend_nickname_title"
-        app:placeholderText="@string/dialog_update_friend_nickname_placeholder_text">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/pretendard_medium"
-            android:inputType="text"
-            android:maxLines="1"
-            android:textSize="@dimen/body_large" />
-    </com.google.android.material.textfield.TextInputLayout>
+        app:layout_constraintTop_toBottomOf="@id/dialog_add_friend_title" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialog_update_friend_nickname_cancel"
+        android:id="@+id/dialog_add_friend_cancel"
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -60,22 +49,21 @@
         android:text="@string/dialog_cancel"
         android:textColor="@color/md_theme_light_error"
         android:textSize="@dimen/label_large"
-        app:layout_constraintEnd_toStartOf="@id/dialog_update_friend_nickname_save"
-        app:layout_constraintTop_toBottomOf="@id/dialog_update_friend_nickname_field" />
+        app:layout_constraintEnd_toStartOf="@id/dialog_add_friend_add"
+        app:layout_constraintTop_toBottomOf="@id/dialog_add_friend_body" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialog_update_friend_nickname_save"
+        android:id="@+id/dialog_add_friend_add"
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginEnd="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_large"
-        android:enabled="false"
         android:fontFamily="@font/pretendard_medium"
-        android:text="@string/dialog_save"
+        android:text="@string/dialog_add"
         android:textSize="@dimen/label_large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_update_friend_nickname_field" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_add_friend_body" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.R
-import studio.hcmc.reminisce.databinding.ActivityAddCategoryBinding
+import studio.hcmc.reminisce.databinding.ActivityCategoryAddBinding
 import studio.hcmc.reminisce.dto.category.CategoryDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
@@ -16,11 +16,11 @@ import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
 class AddCategoryActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityAddCategoryBinding
+    private lateinit var viewBinding: ActivityCategoryAddBinding
     // TODO CREATE ERROR DIALOG
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityAddCategoryBinding.inflate(layoutInflater)
+        viewBinding = ActivityCategoryAddBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
         val appBar = viewBinding.addCategoryAppbar

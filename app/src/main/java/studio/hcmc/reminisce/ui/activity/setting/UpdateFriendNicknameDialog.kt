@@ -1,39 +1,69 @@
 package studio.hcmc.reminisce.ui.activity.setting
 
 import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import androidx.core.widget.addTextChangedListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.databinding.DialogUpdateFriendNicknameBinding
+import studio.hcmc.reminisce.dto.friend.FriendDTO
+import studio.hcmc.reminisce.ext.user.UserExtension
+import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 import studio.hcmc.reminisce.util.string
+import studio.hcmc.reminisce.vo.friend.FriendVO
 
 class UpdateFriendNicknameDialog(
     activity: Activity,
-    delegate: Delegate
+    context: Context,
+    friend: FriendVO,
+//    opponentId: Int,
+//    nicknameByUser: String,
+    opponentNickname: String,
+    opponentEmail: String
 ) {
-    interface Delegate {
-        fun onSaveClick(nickname: String)
-    }
-
+    private val responseContext = context
     init {
         val viewBinding = DialogUpdateFriendNicknameBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
         val inputField = viewBinding.dialogUpdateFriendNicknameField
+        // TODO friend.nickname이 존재하는 경우에만 NullPointerException 발생
+//        inputField.hint = nicknameByUser
+        inputField.hint = friend.nickname ?: ""
+        inputField.helperText = opponentEmail
+        inputField.placeholderText = opponentNickname
 
         dialog.show()
 
         inputField.editText!!.addTextChangedListener {
-            viewBinding.dialogUpdateFriendNicknameSave.isEnabled = inputField.string.isNotEmpty()
+            viewBinding.dialogUpdateFriendNicknameSave.isEnabled = inputField.string.isNotEmpty() && inputField.string.length <= 20
         }
         viewBinding.dialogUpdateFriendNicknameSave.setOnClickListener {
-            val inputtedValue = inputField.string
-            if (inputtedValue.length <= 20) {
+            if (inputField.string.length <= 20) {
+                patchFriend(friend.opponentId, inputField.string)
                 dialog.dismiss()
-                delegate.onSaveClick(inputtedValue)
             }
         }
         viewBinding.dialogUpdateFriendNicknameCancel.setOnClickListener {
             dialog.dismiss()
         }
     }
+
+    private fun patchFriend(opponentId: Int, editedNickname: String) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(responseContext)
+        val putDTO = FriendDTO.Put().apply {
+            nickname = editedNickname
+        }
+        runCatching { FriendIO.put(user.id, opponentId, putDTO) }
+            .onFailure {
+                it.cause
+                it.message
+                it.stackTrace
+            }
+    }
 }
+
+// friend.nickname != null -> text = friend.nickname
+// friend.nickname

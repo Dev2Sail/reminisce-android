@@ -48,6 +48,8 @@
         android:id="@+id/write_options_add_tag_new_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/write_options_add_tag_new_header">
@@ -79,6 +81,8 @@
         android:id="@+id/write_options_add_tag_old_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/write_options_add_tag_old_header">

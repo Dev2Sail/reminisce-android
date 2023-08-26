@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
@@ -34,14 +35,17 @@ class HomeActivity : AppCompatActivity() {
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val categoryInfo = HashMap<Int /* categoryId */, Int /* count */>()
 
-    // TODO signIn auto complete
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        // TODO remove fab
+        test()
+
+        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
+    }
+
+    private fun test() {
         viewBinding.homeWriter.setOnClickListener {
             Intent(this, WriteActivity::class.java).apply {
                 startActivity(this)
@@ -52,8 +56,6 @@ class HomeActivity : AppCompatActivity() {
                 startActivity(this)
             }
         }
-
-        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
     }
     private suspend fun fetchContents() = coroutineScope {
         val result = runCatching {
@@ -81,6 +83,9 @@ class HomeActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
             // TODO handle error
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@HomeActivity, "어플을 다시 실행해 주세요.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

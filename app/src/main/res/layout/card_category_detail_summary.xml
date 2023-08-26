@@ -45,30 +45,40 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
+            <include
+                android:id="@+id/card_category_detail_summary_visited_at"
+                layout="@layout/card_category_detail_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_regular"
                 android:layout_marginTop="@dimen/margin_regular"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_category_detail__summary_title" />
+
+            <include
+                android:id="@+id/card_category_detail_summary_address"
+                layout="@layout/card_category_detail_summary_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_regular"
+                android:layout_marginTop="@dimen/margin_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_category_detail_summary_visited_at" />
+
+            <include
+                android:id="@+id/card_category_detail_summary_visit_count"
+                layout="@layout/card_category_detail_summary_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_regular"
+                android:layout_marginTop="@dimen/margin_small"
+                android:layout_marginBottom="@dimen/margin_regular"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_category_detail__summary_title">
-
-                <include
-                    android:id="@+id/card_category_detail_summary_visited_at"
-                    layout="@layout/card_category_detail_summary_item" />
-
-                <include
-                    android:id="@+id/card_category_detail_summary_address"
-                    layout="@layout/card_category_detail_summary_item" />
-
-                <include
-                    android:id="@+id/card_category_detail_summary_visit_count"
-                    layout="@layout/card_category_detail_summary_item" />
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@id/card_category_detail_summary_address" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

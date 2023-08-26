@@ -17,7 +17,6 @@ import studio.hcmc.reminisce.ui.activity.home.HomeActivity
 class LauncherActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityLauncherBinding
 
-    // TODO LOGIN AUTO
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityLauncherBinding.inflate(layoutInflater)

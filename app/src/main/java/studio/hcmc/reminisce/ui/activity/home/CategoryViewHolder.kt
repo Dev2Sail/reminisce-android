@@ -33,10 +33,8 @@ class CategoryViewHolder(
             delegate.onCategoryClick(category)
         }
         viewBinding.root.setOnLongClickListener {
-//            DeleteCategoryDialog(it.context)
             DeleteCategoryDialog(it.context, category.id)
             false
         }
     }
-
 }

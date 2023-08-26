@@ -16,12 +16,23 @@
         app:layout_constraintTop_toTopOf="parent" />
 
    <ScrollView
-       android:id="@+id/setting_friend_items_container"
-       android:layout_width="0dp"
+       android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       app:layout_constraintStart_toStartOf="parent"
+       android:layout_marginTop="@dimen/margin_small"
+       android:clipToPadding="false"
+       android:fillViewport="true"
+       android:paddingBottom="80dp"
+       android:scrollbars="vertical"
        app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
        app:layout_constraintTop_toBottomOf="@id/setting_friend_appbar">
+
+       <LinearLayout
+           android:id="@+id/setting_friend_items"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical">
+       </LinearLayout>
    </ScrollView>
     
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -22,18 +22,16 @@ class DeleteCategoryDialog(
 
         dialog.show()
 
-        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener {
-            dialog.dismiss()
-        }
+        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
-            deleteCategory()
             dialog.dismiss()
+            deleteCategory()
         }
     }
     private fun deleteCategory() = CoroutineScope(Dispatchers.IO).launch {
         runCatching { CategoryIO.delete(selectedCategoryId) }
             .onSuccess {
-                Toast.makeText(viewBinding.root.context, "폴더가 삭제되었어요.", Toast.LENGTH_SHORT).show()
+                onDeleteMessage(viewBinding.root.context)
             }
             .onFailure {
                 it.cause
@@ -42,7 +40,7 @@ class DeleteCategoryDialog(
             }
     }
 
-//    private fun deleteCategoryMessage() = CoroutineScope(Dispatchers.IO).launch {
-//        Toast.makeText(viewBinding.root.context, "폴더가 삭제되었어요", Toast.LENGTH_SHORT).show()
-//    }
+    private fun onDeleteMessage(context: Context) = CoroutineScope(Dispatchers.Main).launch {
+        Toast.makeText(context, "폴더가 삭제되었어요", Toast.LENGTH_SHORT).show()
+    }
 }

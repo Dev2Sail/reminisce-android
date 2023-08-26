@@ -1,10 +1,10 @@
 package studio.hcmc.reminisce.ui.activity.category
 
 import android.widget.Toast
-import studio.hcmc.reminisce.databinding.CardCategoryDetailHeaderBinding
+import studio.hcmc.reminisce.databinding.CardCategoryDetailEditableHeaderBinding
 
 class CategoryDetailEditableHeaderViewHolder (
-    private val viewBinding: CardCategoryDetailHeaderBinding
+    private val viewBinding: CardCategoryDetailEditableHeaderBinding
 ) {
     fun bind() {
         viewBinding.categoryDetailHeaderAction1.text = "완료"

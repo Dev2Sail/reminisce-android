@@ -64,7 +64,6 @@ class SignInActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun setNextEnabledState() {
         val inputtedEmail = viewBinding.signInEmail.string
         val checkedState = Patterns.EMAIL_ADDRESS.matcher(inputtedEmail).matches()

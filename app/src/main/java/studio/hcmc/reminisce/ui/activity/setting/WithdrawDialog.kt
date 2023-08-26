@@ -5,7 +5,13 @@ import android.view.LayoutInflater
 import studio.hcmc.reminisce.databinding.DialogDeleteHomeCategoryBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
-class WithdrawDialog(activity: Activity) {
+class WithdrawDialog(
+    activity: Activity,
+    delegate: Delegate
+) {
+    interface Delegate {
+        fun onDoneClick()
+    }
     init {
         val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
@@ -17,8 +23,7 @@ class WithdrawDialog(activity: Activity) {
         }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
             dialog.dismiss()
-            // launcher로 이동시켜야 함...!
-            activity.finish()
+            delegate.onDoneClick()
         }
     }
 }
