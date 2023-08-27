@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +10,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityHomeBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
@@ -18,45 +18,34 @@ import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
-import studio.hcmc.reminisce.ui.activity.setting.SettingActivity
-import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
+import studio.hcmc.reminisce.ui.view.CommonError
+import studio.hcmc.reminisce.ui.view.Navigation
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
 class HomeActivity : AppCompatActivity() {
-    private lateinit var viewBinding : ActivityHomeBinding
+    private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var categories: List<CategoryVO>
     private lateinit var tags: List<TagVO>
     private lateinit var friends: List<FriendVO>
     private val cityTags = ArrayList<String>()
 
     private val users = HashMap<Int /* UserId */, UserVO>()
-    private val categoryInfo = HashMap<Int /* categoryId */, Int /* count */>()
+//    private val categoryInfo = HashMap<Int /* categoryId */, Int /* count */>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        test()
-
+        val menuId = intent.getIntExtra("selectedMenuId", -1)
+        viewBinding.homeNavView.navItems.selectedItemId = menuId
+        navController()
         CoroutineScope(Dispatchers.IO).launch { fetchContents() }
     }
 
-    private fun test() {
-        viewBinding.homeWriter.setOnClickListener {
-            Intent(this, WriteActivity::class.java).apply {
-                startActivity(this)
-            }
-        }
-        viewBinding.homeSetting.setOnClickListener {
-            Intent(this, SettingActivity::class.java).apply {
-                startActivity(this)
-            }
-        }
-    }
     private suspend fun fetchContents() = coroutineScope {
         val result = runCatching {
             val user = UserExtension.getUser(this@HomeActivity)
@@ -72,11 +61,6 @@ class HomeActivity : AppCompatActivity() {
                     users[opponent.id] = opponent
                 }
             }
-
-//            for (category in categories) {
-//                val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, category.id).toString().toInt()
-//                categoryInfo[category.id] = count
-//            }
         }
 
         if (result.isSuccess) {
@@ -84,7 +68,7 @@ class HomeActivity : AppCompatActivity() {
         } else {
             // TODO handle error
             withContext(Dispatchers.Main) {
-                Toast.makeText(this@HomeActivity, "어플을 다시 실행해 주세요.", Toast.LENGTH_SHORT).show()
+                CommonError.onrDialog(this@HomeActivity)
             }
         }
     }
@@ -92,6 +76,34 @@ class HomeActivity : AppCompatActivity() {
     private fun onContentsReady() {
         viewBinding.homeItems.layoutManager = LinearLayoutManager(this)
         viewBinding.homeItems.adapter = HomeAdapter(headerDelegate, categoryDelegate, personTagDelegate, cityDelegate, tagDelegate)
+    }
+
+    private fun navController() {
+        viewBinding.homeNavView.navItems.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.nav_main_home -> {
+                    true
+                }
+
+                R.id.nav_main_map -> {
+                    true
+                }
+
+                R.id.nav_main_report -> {
+                    startActivity(Navigation.onNextReport(applicationContext, it.itemId))
+                    finish()
+                    true
+                }
+
+                R.id.nav_main_setting -> {
+                    startActivity(Navigation.onNextSetting(applicationContext, it.itemId))
+                    finish()
+                    true
+                }
+
+                else -> false
+            }
+        }
     }
 
     private val headerDelegate = object : HeaderViewHolder.Delegate {
@@ -106,10 +118,6 @@ class HomeActivity : AppCompatActivity() {
     private val categoryDelegate = object : CategoryViewHolder.Delegate {
         override val categories: List<CategoryVO>
             get() = this@HomeActivity.categories
-
-//        override fun getCount(categoryId: Int): Int {
-//            return categoryInfo[categoryId]!!
-//        }
 
         override fun onCategoryClick(category: CategoryVO) {
             Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {

@@ -66,6 +66,8 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/body_small"
+                    android:fontFamily="@font/pretendard_regular"
                     android:background="@color/md_theme_light_surface"
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>

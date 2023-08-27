@@ -4,10 +4,14 @@
 
     <style name="testMessage">Test</style>
 
+    <string name="nav_main_home">홈</string>
+    <string name="nav_main_map">지도</string>
+    <string name="nav_main_report">추억</string>
+    <string name="nav_main_setting">설정</string>
+
     <string name="email"> 이메일</string>
     <string name="password">비밀번호</string>
     <string name="nickname">닉네임</string>
-
 
     <string name="greeting_sign_up">회원가입</string>
     <string name="greeting_sign_in">이미 계정이 있으신가요?</string>
@@ -103,7 +107,6 @@
 
     <string name="dialog_withdraw_title">서비스 탈퇴</string>
     <string name="dialog_withdraw_body">오늘추억을 탈퇴하시겠어요?\n\n- 기록된 모든 추억은 복구할 수 없어요.\n- 해당 이메일로 재가입이 어려워요.</string>
-    <string name="dialog_withdraw_ok">탈퇴</string>
 
     <string name="dialog_error_common_title">오류 발생</string>
     <string name="dialog_error_common_body">오류가 발생했어요. 앱을 재실행 해주세요.</string>
@@ -119,4 +122,15 @@
     <string name="header_view_holder_action">추가</string>
     <string name="add_category_title">새로운 폴더</string>
     <string name="header_action">편집</string>
+
+    <string name="activity_report_title">Report</string>
+
+    <string name="layout_not_found">검색 결과가 없어요.</string>
+
+    <string name="write_visited_at">언제</string>
+    <string name="write_location">어디에서</string>
+    <string name="write_emoji">어떤 추억을</string>
+    <string name="write_friend">누구와</string>
+    <string name="write_hashtag">무엇을 했는지 남겨보세요!</string>
+
 </resources>

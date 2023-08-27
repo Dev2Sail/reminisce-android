@@ -8,21 +8,20 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityCategoryDetailBinding
-import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
+import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.vo.location.LocationVO
 
 class CategoryDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCategoryDetailBinding
     private lateinit var locations: List<LocationVO>
-
+    private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
+    private val categoryTitle by lazy { intent.getStringExtra("categoryTitle") }
     private val summaryList = ArrayList<LocationVO>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,29 +34,28 @@ class CategoryDetailActivity : AppCompatActivity() {
         viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { finish() }
 
         viewBinding.categoryDetailAddButton.setOnClickListener {
-            val intent = Intent(this, WriteActivity::class.java)
-//            intent.putExtra("selectedCategory", categoryTitle)
-            startActivity(intent)
+            Intent(this, WriteActivity::class.java).apply {
+                putExtra("categoryId", categoryId)
+                startActivity(this)
+            }
         }
 
-        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
+        prepareContents()
+
+//        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
     }
 
-    private suspend fun fetchContents() = coroutineScope {
-        val result = runCatching {
-            val user = UserExtension.getUser(this@CategoryDetailActivity)
-            val categoryId = intent.getIntExtra("categoryId", -1)
-            listOf(
-                launch { locations = LocationIO.listByCategoryId(categoryId) }
-            ).joinAll()
-        }
+  private fun prepareContents() = CoroutineScope(Dispatchers.IO).launch {
+      runCatching { LocationIO.listByCategoryId(categoryId) }
+          .onSuccess {
+              locations = it
+              withContext(Dispatchers.Main) { onContentsReady() }
+          }
+          .onFailure {
 
-        if (result.isSuccess) {
-            withContext(Dispatchers.Main) { onContentsReady() }
-        } else {
-            // TODO handle error
-        }
-    }
+              CommonError.onrDialog(this@CategoryDetailActivity)
+          }
+  }
 
     private fun onContentsReady() {
         viewBinding.categoryDetailItems.layoutManager = LinearLayoutManager(this)
@@ -66,7 +64,7 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private val categoryHeaderDelegate = object : CategoryDetailHeaderViewHolder.Delegate {
         override val title: String
-            get() = intent.getStringExtra("categoryTitle")!!
+            get() = this@CategoryDetailActivity.categoryTitle!!
 
         override fun onClick() {
             Intent(this@CategoryDetailActivity, CategoryDetailEditableHeaderViewHolder::class.java).apply {
@@ -85,9 +83,8 @@ class CategoryDetailActivity : AppCompatActivity() {
     }
 }
 
-// TODO 카테고리 icon 클릭 시 appbar title = category title
 // TODO 카테고리 icon 클릭 시 category id에 해당하는 location 정보 표시
-// TODO 카테고리 date separator 월별 구분
+// TODO 카테고리 date separator 월별 구분 -> activity에서 contents 만들어서 넘겨야 함 !
 // TODO '한눈에 보기' 클릭 시 uesr의 모든 location 정보 표시
 /*
 categoryDetail에서 '편집' 눌렀을 때

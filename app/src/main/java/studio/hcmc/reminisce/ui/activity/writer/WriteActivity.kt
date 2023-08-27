@@ -12,42 +12,43 @@ import java.util.Locale
 class WriteActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteBinding
     private val nextIntent by lazy { Intent(this, WriteOptionsActivity::class.java) }
+    private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
+    private val contents = HashMap<String, String>()
 
+    // TODO write에서 작성한 내용을 write_options로 넘겨서 저장
+    // MAP에 담아서 통으로 전달
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityWriteBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        val appBar = viewBinding.writeAppbar
-        appBar.appbarBack.setOnClickListener { finish() }
-        appBar.appbarActionButton1.setOnClickListener {
-            startActivity(nextIntent)
-        }
+        viewBinding.writeAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.writeAppbar.appbarActionButton1.setOnClickListener { startActivity(nextIntent) }
 
         val visitedAt = viewBinding.writeVisitedAt
-        visitedAt.writeOptionsItemBody.text = "방문 날짜"
+        visitedAt.writeOptionsItemBody.text = getText(R.string.write_visited_at)
         visitedAt.writeOptionsItemIcon.setOnClickListener {
             WriteSelectVisitedAtDialog(this, visitedAtDelegate)
         }
 
         val marker = viewBinding.writeMarkerEmoji
         marker.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_reaction_16)
-        marker.writeOptionsItemBody.text = "이모지 추가"
+        marker.writeOptionsItemBody.text = getText(R.string.write_emoji)
         marker.writeOptionsItemIcon.setOnClickListener {
             WriteSelectEmojiDialog(this, emojiDelegate)
         }
 
         val location = viewBinding.writeLocation
         location.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_location_alt_16)
-        location.writeOptionsItemBody.text = "방문한 장소 추가"
+        location.writeOptionsItemBody.text = getText(R.string.write_location)
 
         val friendTag = viewBinding.writeFriendTag
         friendTag.writeOptionsItemIcon.setImageResource(R.drawable.round_group_add_16)
-        friendTag.writeOptionsItemBody.text = "함께 다녀온 친구 추가"
+        friendTag.writeOptionsItemBody.text = getText(R.string.write_friend)
 
         val hashtag = viewBinding.writeTag
         hashtag.writeOptionsItemIcon.setImageResource(R.drawable.round_tag_16)
-        hashtag.writeOptionsItemBody.text = "해시태그 추가"
+        hashtag.writeOptionsItemBody.text = getText(R.string.write_hashtag)
         hashtag.writeOptionsItemIcon.setOnClickListener {
             Intent(this, WriteOptionsAddTagActivity::class.java).apply {
                 startActivity(this)

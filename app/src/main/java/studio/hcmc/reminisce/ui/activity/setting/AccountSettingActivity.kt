@@ -10,8 +10,11 @@ import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySettingAccountBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
+import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.launcher.LauncherActivity
+import studio.hcmc.reminisce.ui.view.CommonError
+import studio.hcmc.reminisce.ui.view.Navigation
 
 class AccountSettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingAccountBinding
@@ -30,12 +33,13 @@ class AccountSettingActivity : AppCompatActivity() {
             WithdrawDialog(this, withdrawDelegate)
         }
 
+        val menuId = intent.getIntExtra("settingMenuId", -1)
+        viewBinding.settingAccountNavView.navItems.selectedItemId = menuId
+        navController()
+
         prepareUser()
     }
-    // TODO 서비스 탈퇴 && 서비스 탈퇴 시 activityResult 회수
-    // TODO password 바뀌었을 때
-    // TODO 닉네임 업데이트
-    // TODO 비밀번호 업데이트
+
     private fun prepareUser() = CoroutineScope(Dispatchers.Main).launch {
         val user = UserExtension.getUser(this@AccountSettingActivity)
         viewBinding.settingAccountEmailBody.text = user.email
@@ -55,17 +59,68 @@ class AccountSettingActivity : AppCompatActivity() {
         override fun onDoneClick() {
             CoroutineScope(Dispatchers.IO).launch {
                 val user = UserExtension.getUser(this@AccountSettingActivity)
-                runCatching { UserIO.delete(UserIO.getByEmail(user.email).id) }
+                val userId = UserIO.getByEmail(user.email).id
+                runCatching { UserIO.delete(userId) }
                     .onSuccess {
+                        UserAuthVO(user.email, user.password).delete(this@AccountSettingActivity)
+                        // TODO Activity Result 회수
                         Intent(this@AccountSettingActivity, LauncherActivity::class.java).apply {
                             startActivity(this)
                         }
                     }
                     .onFailure {
+                        CommonError.onrDialog(this@AccountSettingActivity)
                         it.cause
                         it.message
                         it.stackTrace
                     }
+            }
+        }
+    }
+//    private suspend fun withdrawUser() = coroutineScope {
+//        val result = runCatching {
+//            val user = UserExtension.getUser(this@AccountSettingActivity)
+//            val userId = UserIO.getByEmail(user.email).id
+//            listOf(
+//                launch { UserIO.delete(userId) },
+//                launch { UserAuthVO(user.email, user.password)
+//                    .delete(this@AccountSettingActivity)
+//                }
+//            ).joinAll()
+//        }
+//
+//        if (result.isSuccess) {
+//            Intent(this@AccountSettingActivity, LauncherActivity::class.java).apply {
+//                startActivity(this)
+//            }
+//        } else {
+//            CommonError.onrDialog(this@AccountSettingActivity)
+//        }
+//    }
+
+    private fun navController() {
+        viewBinding.settingAccountNavView.navItems.setOnItemSelectedListener {
+            when(it.itemId) {
+                R.id.nav_main_home -> {
+                    startActivity(Navigation.onNextHome(applicationContext, it.itemId))
+                    finish()
+
+                    true
+                }
+                R.id.nav_main_map -> {
+                    true
+                }
+                R.id.nav_main_report -> {
+                    startActivity(Navigation.onNextReport(applicationContext, it.itemId))
+                    finish()
+
+                    true
+                }
+                R.id.nav_main_setting -> {
+                    true
+                }
+
+                else -> false
             }
         }
     }

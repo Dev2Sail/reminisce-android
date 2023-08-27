@@ -9,7 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityFriendAddBinding
-import studio.hcmc.reminisce.databinding.CardAddFriendItemBinding
+import studio.hcmc.reminisce.databinding.LayoutAddFriendItemBinding
+import studio.hcmc.reminisce.databinding.LayoutNotFoundBinding
 import studio.hcmc.reminisce.dto.friend.FriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
@@ -47,17 +48,14 @@ class AddFriendActivity : AppCompatActivity() {
                 onResult(it.id, it.nickname, it.email)
             }
             .onFailure {
-                it.cause
-                it.message
-                it.localizedMessage
-                it.stackTrace
+                notFoundUser()
             }
     }
 
     private fun onResult(opponentId: Int, nickname: String, email: String) {
         // 검색 결과는 1 or 0
         viewBinding.addFriendItems.removeAllViews()
-        val cardView = CardAddFriendItemBinding.inflate(layoutInflater)
+        val cardView = LayoutAddFriendItemBinding.inflate(layoutInflater)
         cardView.addFriendItemEmail.text = email
         cardView.addFriendItemNickname.text = nickname
 
@@ -66,6 +64,12 @@ class AddFriendActivity : AppCompatActivity() {
         }
 
         viewBinding.addFriendItems.addView(cardView.root)
+    }
+
+    private fun notFoundUser() {
+        viewBinding.addFriendItems.removeAllViews()
+        val textView = LayoutNotFoundBinding.inflate(layoutInflater)
+        viewBinding.addFriendItems.addView(textView.root)
     }
 
     private val addFriendDialogDelegate = object : AddFriendDialog.Delegate {

@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.util
+package studio.hcmc.reminisce.ui.view
 
 import android.content.Context
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -6,8 +6,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object globalError {
-    private fun onErrorDialog(
+object CommonError {
+    fun onrDialog(
         context: Context
     ) = CoroutineScope(Dispatchers.Main).launch {
         MaterialAlertDialogBuilder(context)
@@ -18,4 +18,16 @@ object globalError {
             .show()
     }
 
+    fun onMessageDialog(
+        context: Context,
+        title: String,
+        message: String
+    ) = CoroutineScope(Dispatchers.Main).launch {
+        MaterialAlertDialogBuilder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("확인") { _, _ -> }
+            .setCancelable(true)
+            .show()
+    }
 }

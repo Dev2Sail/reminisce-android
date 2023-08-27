@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.setting
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -8,8 +9,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySettingAccountDetailNicknameBinding
+import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.UserIO
+import studio.hcmc.reminisce.ui.view.CommonError
+import studio.hcmc.reminisce.ui.view.CommonMessage
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
@@ -35,9 +39,10 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
 
         appBar.appbarActionButton1.setOnClickListener {
             if (inputField.string.length <= 20) {
-
+                patchNickname(inputField.string)
             }
         }
+        prepareUser()
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.Main).launch {
@@ -47,6 +52,27 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
             .onSuccess {
                 field.placeholderText = it.nickname
             }
-            .onFailure {  }
+            .onFailure {
+                CommonError.onrDialog(this@AccountSettingDetailNicknameActivity)
+                it.cause
+                it.message
+                it.stackTrace
+            }
+    }
+
+    private fun patchNickname(editedNickname: String) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@AccountSettingDetailNicknameActivity)
+        val userId = UserIO.getByEmail(user.email).id
+        val patchDTO = UserDTO.Patch().apply {
+            nickname = editedNickname
+        }
+        runCatching { UserIO.patch(userId, patchDTO) }
+            .onSuccess {
+                CommonMessage.onMessage(this@AccountSettingDetailNicknameActivity, "닉네임이 변경되었어요.")
+                Intent(this@AccountSettingDetailNicknameActivity, AccountSettingActivity::class.java).apply {
+                    startActivity(this)
+                }
+            }
+            .onFailure { CommonError.onrDialog(this@AccountSettingDetailNicknameActivity) }
     }
 }

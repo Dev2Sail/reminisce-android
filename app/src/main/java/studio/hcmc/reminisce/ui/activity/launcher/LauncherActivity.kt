@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import studio.hcmc.kotlin.crypto.sha512
 import studio.hcmc.reminisce.databinding.ActivityLauncherBinding
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.ui.activity.MainActivity
@@ -37,7 +38,8 @@ class LauncherActivity : AppCompatActivity() {
     private fun prepareSignIn() = CoroutineScope(Dispatchers.IO).launch {
         val context = this@LauncherActivity
         val info = UserAuthVO(context)
-        Log.v("info", "user Info : $info")
+        Log.v("info", "===== user Info : $info")
+        println("123456".sha512)
         if (info != null) {
             launchHome()
 

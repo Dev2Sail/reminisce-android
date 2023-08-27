@@ -14,15 +14,15 @@ import studio.hcmc.reminisce.databinding.LayoutSettingFriendItemBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
+import studio.hcmc.reminisce.ui.view.Navigation
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.user.UserVO
 import kotlin.collections.set
 
 class FriendSettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingFriendBinding
-//    private val friends = ArrayList<FriendVO>()
     private lateinit var friends: List<FriendVO>
-    private val users = HashMap<Int /* userId*/, UserVO>()
+    private val users = HashMap<Int /* userId */, UserVO>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +35,10 @@ class FriendSettingActivity : AppCompatActivity() {
         viewBinding.settingFriendAdd.setOnClickListener { launchSearchFriend() }
         viewBinding.settingFriendItems.removeAllViews()
 
+        val menuId = intent.getIntExtra("settingMenuId", -1)
+        viewBinding.settingFriendNavView.navItems.selectedItemId = menuId
+        navController()
+
         prepareFriends()
     }
 
@@ -44,12 +48,10 @@ class FriendSettingActivity : AppCompatActivity() {
         runCatching { FriendIO.listByUserId(userId) }
             .onSuccess {
                 friends = it
+                for (friend in it) {
+                    val opponent = UserIO.getById(friend.opponentId)
+                    users[opponent.id] = opponent
 
-                for (friend in friends) {
-                    if (friend.nickname == null) {
-                        val opponent = UserIO.getById(friend.opponentId)
-                        users[opponent.id] = opponent
-                    }
                     withContext(Dispatchers.Main) { addFriendView(friend)}
                 }
             }
@@ -79,7 +81,35 @@ class FriendSettingActivity : AppCompatActivity() {
 
             false
         }
+
         viewBinding.settingFriendItems.addView(cardView.root)
+    }
+
+    private fun navController() {
+        viewBinding.settingFriendNavView.navItems.setOnItemSelectedListener {
+            when(it.itemId) {
+                R.id.nav_main_home -> {
+                    startActivity(Navigation.onNextHome(applicationContext, it.itemId))
+                    finish()
+
+                    true
+                }
+                R.id.nav_main_map -> {
+                    true
+                }
+                R.id.nav_main_report -> {
+                    startActivity(Navigation.onNextReport(applicationContext, it.itemId))
+                    finish()
+
+                    true
+                }
+                R.id.nav_main_setting -> {
+                    true
+                }
+
+                else -> false
+            }
+        }
     }
 
     private fun launchSearchFriend() {

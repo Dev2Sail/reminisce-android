@@ -16,6 +16,8 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
     private val newTagList = ArrayList<String>()
     private val oldTagList = ArrayList<String>()
 
+    // TODO 필요한 것 : userId와 tag body
+    // TODO 저장 클릭 시 TagIO 요청
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityWriteOptionsAddTagBinding.inflate(layoutInflater)

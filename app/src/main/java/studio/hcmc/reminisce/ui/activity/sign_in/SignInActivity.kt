@@ -35,13 +35,6 @@ class SignInActivity : AppCompatActivity() {
                 startActivity(this)
             }
         }
-
-        viewBinding.signInGoHome.setOnClickListener {
-            Intent(this, HomeActivity::class.java).apply {
-                startActivity(this)
-            }
-        }
-
         viewBinding.signInEmail.editText!!.addTextChangedListener {
             setNextEnabledState()
         }

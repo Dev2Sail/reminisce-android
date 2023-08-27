@@ -19,8 +19,6 @@ class UpdateFriendNicknameDialog(
     activity: Activity,
     context: Context,
     friend: FriendVO,
-//    opponentId: Int,
-//    nicknameByUser: String,
     opponentNickname: String,
     opponentEmail: String
 ) {
@@ -29,8 +27,6 @@ class UpdateFriendNicknameDialog(
         val viewBinding = DialogUpdateFriendNicknameBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
         val inputField = viewBinding.dialogUpdateFriendNicknameField
-        // TODO friend.nickname이 존재하는 경우에만 NullPointerException 발생
-//        inputField.hint = nicknameByUser
         inputField.hint = friend.nickname ?: ""
         inputField.helperText = opponentEmail
         inputField.placeholderText = opponentNickname
@@ -64,6 +60,3 @@ class UpdateFriendNicknameDialog(
             }
     }
 }
-
-// friend.nickname != null -> text = friend.nickname
-// friend.nickname
