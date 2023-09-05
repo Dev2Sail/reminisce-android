@@ -53,7 +53,7 @@ class CategoryDetailActivity : AppCompatActivity() {
           }
           .onFailure {
 
-              CommonError.onrDialog(this@CategoryDetailActivity)
+              CommonError.onDialog(this@CategoryDetailActivity)
           }
   }
 

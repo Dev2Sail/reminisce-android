@@ -21,9 +21,11 @@
         android:layout_marginTop="@dimen/margin_regular"
         app:counterEnabled="true"
         app:counterMaxLength="10"
+        app:endIconMode="clear_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/write_options_add_tag_appbar">
+        app:layout_constraintTop_toBottomOf="@id/write_options_add_tag_appbar"
+        app:placeholderText="@string/write_options_add_tag_placeholderText">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"

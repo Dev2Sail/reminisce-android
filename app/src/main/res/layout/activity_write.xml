@@ -24,7 +24,7 @@
                 layout="@layout/layout_write_options_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginTop="@dimen/margin_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/write_appbar" />
@@ -55,7 +55,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_regular"
-                android:layout_marginTop="@dimen/margin_small"
                 app:counterEnabled="true"
                 app:counterMaxLength="1000"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -66,7 +65,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/body_small"
+                    android:textSize="@dimen/body_medium"
                     android:fontFamily="@font/pretendard_regular"
                     android:background="@color/md_theme_light_surface"
                     android:inputType="textMultiLine" />
@@ -83,6 +82,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/write_text_container" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/write_option"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:fontFamily="@font/pretendard_medium"
+                android:text="@string/write_option"
+                android:textColor="@color/md_theme_light_secondary"
+                android:textSize="@dimen/title_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/write_divider2" />
+
             <include
                 android:id="@+id/write_location"
                 layout="@layout/layout_write_options_item"
@@ -91,7 +104,7 @@
                 android:layout_marginTop="@dimen/margin_regular"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/write_divider2" />
+                app:layout_constraintTop_toBottomOf="@id/write_option" />
 
             <include
                 android:id="@+id/write_friend_tag"
@@ -112,6 +125,16 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/write_friend_tag" />
+
+            <include
+                android:id="@+id/write_category"
+                layout="@layout/layout_write_options_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_regular"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/write_tag" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </FrameLayout>

@@ -3,80 +3,138 @@ package studio.hcmc.reminisce.ui.activity.writer
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityWriteBinding
+import studio.hcmc.reminisce.dto.tag.TagDTO
+import studio.hcmc.reminisce.ext.user.UserExtension
+import studio.hcmc.reminisce.io.ktor_client.TagIO
 import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class WriteActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteBinding
-    private val nextIntent by lazy { Intent(this, WriteOptionsActivity::class.java) }
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
-    private val contents = HashMap<String, String>()
+    private val writeOptions = HashMap<String, Any>()
 
-    // TODO write에서 작성한 내용을 write_options로 넘겨서 저장
-    // MAP에 담아서 통으로 전달
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityWriteBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+        initView()
+    }
 
-        viewBinding.writeAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.writeAppbar.appbarActionButton1.setOnClickListener { startActivity(nextIntent) }
+    private fun initView() {
+        viewBinding.writeAppbar.apply {
+            appbarTitle.text = ""
+            appbarBack.setOnClickListener { finish() }
+            appbarActionButton1.setOnClickListener {
 
-        val visitedAt = viewBinding.writeVisitedAt
-        visitedAt.writeOptionsItemBody.text = getText(R.string.write_visited_at)
-        visitedAt.writeOptionsItemIcon.setOnClickListener {
-            WriteSelectVisitedAtDialog(this, visitedAtDelegate)
+            }
         }
 
-        val marker = viewBinding.writeMarkerEmoji
-        marker.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_reaction_16)
-        marker.writeOptionsItemBody.text = getText(R.string.write_emoji)
-        marker.writeOptionsItemIcon.setOnClickListener {
-            WriteSelectEmojiDialog(this, emojiDelegate)
+        viewBinding.writeVisitedAt.apply {
+            writeOptionsItemBody.text = getText(R.string.write_visited_at)
+            root.setOnClickListener {
+                WriteSelectVisitedAtDialog(this@WriteActivity, visitedAtDelegate)
+            }
         }
 
-        val location = viewBinding.writeLocation
-        location.writeOptionsItemIcon.setImageResource(R.drawable.outline_add_location_alt_16)
-        location.writeOptionsItemBody.text = getText(R.string.write_location)
+        viewBinding.writeMarkerEmoji.apply {
+            writeOptionsItemBody.text = getText(R.string.write_emoji)
+            writeOptionsItemIcon.setImageResource(R.drawable.outline_add_reaction_16)
+            root.setOnClickListener {
+                WriteSelectEmojiDialog(this@WriteActivity, emojiDelegate)
+            }
+        }
 
-        val friendTag = viewBinding.writeFriendTag
-        friendTag.writeOptionsItemIcon.setImageResource(R.drawable.round_group_add_16)
-        friendTag.writeOptionsItemBody.text = getText(R.string.write_friend)
+        viewBinding.writeLocation.apply {
+            writeOptionsItemBody.text = getText(R.string.write_location)
+            writeOptionsItemIcon.setImageResource(R.drawable.outline_add_location_alt_16)
+        }
 
-        val hashtag = viewBinding.writeTag
-        hashtag.writeOptionsItemIcon.setImageResource(R.drawable.round_tag_16)
-        hashtag.writeOptionsItemBody.text = getText(R.string.write_hashtag)
-        hashtag.writeOptionsItemIcon.setOnClickListener {
-            Intent(this, WriteOptionsAddTagActivity::class.java).apply {
-                startActivity(this)
+        viewBinding.writeFriendTag.apply {
+            writeOptionsItemBody.text = getText(R.string.write_friend)
+            writeOptionsItemIcon.setImageResource(R.drawable.outline_group_add_16)
+            root.setOnClickListener {
+                Intent(this@WriteActivity, WriteSelectFriendActivity::class.java).apply {
+                    startActivity(this)
+                }
+            }
+        }
+
+        viewBinding.writeTag.apply {
+            writeOptionsItemBody.text = getText(R.string.write_hashtag)
+            writeOptionsItemIcon.setImageResource(R.drawable.round_tag_16)
+            root.setOnClickListener {
+                Intent(this@WriteActivity, WriteOptionsAddTagActivity::class.java).apply {
+                    startActivity(this)
+                }
+            }
+            val tagList = intent.getStringArrayListExtra("tags")
+            val tagBuilder = StringBuilder()
+            if (tagList != null) {
+                for (tag in tagList) {
+                    tagBuilder.append("#")
+                    tagBuilder.append(tag)
+                    tagBuilder.append(" ")
+                }
+                writeOptionsItemBody.text = tagBuilder.toString()
             }
         }
     }
 
+    private suspend fun postContents() = coroutineScope {
+        val result = runCatching {
+
+            async {  }
+
+
+        }
+    }
+
+    private fun postTags(value: String) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@WriteActivity).id
+        val postDTO = TagDTO.Post().apply {
+            userId = user
+            body = value
+        }
+        runCatching { TagIO.post(postDTO) }
+            .onSuccess {  }
+    }
+
     private val visitedAtDelegate = object : WriteSelectVisitedAtDialog.Delegate {
+        // use java sql date
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
         var currentDate: String = dateFormat.format(Date(System.currentTimeMillis()))
 
         override fun onSaveClick(value: String) {
             if (value.isNotEmpty()) {
+                writeOptions["visitedAt"] = value
                 viewBinding.writeVisitedAt.writeOptionsItemBody.text = value
-                nextIntent.putExtra("visitedAt", value)
             } else {
+                writeOptions["visitedAt"] = currentDate
                 viewBinding.writeVisitedAt.writeOptionsItemBody.text = currentDate
-                nextIntent.putExtra("visitedAt", currentDate)
             }
         }
     }
 
     private val emojiDelegate = object :WriteSelectEmojiDialog.Delegate {
         override fun onSaveClick(value: String) {
+            writeOptions["emoji"] = value
             viewBinding.writeMarkerEmoji.writeOptionsItemBody.text = value
-            nextIntent.putExtra("emoji", value)
         }
     }
 }
-
+/*
+userId, locationId, tagId
+tagService add
+locationService add
+location_tag add 한 트랜잭셩~~~
+ */
 

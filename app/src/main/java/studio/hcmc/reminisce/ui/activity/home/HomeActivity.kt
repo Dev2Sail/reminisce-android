@@ -68,7 +68,7 @@ class HomeActivity : AppCompatActivity() {
         } else {
             // TODO handle error
             withContext(Dispatchers.Main) {
-                CommonError.onrDialog(this@HomeActivity)
+                CommonError.onDialog(this@HomeActivity)
             }
         }
     }

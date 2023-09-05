@@ -40,7 +40,7 @@ class DeleteFriendDialog(
         runCatching { FriendIO.delete(user.id, opponentId) }
             .onSuccess { CommonMessage.onMessage(viewBinding.root.context, "친구가 끊어졌어요.") }
             .onFailure {
-                CommonError.onrDialog(viewBinding.root.context)
+                CommonError.onDialog(viewBinding.root.context)
                 it.cause
                 it.message
                 it.stackTrace

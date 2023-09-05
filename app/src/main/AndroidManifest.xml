@@ -16,13 +16,13 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
+            android:name=".ui.activity.writer.WriteSelectFriendActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.report.ReportActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.writer.WriteOptionsAddTagActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.writer.WriteOptionsActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.setting.AddFriendActivity"

@@ -57,6 +57,6 @@ class AccountSettingDetailPasswordActivity : AppCompatActivity() {
                     startActivity(this)
                 }
             }
-            .onFailure { CommonError.onrDialog(this@AccountSettingDetailPasswordActivity) }
+            .onFailure { CommonError.onDialog(this@AccountSettingDetailPasswordActivity) }
     }
 }

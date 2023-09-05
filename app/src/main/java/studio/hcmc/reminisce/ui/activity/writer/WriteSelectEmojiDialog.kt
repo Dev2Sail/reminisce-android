@@ -23,8 +23,8 @@ class WriteSelectEmojiDialog(
         dialog.show()
 
         viewBinding.dialogSelectEmojiField.editText!!.addTextChangedListener {
-            val emoji = viewBinding.dialogSelectEmojiField.string
-            viewBinding.dialogSelectSave.isEnabled = emoji.isEmoji()
+            val input = viewBinding.dialogSelectEmojiField.string
+            viewBinding.dialogSelectSave.isEnabled = input.isEmoji()
         }
         viewBinding.dialogSelectCancel.setOnClickListener {
             dialog.dismiss()

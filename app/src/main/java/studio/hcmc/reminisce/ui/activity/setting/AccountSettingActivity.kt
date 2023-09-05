@@ -69,7 +69,7 @@ class AccountSettingActivity : AppCompatActivity() {
                         }
                     }
                     .onFailure {
-                        CommonError.onrDialog(this@AccountSettingActivity)
+                        CommonError.onDialog(this@AccountSettingActivity)
                         it.cause
                         it.message
                         it.stackTrace

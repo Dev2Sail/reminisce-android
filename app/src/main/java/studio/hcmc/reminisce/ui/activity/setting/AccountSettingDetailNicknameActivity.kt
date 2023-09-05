@@ -53,7 +53,7 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
                 field.placeholderText = it.nickname
             }
             .onFailure {
-                CommonError.onrDialog(this@AccountSettingDetailNicknameActivity)
+                CommonError.onDialog(this@AccountSettingDetailNicknameActivity)
                 it.cause
                 it.message
                 it.stackTrace
@@ -73,6 +73,6 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
                     startActivity(this)
                 }
             }
-            .onFailure { CommonError.onrDialog(this@AccountSettingDetailNicknameActivity) }
+            .onFailure { CommonError.onDialog(this@AccountSettingDetailNicknameActivity) }
     }
 }

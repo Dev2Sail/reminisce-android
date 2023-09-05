@@ -38,11 +38,12 @@
 
     <string name="category_view_holder_title">한눈에 보기</string>
 
-
+    <string name="write_option">Options</string>
     <string name="writer_options_category">폴더</string>
     <string name="write_options_add_tag_title">해시태그 추가</string>
     <string name="write_options_add_tag_new_tag_container">저장할 해시태그</string>
     <string name="write_options_add_tag_old_tag_container">이전에 사용된 해시태그</string>
+    <string name="write_options_add_tag_placeholderText">해시태그 입력 후 엔터를 입력해주세요.</string>
 
 
     <string name="add_friend_title">친구 검색</string>
@@ -129,7 +130,7 @@
 
     <string name="write_visited_at">언제</string>
     <string name="write_location">어디에서</string>
-    <string name="write_emoji">어떤 추억을</string>
+    <string name="write_emoji">어떤 모습으로</string>
     <string name="write_friend">누구와</string>
     <string name="write_hashtag">무엇을 했는지 남겨보세요!</string>
 

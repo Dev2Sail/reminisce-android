@@ -22,7 +22,6 @@
         android:layout_marginStart="@dimen/margin_small"
         android:layout_marginEnd="@dimen/margin_large"
         android:fontFamily="@font/pretendard_regular"
-        android:text="2022-08-02"
         android:textColor="@color/md_theme_light_primary"
         android:textSize="@dimen/body_medium"
         app:layout_constraintEnd_toEndOf="parent"
