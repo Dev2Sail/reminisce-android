@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.core.widget.addTextChangedListener
 import kotlinx.coroutines.CoroutineScope
@@ -26,16 +27,18 @@ class UpdateFriendNicknameDialog(
     init {
         val viewBinding = DialogUpdateFriendNicknameBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        val inputField = viewBinding.dialogUpdateFriendNicknameField
-        inputField.hint = friend.nickname ?: ""
-        inputField.helperText = opponentEmail
-        inputField.placeholderText = opponentNickname
+        val inputField = viewBinding.dialogUpdateFriendNicknameField.apply {
+            hint = friend.nickname ?: ""
+            helperText = opponentEmail
+            placeholderText = opponentNickname
+        }
 
         dialog.show()
 
         inputField.editText!!.addTextChangedListener {
             viewBinding.dialogUpdateFriendNicknameSave.isEnabled = inputField.string.isNotEmpty() && inputField.string.length <= 20
         }
+
         viewBinding.dialogUpdateFriendNicknameSave.setOnClickListener {
             if (inputField.string.length <= 20) {
                 patchFriend(friend.opponentId, inputField.string)
@@ -54,9 +57,7 @@ class UpdateFriendNicknameDialog(
         }
         runCatching { FriendIO.put(user.id, opponentId, putDTO) }
             .onFailure {
-                it.cause
-                it.message
-                it.stackTrace
+                Log.v("reminisce Logger", "[reminisce > friendSetting > update friend nickname] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
             }
     }
 }

@@ -1,6 +1,7 @@
 package studio.hcmc.reminisce.ui.activity.setting
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -26,38 +27,51 @@ class AddFriendActivity : AppCompatActivity() {
         viewBinding = ActivityFriendAddBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.addFriendAppbar.appbarTitle.text = getText(R.string.add_friend_title)
-        viewBinding.addFriendAppbar.appbarActionButton1.isVisible = false
-        viewBinding.addFriendAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.addFriendSearch.endIconDrawable = getDrawable(R.drawable.round_search_24)
-        viewBinding.addFriendSearch.setEndIconOnClickListener { searchUser() }
-
+        initView()
         CoroutineScope(Dispatchers.IO).launch { prepareUser() }
     }
+
+    private fun initView() {
+        viewBinding.addFriendAppbar.apply {
+            appbarTitle.text = getText(R.string.add_friend_title)
+            appbarActionButton1.isVisible = false
+            appbarBack.setOnClickListener { finish() }
+        }
+
+        viewBinding.addFriendSearch.apply {
+            endIconDrawable = getDrawable(R.drawable.round_search_24)
+            setEndIconOnClickListener { searchUser() }
+        }
+    }
+
     private suspend fun prepareUser() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@AddFriendActivity)
-        val builder = StringBuilder()
-        builder.append("내 이메일 : ")
-        builder.append(user.email)
+        val builder = StringBuilder().apply {
+            append("내 이메일 : ")
+            append(user.email)
+        }
         viewBinding.addFriendSearch.helperText = builder.toString()
     }
 
     private fun searchUser() = CoroutineScope(Dispatchers.Main).launch {
-        runCatching { UserIO.getByEmail(viewBinding.addFriendSearch.string) }
+        val email = viewBinding.addFriendSearch.string
+        runCatching { UserIO.getByEmail(email) }
             .onSuccess {
                 onResult(it.id, it.nickname, it.email)
             }
             .onFailure {
                 notFoundUser()
+                Log.v("reminisce Logger", "[reminisce > friendSetting > addFriend - searchUser()] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
             }
     }
 
     private fun onResult(opponentId: Int, nickname: String, email: String) {
         // 검색 결과는 1 or 0
         viewBinding.addFriendItems.removeAllViews()
-        val cardView = LayoutAddFriendItemBinding.inflate(layoutInflater)
-        cardView.addFriendItemEmail.text = email
-        cardView.addFriendItemNickname.text = nickname
+        val cardView = LayoutAddFriendItemBinding.inflate(layoutInflater).apply {
+            addFriendItemEmail.text = email
+            addFriendItemNickname.text = nickname
+        }
 
         cardView.root.setOnClickListener {
             AddFriendDialog(this, opponentId, nickname, addFriendDialogDelegate)
@@ -91,9 +105,7 @@ class AddFriendActivity : AppCompatActivity() {
             }
             .onFailure {
                 onAddFailure()
-                it.cause
-                it.message
-                it.stackTrace
+                Log.v("reminisce Logger", "[reminisce > friendSetting > addFriend - onAddReady] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
             }
     }
 

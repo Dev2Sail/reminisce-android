@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/dialog_write_options_handle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/write_options_next_friend"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_regular"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:layout_constraintBottom_toTopOf="@id/write_options_next_tag"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_write_options_handle">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/write_options_friend_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_group_add_24"
+                app:layout_constraintBottom_toBottomOf="@id/write_options_friend_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/write_options_friend_title"
+                app:tint="@color/md_theme_light_primary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/write_options_friend_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/margin_regular"
+                android:layout_marginStart="@dimen/margin_small"
+                android:text="@string/write_friend"
+                android:textSize="@dimen/title_medium"
+                app:fontFamily="@font/pretendard_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/write_options_friend_icon"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/write_options_next_tag"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/margin_regular"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:layout_constraintBottom_toTopOf="@id/write_options_next_category"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_next_friend">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/write_options_tag_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_tag_24"
+                app:layout_constraintBottom_toBottomOf="@id/write_options_tag_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/write_options_tag_title"
+                app:tint="@color/md_theme_light_primary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/write_options_tag_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/margin_regular"
+                android:layout_marginStart="@dimen/margin_small"
+                android:text="@string/write_hashtag"
+                android:textSize="@dimen/title_medium"
+                app:fontFamily="@font/pretendard_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/write_options_tag_icon"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/write_options_next_category"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/appbar_height"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/write_options_category_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_folder_24"
+                app:layout_constraintBottom_toBottomOf="@id/write_options_category_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/write_options_category_title"
+                app:tint="@color/md_theme_light_primary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/write_options_category_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/margin_regular"
+                android:layout_marginStart="@dimen/margin_small"
+                android:text="@string/write_category"
+                android:textSize="@dimen/title_medium"
+                app:fontFamily="@font/pretendard_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/write_options_category_icon"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+<!--    <ImageView-->
+<!--        android:id="@+id/test1"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="@dimen/margin_large"-->
+<!--        android:src="@drawable/round_group_add_24"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/test_title"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="@id/test_title"-->
+<!--        app:tint="@color/md_theme_light_primary" />-->
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/test_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/margin_regular"
+        android:layout_marginStart="@dimen/margin_4xlarge"
+        android:text="@string/write_friend"
+        android:textSize="@dimen/title_medium"
+        app:fontFamily="@font/pretendard_medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/test1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_next_category" />
+
+    <ImageView
+        android:id="@+id/test1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/round_arrow_forward_ios_24"
+        app:layout_constraintTop_toTopOf="@id/test_title"
+        app:layout_constraintBottom_toBottomOf="@id/test_title"
+        android:layout_marginEnd="@dimen/margin_large"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

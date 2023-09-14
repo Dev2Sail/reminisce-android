@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.writer.WriteOptionsActivity">
+
+    <include
+        android:id="@+id/write_options_appbar"
+        layout="@layout/layout_appbar" />
+
+    <ImageView
+        android:id="@+id/write_options_success_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_regular"
+        android:layout_marginTop="@dimen/launcher_hcmc_logo_width"
+        android:src="@drawable/round_check_circle_outline_56"
+        app:layout_constraintTop_toBottomOf="@id/write_options_appbar"
+        app:layout_constraintBottom_toTopOf="@id/write_options_success_date_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/md_theme_light_primary" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/write_options_success_date_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/pretendard_semibold"
+        android:text="@string/write_options_success_date_message"
+        android:textSize="@dimen/title_medium"
+        android:layout_marginTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_success_icon" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/write_options_success_location_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/pretendard_semibold"
+        android:text="@string/write_options_success_location_message"
+        android:textSize="@dimen/title_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/write_options_success_date_message" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/write_options_next_button"
+        style="@style/Widget.Material3.Button.IconButton.Filled"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/launcher_hcmc_logo_width"
+        android:fontFamily="@font/pretendard_medium"
+        android:paddingVertical="@dimen/margin_regular"
+        android:text="@string/write_options_next_button"
+        android:textSize="@dimen/label_large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

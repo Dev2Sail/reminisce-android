@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import kotlinx.coroutines.CoroutineScope
@@ -24,9 +25,18 @@ class AccountSettingActivity : AppCompatActivity() {
         viewBinding = ActivitySettingAccountBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.settingAccountAppbar.appbarTitle.text = getText(R.string.setting_account)
-        viewBinding.settingAccountAppbar.appbarActionButton1.isVisible = false
-        viewBinding.settingAccountAppbar.appbarBack.setOnClickListener { finish() }
+        initView()
+        navController()
+        prepareUser()
+    }
+
+    private fun initView() {
+        viewBinding.settingAccountAppbar.apply {
+            appbarTitle.text = getText(R.string.setting_account)
+            appbarActionButton1.isVisible = false
+            appbarBack.setOnClickListener { finish() }
+        }
+
         viewBinding.settingAccountNicknameIcon.setOnClickListener { launchNicknameSetting() }
         viewBinding.settingAccountPasswordIcon.setOnClickListener { launchPasswordSetting() }
         viewBinding.settingAccountWithdraw.setOnClickListener {
@@ -35,9 +45,6 @@ class AccountSettingActivity : AppCompatActivity() {
 
         val menuId = intent.getIntExtra("settingMenuId", -1)
         viewBinding.settingAccountNavView.navItems.selectedItemId = menuId
-        navController()
-
-        prepareUser()
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.Main).launch {
@@ -49,9 +56,7 @@ class AccountSettingActivity : AppCompatActivity() {
             }
             .onFailure {
                 viewBinding.settingAccountNicknameBody.text = "닉네임을 로드할 수 없습니다."
-                it.cause
-                it.message
-                it.stackTrace
+                Log.v("reminisce Logger", "[reminisce > accountSetting ] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
             }
     }
 
@@ -59,8 +64,7 @@ class AccountSettingActivity : AppCompatActivity() {
         override fun onDoneClick() {
             CoroutineScope(Dispatchers.IO).launch {
                 val user = UserExtension.getUser(this@AccountSettingActivity)
-                val userId = UserIO.getByEmail(user.email).id
-                runCatching { UserIO.delete(userId) }
+                runCatching { UserIO.delete(user.id) }
                     .onSuccess {
                         UserAuthVO(user.email, user.password).delete(this@AccountSettingActivity)
                         // TODO Activity Result 회수
@@ -70,33 +74,12 @@ class AccountSettingActivity : AppCompatActivity() {
                     }
                     .onFailure {
                         CommonError.onDialog(this@AccountSettingActivity)
-                        it.cause
-                        it.message
-                        it.stackTrace
+                        Log.v("reminisce Logger", "[reminisce > accountSetting > withDraw ] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
                     }
             }
         }
     }
-//    private suspend fun withdrawUser() = coroutineScope {
-//        val result = runCatching {
-//            val user = UserExtension.getUser(this@AccountSettingActivity)
-//            val userId = UserIO.getByEmail(user.email).id
-//            listOf(
-//                launch { UserIO.delete(userId) },
-//                launch { UserAuthVO(user.email, user.password)
-//                    .delete(this@AccountSettingActivity)
-//                }
-//            ).joinAll()
-//        }
-//
-//        if (result.isSuccess) {
-//            Intent(this@AccountSettingActivity, LauncherActivity::class.java).apply {
-//                startActivity(this)
-//            }
-//        } else {
-//            CommonError.onrDialog(this@AccountSettingActivity)
-//        }
-//    }
+
 
     private fun navController() {
         viewBinding.settingAccountNavView.navItems.setOnItemSelectedListener {

@@ -27,14 +27,20 @@ class SignInActivity : AppCompatActivity() {
         viewBinding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.signInAppbar.appbarTitle.text = getText(R.string.sign_in_login)
-        viewBinding.signInAppbar.appbarActionButton1.isVisible = false
+    }
 
-        viewBinding.signInAppbar.appbarBack.setOnClickListener {
-            Intent(this, LauncherActivity::class.java).apply {
-                startActivity(this)
+    private fun initView() {
+        viewBinding.signInAppbar.apply {
+            appbarTitle.text = getText(R.string.sign_in_login)
+            appbarActionButton1.isVisible = false
+
+            appbarBack.setOnClickListener {
+                Intent(this@SignInActivity, LauncherActivity::class.java).apply {
+                    startActivity(this)
+                }
             }
         }
+
         viewBinding.signInEmail.editText!!.addTextChangedListener {
             setNextEnabledState()
         }
@@ -52,11 +58,15 @@ class SignInActivity : AppCompatActivity() {
                         Intent(this@SignInActivity, HomeActivity::class.java).apply {
                             startActivity(this)
                         }
+                    }.onFailure {
+                        onSignInError()
+                        Log.v("reminisce Logger", "[reminisce > signIn] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
                     }
-                 .onFailure { onSignInError() }
             }
         }
+
     }
+
     private fun setNextEnabledState() {
         val inputtedEmail = viewBinding.signInEmail.string
         val checkedState = Patterns.EMAIL_ADDRESS.matcher(inputtedEmail).matches()

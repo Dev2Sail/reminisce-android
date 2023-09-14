@@ -12,11 +12,10 @@ import studio.hcmc.reminisce.dto.tag.TagDTO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
 object TagIO {
-    suspend fun post(dto: TagDTO.Post) {
-        httpClient
-            .post("/user/tag") {
-                setBody(Gson().toJsonTree(dto))
-            }.bodyAsText()
+    suspend fun post(dto: TagDTO.Post): TagVO {
+        return httpClient
+            .post("/user/tag") { setBody(Gson().toJsonTree(dto)) }
+            .body()
     }
 
     suspend fun delete(tagId: Int) {
@@ -27,8 +26,7 @@ object TagIO {
 
     suspend fun listByUserId(userId: Int): List<TagVO> {
         return httpClient
-            .get("/user/tag/list/all") {
-                parameter("userId", userId)
-            }.body()
+            .get("/user/tag/list/all") { parameter("userId", userId) }
+            .body()
     }
 }

@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.sign_up
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -26,23 +27,22 @@ class SignUpActivity : AppCompatActivity() {
         viewBinding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.signUpAppbar.appbarTitle.text = getText(R.string.greeting_sign_up)
-        viewBinding.signUpAppbar.appbarBack.setOnClickListener { finish() }
+        initView()
+    }
 
-        viewBinding.signUpAppbar.appbarActionButton1.setOnClickListener {
-            val intent = Intent(this, SignInActivity::class.java)
-            startActivity(intent)
+    private fun initView() {
+        viewBinding.signUpAppbar.apply {
+            appbarTitle.text = getText(R.string.greeting_sign_up)
+            appbarBack.setOnClickListener { finish() }
+            appbarActionButton1.setOnClickListener {
+                val intent = Intent(this@SignUpActivity, SignInActivity::class.java)
+                startActivity(intent)
+            }
         }
 
-        viewBinding.signUpEmail.editText!!.addTextChangedListener {
-            setNextEnabledState()
-        }
-        viewBinding.signUpPassword.editText!!.addTextChangedListener {
-            setNextEnabledState()
-        }
-        viewBinding.signUpNickname.editText!!.addTextChangedListener {
-            setNextEnabledState()
-        }
+        viewBinding.signUpEmail.editText!!.addTextChangedListener { setNextEnabledState() }
+        viewBinding.signUpPassword.editText!!.addTextChangedListener { setNextEnabledState() }
+        viewBinding.signUpNickname.editText!!.addTextChangedListener { setNextEnabledState() }
         viewBinding.signUpNext.setOnClickListener {
             val signUpDTO = UserDTO.Post().apply {
                 email = viewBinding.signUpEmail.string
@@ -50,28 +50,18 @@ class SignUpActivity : AppCompatActivity() {
                 nickname = viewBinding.signUpNickname.string
             }
 
-            // getByEmail 성공하면 (동일한 이메일이 등록돼있지 않다면) signUp 진행
-//            CoroutineScope(Dispatchers.IO).launch {
-//                runCatching { UserIO.signUp(dto) }
-//                    .onSuccess {
-//                        Intent(this@SignUpActivity, LauncherActivity::class.java).apply {
-//                            startActivity(this)
-//                        }
-//                    }
-//                    .onFailure { onFailureDialog() }
-//            }
-
             CoroutineScope(Dispatchers.IO).launch {
                 runCatching { UserIO.getByEmail(signUpDTO.email) }
                     .onSuccess { onSignUpError() }
                     .onFailure {
                         UserIO.signUp(signUpDTO)
                         onSignUpMessage()
+                        Log.v("reminisce Logger", "[reminisce > setting > signUp] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
                     }
             }
         }
-
     }
+
 
     private fun setNextEnabledState() {
         val inputtedEmail = viewBinding.signUpEmail.editText!!.text.toString()

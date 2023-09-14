@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import kotlinx.coroutines.CoroutineScope
@@ -29,23 +30,28 @@ class FriendSettingActivity : AppCompatActivity() {
         viewBinding = ActivitySettingFriendBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.settingFriendAppbar.appbarTitle.text = getText(R.string.setting_friend)
-        viewBinding.settingFriendAppbar.appbarActionButton1.isVisible = false
-        viewBinding.settingFriendAppbar.appbarBack.setOnClickListener { finish() }
+        initView()
+        navController()
+        prepareFriends()
+    }
+
+    private fun initView() {
+        viewBinding.settingFriendAppbar.apply {
+            appbarTitle.text = getText(R.string.setting_friend)
+            appbarActionButton1.isVisible = false
+            appbarBack.setOnClickListener { finish() }
+        }
+
         viewBinding.settingFriendAdd.setOnClickListener { launchSearchFriend() }
         viewBinding.settingFriendItems.removeAllViews()
 
         val menuId = intent.getIntExtra("settingMenuId", -1)
         viewBinding.settingFriendNavView.navItems.selectedItemId = menuId
-        navController()
-
-        prepareFriends()
     }
 
     private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendSettingActivity)
-        val userId = UserIO.getByEmail(user.email).id
-        runCatching { FriendIO.listByUserId(userId) }
+        runCatching { FriendIO.listByUserId(user.id) }
             .onSuccess {
                 friends = it
                 for (friend in it) {
@@ -56,26 +62,26 @@ class FriendSettingActivity : AppCompatActivity() {
                 }
             }
             .onFailure {
-                it.cause
-                it.message
-                it.stackTrace
+                Log.v("reminisce Logger", "[reminisce > friendSetting] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
             }
     }
 
     private fun getFriend(userId: Int): UserVO { return users[userId]!! }
 
     private fun addFriendView(friend: FriendVO) {
-        val cardView = LayoutSettingFriendItemBinding.inflate(layoutInflater)
-        cardView.settingFriendTitle.text = friend.nickname ?: getFriend(friend.opponentId).nickname
-        cardView.settingFriendItemIcon.setOnClickListener {
-            UpdateFriendNicknameDialog(
-                this,
-                this,
-                friend,
-                getFriend(friend.opponentId).nickname,
-                getFriend(friend.opponentId).email
-            )
+        val cardView = LayoutSettingFriendItemBinding.inflate(layoutInflater).apply {
+            settingFriendTitle.text = friend.nickname ?: getFriend(friend.opponentId).nickname
+            settingFriendItemIcon.setOnClickListener {
+                UpdateFriendNicknameDialog(
+                    this@FriendSettingActivity,
+                    this@FriendSettingActivity,
+                    friend,
+                    getFriend(friend.opponentId).nickname,
+                    getFriend(friend.opponentId).email
+                )
+            }
         }
+
         cardView.root.setOnLongClickListener {
             DeleteFriendDialog(this, friend.opponentId)
 

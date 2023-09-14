@@ -6,19 +6,29 @@ package studio.hcmc.reminisce
 Home / setting / report / map
 >> Error Handling
 
+Log.v("reminisce Logger", "[reminisce > setting > signOut] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+
+
 * home recyclerview 내용 변경 시 알림 diff 때마다 업데이트
 * category에 저장된 location 수 조회 후 출력
 
 * write_viewer 완성
-* write 에서 입력한 내용들 map으로 묶어서 write_options으로 전달 후 write_options에서 저장
-* write : select friend dialog
+* activity 이동 시 activityResult 써서 완전히 종료
 * write_options : select category dialog
 * AddTagActivity 에서 userId와 tag Body 필요, 버튼 클릭 시 tagIO 요ㅇ
 
  location 저장 시
- 1) tag table insert
- 2) location insert
- 3) location_tag insert -> tag Id 어케 찾냐
+tag 작성 시 이미 저장돼있던 태그를 선택하면 id만 추가,
+          새롭게 저장할 태그라면 태그의 내용만 추가
+
+location insert 할 때 dto에 두 개 항목 포함시켜서 넘김
+tag 중복 검사는 백엔드에서
+
+아 글에서 태그 삭제는 어칼
+location_tag 도 삭제,
+tag 도 삭제
+- 한 트랜잭션 안에서 해야 하는데
+
 
 오늘추억
 
@@ -30,9 +40,41 @@ Home / setting / report / map
 
 
 /*
-post tag :
-add Tag -> TagVO -> id 획득
+서
+reminisce Logger 통일 / reminisce > 현재 카테고리
+ */
+
+/*
+userId, locationId, tagId
+tagService add
+locationService add
+location_tag add 한 트랜잭셩~~~
+ */
+
+/*
+이전에 쓰던 seed : <color name="seed">#FFD52E</color>
 
 
+textField 레퍼런스는 activity_friend_add를 볼
+ */
 
+// android:paddingVertical="@dimen/margin_regular"
+// app:cardElevation="@dimen/card_elevation_standard"
+/*
+textView.apply {
+            writeSelectFriendTitle.text = friend.nickname ?: getFriend(friend.opponentId).nickname
+            root.setOnClickListener {
+                if (!checkFlag) {
+                    writeSelectFriendIcon.isVisible = true
+                    selectedFriendIds.add(friend.opponentId)
+                    selectedFriendNicknames.add(writeSelectFriendTitle.text.toString())
+                    checkFlag = true
+                } else {
+                    writeSelectFriendIcon.isVisible = false
+                    selectedFriendIds.remove(friend.opponentId)
+                    selectedFriendNicknames.remove(writeSelectFriendTitle.text.toString())
+                    checkFlag = false
+                }
+            }
+        }
  */

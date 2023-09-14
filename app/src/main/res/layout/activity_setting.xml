@@ -68,7 +68,7 @@
         android:layout_marginStart="@dimen/margin_4xlarge"
         android:layout_marginTop="@dimen/margin_2xlarge"
         android:fontFamily="@font/pretendard_medium"
-        android:text="@string/setting_logout"
+        android:text="@string/setting_signout"
         android:textSize="@dimen/title_medium"
         app:layout_constraintEnd_toStartOf="@id/setting_sign_out_icon"
         app:layout_constraintStart_toStartOf="parent"

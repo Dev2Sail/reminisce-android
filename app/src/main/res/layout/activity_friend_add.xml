@@ -21,19 +21,19 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_regular"
-        app:boxStrokeColor="@color/md_theme_light_primary"
         app:endIconCheckable="true"
         app:endIconMode="custom"
         app:helperText="@string/add_friend_helper_text"
+        app:hintEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_friend_appbar"
-        app:placeholderText="@string/add_friend_placeholder_text">
+        app:layout_constraintTop_toBottomOf="@id/add_friend_appbar">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendard_medium"
+            android:hint="@string/add_friend_placeholder_text"
             android:inputType="text"
             android:maxLines="1"
             android:textSize="@dimen/body_large" />

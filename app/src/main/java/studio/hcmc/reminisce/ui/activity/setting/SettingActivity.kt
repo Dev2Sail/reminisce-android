@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -23,26 +24,36 @@ class SettingActivity : AppCompatActivity() {
         viewBinding = ActivitySettingBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.settingHeader.commonHeaderTitle.text = getText(R.string.setting_activity_header)
-        viewBinding.settingHeader.commonHeaderAction1.isVisible = false
+        initView()
+        navController()
+    }
+
+    private fun initView() {
+        viewBinding.settingHeader.apply {
+            commonHeaderTitle.text = getText(R.string.setting_activity_header)
+            commonHeaderAction1.isVisible = false
+        }
+
         viewBinding.settingAccountIcon.setOnClickListener { launchAccountSetting() }
         viewBinding.settingFriendIcon.setOnClickListener { launchFriendSetting() }
-        // TODO signOut 클릭시 로그아웃 여부 묻는 dialog
-        viewBinding.settingSignOutIcon.setOnClickListener { signOut() }
+        viewBinding.settingSignOutIcon.setOnClickListener {
+            SignOutDialog(this, signOutDelegate)
+        }
 
         val menuId = intent.getIntExtra("selectedMenuId", -1)
         viewBinding.settingNavView.navItems.selectedItemId = menuId
-        navController()
     }
 
     private fun signOut() = CoroutineScope(Dispatchers.IO).launch {
         runCatching { UserAuthVO(
             UserExtension.getUser(this@SettingActivity).email,
             UserExtension.getUser(this@SettingActivity).password)
-            .delete(this@SettingActivity)
+            .delete(this@SettingActivity) }
+            .onSuccess { onSignOut() }
+            .onFailure {
+            errorSignOut()
+            Log.v("reminisce Logger", "[reminisce > setting > signOut] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
         }
-        .onSuccess { onSignOut() }
-        .onFailure { errorSignOut() }
     }
 
     private fun errorSignOut() = CoroutineScope(Dispatchers.Main).launch {
@@ -79,6 +90,12 @@ class SettingActivity : AppCompatActivity() {
 
                 else -> false
             }
+        }
+    }
+
+    private val signOutDelegate = object : SignOutDialog.Delegate {
+        override fun onDoneClick() {
+            signOut()
         }
     }
 

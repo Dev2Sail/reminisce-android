@@ -39,11 +39,18 @@
     <string name="category_view_holder_title">한눈에 보기</string>
 
     <string name="write_option">Options</string>
+    <string name="write_date">Date</string>
+    <string name="write_location_title">Location</string>
     <string name="writer_options_category">폴더</string>
     <string name="write_options_add_tag_title">해시태그 추가</string>
     <string name="write_options_add_tag_new_tag_container">저장할 해시태그</string>
     <string name="write_options_add_tag_old_tag_container">이전에 사용된 해시태그</string>
     <string name="write_options_add_tag_placeholderText">해시태그 입력 후 엔터를 입력해주세요.</string>
+
+    <string name="write_options_success_date_message">2023년 2월 2일에 다녀온</string>
+    <string name="write_options_success_location_message">"청운대학교" 추억이 저장되었어요!</string>
+    <string name="write_options_next_button">더욱 다양한 추억을 기록해 보세요</string>
+    <string name="write_options_select_category_title">카테고리 선택</string>
 
 
     <string name="add_friend_title">친구 검색</string>
@@ -57,10 +64,11 @@
     <string name="setting_account_detail_password_title">비밀번호 설정</string>
     <string name="setting_account_detail_password_placeholder_text">5자 이상 입력해 주세요.</string>
     <string name="setting_account_service_withdraw">서비스 탈퇴하기</string>
+    <string name="setting_signout_body">오늘추억에서 로그아웃 할까요?</string>
 
 
     <string name="setting_friend">친구 관리</string>
-    <string name="setting_logout">로그아웃</string>
+    <string name="setting_signout">로그아웃</string>
 
     <string name="setting_activity_header">Setting</string>
     <string name="setting_friend_item">friend nickname</string>
@@ -132,6 +140,8 @@
     <string name="write_location">어디에서</string>
     <string name="write_emoji">어떤 모습으로</string>
     <string name="write_friend">누구와</string>
-    <string name="write_hashtag">무엇을 했는지 남겨보세요!</string>
+    <string name="write_hashtag">해시태그</string>
+    <string name="write_category">카테고리</string>
 
+    <string name="message_account_setting_detail_nickname">닉네임이 변경되었어요.</string>
 </resources>

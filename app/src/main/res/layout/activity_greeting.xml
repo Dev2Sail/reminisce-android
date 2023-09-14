@@ -19,7 +19,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_medium"
         android:text="@string/greeting_sign_up"
+        android:textSize="@dimen/label_large"
         app:layout_constraintBottom_toTopOf="@id/greeting_sign_in_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -32,8 +34,10 @@
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginBottom="@dimen/greeting_bottom_margin"
         android:backgroundTint="@color/md_theme_light_surface"
+        android:fontFamily="@font/pretendard_medium"
         android:text="@string/greeting_sign_in"
-        android:textColor="@color/md_theme_light_primary"
+        android:textColor="@color/md_theme_light_onPrimaryContainer"
+        android:textSize="@dimen/label_large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_regular"
-        android:src="@drawable/round_arrow_back_ios_new_24"
+        android:src="@drawable/round_arrow_back_ios_new_16"
         app:layout_constraintBottom_toBottomOf="@id/appbar_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/appbar_title" />
@@ -25,6 +25,7 @@
         android:maxLines="1"
         android:text="@string/appbar_title"
         android:textSize="@dimen/title_medium"
+        app:fontFamily="@font/pretendard_regular"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/appbar_action_container"
         app:layout_constraintStart_toEndOf="@id/appbar_back"
@@ -54,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendard_medium"
-            android:text="저장"
+            android:text="@string/dialog_save"
             android:textSize="@dimen/label_large" />
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

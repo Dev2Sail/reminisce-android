@@ -1,6 +1,7 @@
 package studio.hcmc.reminisce.ui.activity.setting
 
 import android.app.Activity
+import android.util.Log
 import android.view.LayoutInflater
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,12 +39,10 @@ class DeleteFriendDialog(
     private fun deleteFriend(opponentId: Int) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(viewBinding.root.context)
         runCatching { FriendIO.delete(user.id, opponentId) }
-            .onSuccess { CommonMessage.onMessage(viewBinding.root.context, "친구가 끊어졌어요.") }
+            .onSuccess { CommonMessage.onMessage(viewBinding.root.context, "친구가 삭제되었어요.") }
             .onFailure {
                 CommonError.onDialog(viewBinding.root.context)
-                it.cause
-                it.message
-                it.stackTrace
+                Log.v("reminisce Logger", "[reminisce > friendSetting > deleteFriend] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
             }
     }
 }

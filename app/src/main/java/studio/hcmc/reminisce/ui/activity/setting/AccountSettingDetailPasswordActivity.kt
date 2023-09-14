@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import kotlinx.coroutines.CoroutineScope
@@ -27,36 +28,46 @@ class AccountSettingDetailPasswordActivity : AppCompatActivity() {
         viewBinding = ActivitySettingAccountDetailPasswordBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        initView()
+    }
+
+    private fun initView() {
         val appBar = viewBinding.settingAccountDetailPasswordAppbar
-        appBar.appbarTitle.text = getText(R.string.setting_account_detail_password_title)
-        appBar.appbarActionButton1.text = getText(R.string.appbar_button_text)
-        appBar.appbarActionButton1.isEnabled = false
-        appBar.appbarBack.setOnClickListener { finish() }
         val inputField = viewBinding.settingAccountDetailPasswordField
+
+        viewBinding.settingAccountDetailPasswordAppbar.apply {
+            appbarTitle.text = getText(R.string.setting_account_detail_password_title)
+            appbarActionButton1.text = getText(R.string.appbar_button_text)
+            appbarBack.setOnClickListener { finish() }
+            appbarActionButton1.isEnabled = false
+            appbarActionButton1.setOnClickListener {
+                if (inputField.string.length >= 5) {
+                    patchPassword(inputField.string)
+                }
+            }
+        }
+
         inputField.editText!!.addTextChangedListener {
             appBar.appbarActionButton1.isEnabled = inputField.text.isNotEmpty() && inputField.text.length >= 5
-        }
-        appBar.appbarActionButton1.setOnClickListener {
-            if (inputField.string.length >= 5) {
-                patchPassword(inputField.string)
-            }
         }
     }
 
     private fun patchPassword(editedPassword: String) = CoroutineScope(Dispatchers.IO).launch {
-        val userAuth = UserExtension.getUser(this@AccountSettingDetailPasswordActivity)
-        val user = UserIO.getByEmail(userAuth.email)
+        val user = UserExtension.getUser(this@AccountSettingDetailPasswordActivity)
         val patchDTO = UserDTO.Patch().apply {
             password = editedPassword.sha512
         }
         runCatching { UserIO.patch(user.id, patchDTO) }
             .onSuccess {
-                UserAuthVO(userAuth.email, editedPassword).save(this@AccountSettingDetailPasswordActivity)
+                UserAuthVO(user.email, editedPassword).save(this@AccountSettingDetailPasswordActivity)
                 CommonMessage.onMessage(this@AccountSettingDetailPasswordActivity, "비밀번호가 변경되었어요.")
                 Intent(this@AccountSettingDetailPasswordActivity, AccountSettingActivity::class.java).apply {
                     startActivity(this)
                 }
             }
-            .onFailure { CommonError.onDialog(this@AccountSettingDetailPasswordActivity) }
+            .onFailure {
+                CommonError.onDialog(this@AccountSettingDetailPasswordActivity)
+                Log.v("reminisce Logger", "[reminisce > accountSetting > password] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+            }
     }
 }

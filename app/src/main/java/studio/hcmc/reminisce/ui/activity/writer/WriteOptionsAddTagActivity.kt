@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.writer
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +15,6 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityWriteOptionsAddTagBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
@@ -23,7 +23,12 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 class WriteOptionsAddTagActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteOptionsAddTagBinding
     private lateinit var tags: List<TagVO>
+    // 저장할 태그
     private val newTags = ArrayList<String>()
+    // 이전에 저장된 태그들 중 해당 location에 저장할 태그 Id
+//    private val savedTagIds = ArrayList<Int>()
+    private val savedTagIds = HashSet<Int>()
+    private val selectedTagIds = HashSet<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,16 +70,16 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
 
     private fun prepareTags() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@WriteOptionsAddTagActivity)
-        val userId = UserIO.getByEmail(user.email).id
-        runCatching { TagIO.listByUserId(userId) }
+        runCatching { TagIO.listByUserId(user.id) }
             .onSuccess {
                 tags = it
                 for (item in it) {
-                    withContext(Dispatchers.Main) { addSavedChip(item.body) }
+                    withContext(Dispatchers.Main) { addSavedChip(item.id, item.body) }
                 }
             }
             .onFailure {
                 CommonError.debugError(it)
+                Log.v("reminisce Logger", "[reminisce > tag] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
                 CommonError.onDialog(this@WriteOptionsAddTagActivity)
             }
     }
@@ -104,7 +109,7 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
         }
     }
 
-    private fun addSavedChip(value: String) {
+    private fun addSavedChip(id: Int, value: String) {
         val chip = Chip(this).apply {
             text = value
             maxLines = 1
@@ -114,17 +119,12 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
         }
 
         chip.setOnCheckedChangeListener { _, _ ->
-            if (!newTags.contains(value)) {
-                newTags.add(value)
-                viewBinding.writeOptionsAddTagAppbar.apply {
-                    appbarActionButton1.isEnabled = newTags.isNotEmpty()
-                }
+            if (!selectedTagIds.add(id)) {
+                selectedTagIds.remove(id)
+            }
 
-            } else {
-                newTags.remove(value)
-                viewBinding.writeOptionsAddTagAppbar.apply {
-                    appbarActionButton1.isEnabled = newTags.isNotEmpty()
-                }
+            viewBinding.writeOptionsAddTagAppbar.apply {
+                appbarActionButton1.isEnabled = newTags.isNotEmpty() && selectedTagIds.isNotEmpty()
             }
         }
 

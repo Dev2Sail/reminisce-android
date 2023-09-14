@@ -24,7 +24,7 @@ class WriteSelectVisitedAtDialog(
         val viewBinding = DialogSelectVisitedAtBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
 
-
+        // simpleFormat 말고 그냥 format으로 변환
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
         var now = dateFormat.format(Date(System.currentTimeMillis()))
         viewBinding.dialogSelectVisitedAtField.placeholderText = now
