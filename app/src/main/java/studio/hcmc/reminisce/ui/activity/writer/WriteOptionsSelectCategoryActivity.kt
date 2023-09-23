@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.writer
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.divider.MaterialDivider
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +26,7 @@ class WriteOptionsSelectCategoryActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         initView()
+        prepareCategories()
 
     }
 
@@ -33,7 +35,7 @@ class WriteOptionsSelectCategoryActivity : AppCompatActivity() {
             appbarTitle.text = getText(R.string.write_options_select_category_title)
             appbarBack.setOnClickListener { finish() }
             appbarActionButton1.setOnClickListener {
-
+                Toast.makeText(this@WriteOptionsSelectCategoryActivity, "save", Toast.LENGTH_SHORT)
             }
         }
 
@@ -49,9 +51,10 @@ class WriteOptionsSelectCategoryActivity : AppCompatActivity() {
         val user = UserExtension.getUser(this@WriteOptionsSelectCategoryActivity)
         runCatching { CategoryIO.listByUserId(user.id) }
             .onSuccess {
-                categories = it
-                for (category in it) {
-                    addCategoryView(category)
+                  categories = it
+
+                for (category in it.sortedBy { it.sortOrder }) {
+                    prepareCategoryView(category)
                 }
             }
             .onFailure {
@@ -59,30 +62,43 @@ class WriteOptionsSelectCategoryActivity : AppCompatActivity() {
             }
     }
 
-    private fun addCategoryView(category: CategoryVO) {
+    private fun prepareCategoryView(category: CategoryVO) {
         var checkFlag = false
+        val radioView = LayoutWriteOptionsSelectCategoryItemBinding.inflate(layoutInflater).apply {
+            writeOptionsSelectCategoryItem.text = category.title
+        }
         /*
-        textView는 단일 선택만 가능함
-        1) category detail에서 write 한 경우 -> 해당 categoryId 체크
-        2) map에서 write 한 경우 -> 기본 categoryId 체크
+        textView는 단일 선택만 가능함 -> radio group
+
+        array 내 radio button divider 넣어서 ...
+
+        single select -> radio button or
 
          */
-        val textView = LayoutWriteOptionsSelectCategoryItemBinding.inflate(layoutInflater).apply {
-            writeOptionsSelectCategoryTitle.text = category.title
-            root.setOnClickListener {
 
-
-            }
-
-        }
         val divider = MaterialDivider(this)
 
-
-
-
-
-        viewBinding.writeOptionsSelectCategoryItems.addView(textView.root)
+        viewBinding.writeOptionsSelectCategoryItems.addView(radioView.root)
         viewBinding.writeOptionsSelectCategoryItems.addView(divider)
+
+        viewBinding.writeOptionsSelectCategoryRadioGroup.clearCheck()
+        viewBinding.writeOptionsSelectCategoryRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+
+            Log.v("checkedId", "=== checked Id : $checkedId + ${group.checkedRadioButtonId}")
+            Log.v("categoryId", "=== checked category Id : ${category.id} || sort : ${category.sortOrder}" )
+        }
+
+
+
+
+
+
+
+    }
+
+    private fun addCategoryView() {
+    //        viewBinding.writeOptionsSelectCategoryItems.addView(textView.root)
+//        viewBinding.writeOptionsSelectCategoryItems.addView(divider)
 
     }
 

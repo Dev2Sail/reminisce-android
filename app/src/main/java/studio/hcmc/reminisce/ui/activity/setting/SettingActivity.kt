@@ -75,19 +75,14 @@ class SettingActivity : AppCompatActivity() {
 
                     true
                 }
-                R.id.nav_main_map -> {
-                    true
-                }
+                R.id.nav_main_map -> { true }
                 R.id.nav_main_report -> {
                     startActivity(Navigation.onNextReport(applicationContext, it.itemId))
                     finish()
 
                     true
                 }
-                R.id.nav_main_setting -> {
-                    true
-                }
-
+                R.id.nav_main_setting -> { true }
                 else -> false
             }
         }

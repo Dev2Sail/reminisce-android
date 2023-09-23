@@ -25,8 +25,6 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
     private lateinit var tags: List<TagVO>
     // 저장할 태그
     private val newTags = ArrayList<String>()
-    // 이전에 저장된 태그들 중 해당 location에 저장할 태그 Id
-//    private val savedTagIds = ArrayList<Int>()
     private val savedTagIds = HashSet<Int>()
     private val selectedTagIds = HashSet<Int>()
 

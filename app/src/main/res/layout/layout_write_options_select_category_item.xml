@@ -4,6 +4,24 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <com.google.android.material.radiobutton.MaterialRadioButton
+        android:id="@+id/write_options_select_category_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_2xlarge"
+        android:layout_marginEnd="@dimen/margin_4xlarge"
+        android:button="@null"
+        android:drawableEnd="@drawable/round_check_24"
+        android:drawablePadding="@dimen/margin_regular"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="test data"
+        android:textSize="@dimen/title_medium"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 <!--    <com.google.android.material.textview.MaterialTextView-->
 <!--        android:id="@+id/write_options_select_category_title"-->
 <!--        android:layout_width="0dp"-->
@@ -29,29 +47,5 @@
 <!--        app:layout_constraintTop_toTopOf="@id/write_options_select_category_title" />-->
 
 
-    <RadioGroup
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_2xlarge"
-            android:layout_marginEnd="@dimen/margin_4xlarge"
-            android:button="@null"
-            android:drawableEnd="@drawable/round_check_24"
-            android:drawablePadding="@dimen/margin_regular"
-            android:fontFamily="@font/pretendard_medium"
-            android:text="test data"
-
-            android:textSize="@dimen/title_medium"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </RadioGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>

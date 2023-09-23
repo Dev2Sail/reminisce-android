@@ -9,6 +9,13 @@ Home / setting / report / map
 Log.v("reminisce Logger", "[reminisce > setting > signOut] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
 
 
+친구 추가 ㅇㅋ 삭제 어
+
+naver map 의존성 추가 client Id 넣어둠
+담에 확인하고 싱크
+
+
+* 백엔드 locationService 중 put과 patch 개별 작성
 * home recyclerview 내용 변경 시 알림 diff 때마다 업데이트
 * category에 저장된 location 수 조회 후 출력
 

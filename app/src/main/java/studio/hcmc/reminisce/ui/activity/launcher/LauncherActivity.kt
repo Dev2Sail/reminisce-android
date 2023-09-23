@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.naver.maps.map.NaverMapSdk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,6 +23,7 @@ class LauncherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityLauncherBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+        NaverMapSdk.getInstance(applicationContext).client = NaverMapSdk.NaverCloudPlatformClient("ca36w08yej")
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({

@@ -50,7 +50,7 @@
     <string name="write_options_success_date_message">2023년 2월 2일에 다녀온</string>
     <string name="write_options_success_location_message">"청운대학교" 추억이 저장되었어요!</string>
     <string name="write_options_next_button">더욱 다양한 추억을 기록해 보세요</string>
-    <string name="write_options_select_category_title">카테고리 선택</string>
+    <string name="write_options_select_category_title">카테고리 선크</string>
 
 
     <string name="add_friend_title">친구 검색</string>
@@ -144,4 +144,6 @@
     <string name="write_category">카테고리</string>
 
     <string name="message_account_setting_detail_nickname">닉네임이 변경되었어요.</string>
+
+    
 </resources>

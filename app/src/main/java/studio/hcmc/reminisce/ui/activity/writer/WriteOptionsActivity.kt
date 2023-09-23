@@ -43,7 +43,9 @@ class WriteOptionsActivity : AppCompatActivity() {
         }
 
         override fun selectCategoryClick() {
-            TODO("Not yet implemented")
+            Intent(this@WriteOptionsActivity, WriteOptionsSelectCategoryActivity::class.java).apply {
+                startActivity(this)
+            }
         }
     }
 }

@@ -35,6 +35,8 @@ class HomeActivity : AppCompatActivity() {
     private val users = HashMap<Int /* UserId */, UserVO>()
 //    private val categoryInfo = HashMap<Int /* categoryId */, Int /* count */>()
 
+
+    // TODO contents들 arrayList로 만들어 adapter에게 넘길 것
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityHomeBinding.inflate(layoutInflater)
@@ -86,6 +88,8 @@ class HomeActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_main_map -> {
+                    startActivity(Navigation.onNextMap(applicationContext, it.itemId))
+                    finish()
                     true
                 }
 
