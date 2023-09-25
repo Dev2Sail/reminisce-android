@@ -12,7 +12,6 @@ class WriteOptionsDialog(
     interface Delegate {
         fun addTagClick()
         fun addFriendClick()
-
         fun selectCategoryClick()
     }
 
@@ -22,19 +21,8 @@ class WriteOptionsDialog(
 
         dialog.show()
 
-        viewBinding.writeOptionsNextFriend.rootView.setOnClickListener {
-
-            delegate.addFriendClick()
-        }
-
-        viewBinding.writeOptionsNextTag.setOnClickListener {
-
-            delegate.addTagClick()
-        }
-
-        viewBinding.writeOptionsNextCategory.setOnClickListener {
-
-            delegate.selectCategoryClick()
-        }
+        viewBinding.writeOptionsNextFriend.setOnClickListener { delegate.addFriendClick() }
+        viewBinding.writeOptionsNextTag.setOnClickListener { delegate.addTagClick() }
+        viewBinding.writeOptionsNextCategory.setOnClickListener { delegate.selectCategoryClick() }
     }
 }

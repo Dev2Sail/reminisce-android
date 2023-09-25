@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context=".ui.activity.writer.WriteOptionsSelectCategoryActivity">
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.writer.options.WriteOptionSelectCategoryActivity">
 
     <include
         android:id="@+id/write_options_select_category_appbar"
@@ -15,32 +15,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_small"
-        android:clipToPadding="false"
-        android:fillViewport="true"
-        android:paddingBottom="80dp"
-        android:scrollbars="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/write_options_select_category_appbar">
-
-        <LinearLayout
-            android:id="@+id/write_options_select_category_items"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <RadioGroup
-                android:id="@+id/write_options_select_category_radio_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-            </RadioGroup>
-        </LinearLayout>
-    </ScrollView>
+   <androidx.recyclerview.widget.RecyclerView
+       android:id="@+id/write_options_select_category_items"
+       android:layout_width="0dp"
+       android:layout_height="0dp"
+       android:layout_marginTop="@dimen/margin_small"
+       android:clipToPadding="false"
+       android:paddingBottom="80dp"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toBottomOf="@id/write_options_select_category_appbar">
+   </androidx.recyclerview.widget.RecyclerView>
 </androidx.constraintlayout.widget.ConstraintLayout>

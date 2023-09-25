@@ -6,13 +6,25 @@ package studio.hcmc.reminisce
 Home / setting / report / map
 >> Error Handling
 
-Log.v("reminisce Logger", "[reminisce > setting > signOut] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+Log.v("reminisce Logger", "[reminisce > writeOptions > PrePare friend] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
 
 
-친구 추가 ㅇㅋ 삭제 어
+* select category -> 리사이클러뷰 -> categoryItemId 단일 선택 되도록 (기본 카테고리 선택은 됨)
 
-naver map 의존성 추가 client Id 넣어둠
-담에 확인하고 싱크
+recyclerView notify()
+
+1) default checked item id = currentCategoryId
+2)
+
+
+home -> map
+기존 home icon -> folder icon
+map에서 검색해야 글 쓸 수 있게
+
+
+
+
+
 
 
 * 백엔드 locationService 중 put과 patch 개별 작성
@@ -23,6 +35,8 @@ naver map 의존성 추가 client Id 넣어둠
 * activity 이동 시 activityResult 써서 완전히 종료
 * write_options : select category dialog
 * AddTagActivity 에서 userId와 tag Body 필요, 버튼 클릭 시 tagIO 요ㅇ
+
+* categoryDetail checkbox
 
  location 저장 시
 tag 작성 시 이미 저장돼있던 태그를 선택하면 id만 추가,
@@ -65,23 +79,13 @@ location_tag add 한 트랜잭셩~~~
 textField 레퍼런스는 activity_friend_add를 볼
  */
 
-// android:paddingVertical="@dimen/margin_regular"
-// app:cardElevation="@dimen/card_elevation_standard"
+
+
 /*
-textView.apply {
-            writeSelectFriendTitle.text = friend.nickname ?: getFriend(friend.opponentId).nickname
-            root.setOnClickListener {
-                if (!checkFlag) {
-                    writeSelectFriendIcon.isVisible = true
-                    selectedFriendIds.add(friend.opponentId)
-                    selectedFriendNicknames.add(writeSelectFriendTitle.text.toString())
-                    checkFlag = true
-                } else {
-                    writeSelectFriendIcon.isVisible = false
-                    selectedFriendIds.remove(friend.opponentId)
-                    selectedFriendNicknames.remove(writeSelectFriendTitle.text.toString())
-                    checkFlag = false
-                }
-            }
-        }
+kakao - 주소 -> 좌표 받아 naver 변환?
+
+
+
+
  */
+

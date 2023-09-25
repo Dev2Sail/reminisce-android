@@ -140,41 +140,4 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
-
-<!--    <ImageView-->
-<!--        android:id="@+id/test1"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="@dimen/margin_large"-->
-<!--        android:src="@drawable/round_group_add_24"-->
-<!--        app:layout_constraintBottom_toBottomOf="@id/test_title"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="@id/test_title"-->
-<!--        app:tint="@color/md_theme_light_primary" />-->
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/test_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/margin_regular"
-        android:layout_marginStart="@dimen/margin_4xlarge"
-        android:text="@string/write_friend"
-        android:textSize="@dimen/title_medium"
-        app:fontFamily="@font/pretendard_medium"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/test1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/write_options_next_category" />
-
-    <ImageView
-        android:id="@+id/test1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/round_arrow_forward_ios_24"
-        app:layout_constraintTop_toTopOf="@id/test_title"
-        app:layout_constraintBottom_toBottomOf="@id/test_title"
-        android:layout_marginEnd="@dimen/margin_large"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.writer.WriteOptionsAddTagActivity">
+    tools:context=".ui.activity.writer.options.WriteOptionAddTagActivity">
 
     <include
         android:id="@+id/write_options_add_tag_appbar"

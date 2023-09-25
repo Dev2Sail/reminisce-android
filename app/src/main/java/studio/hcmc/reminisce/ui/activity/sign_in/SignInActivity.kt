@@ -27,6 +27,7 @@ class SignInActivity : AppCompatActivity() {
         viewBinding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        initView()
     }
 
     private fun initView() {

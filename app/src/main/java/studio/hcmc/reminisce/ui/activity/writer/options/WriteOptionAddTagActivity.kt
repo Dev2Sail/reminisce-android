@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.writer
+package studio.hcmc.reminisce.ui.activity.writer.options
 
 import android.content.Intent
 import android.os.Bundle
@@ -15,12 +15,13 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityWriteOptionsAddTagBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.TagIO
+import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class WriteOptionsAddTagActivity : AppCompatActivity() {
+class WriteOptionAddTagActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteOptionsAddTagBinding
     private lateinit var tags: List<TagVO>
     // 저장할 태그
@@ -42,7 +43,7 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
             appbarActionButton1.isEnabled = false
             appbarBack.setOnClickListener { finish() }
             appbarActionButton1.setOnClickListener {
-                Intent(this@WriteOptionsAddTagActivity, WriteActivity::class.java).apply {
+                Intent(this@WriteOptionAddTagActivity, WriteActivity::class.java).apply {
                     putStringArrayListExtra("tags", newTags)
                     startActivity(this)
                 }
@@ -67,7 +68,7 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
     }
 
     private fun prepareTags() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@WriteOptionsAddTagActivity)
+        val user = UserExtension.getUser(this@WriteOptionAddTagActivity)
         runCatching { TagIO.listByUserId(user.id) }
             .onSuccess {
                 tags = it
@@ -78,7 +79,7 @@ class WriteOptionsAddTagActivity : AppCompatActivity() {
             .onFailure {
                 CommonError.debugError(it)
                 Log.v("reminisce Logger", "[reminisce > tag] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
-                CommonError.onDialog(this@WriteOptionsAddTagActivity)
+                CommonError.onDialog(this@WriteOptionAddTagActivity)
             }
     }
 

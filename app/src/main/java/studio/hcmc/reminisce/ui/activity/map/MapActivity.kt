@@ -1,17 +1,21 @@
 package studio.hcmc.reminisce.ui.activity.map
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.naver.maps.map.MapView
+import com.naver.maps.map.NaverMap
+import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.util.MapConstants
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityMapBinding
 import studio.hcmc.reminisce.ui.view.Navigation
 
-class MapActivity : AppCompatActivity() {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var viewBinding: ActivityMapBinding
+    private lateinit var naverMap: NaverMap
     private var mapView: MapView? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +33,21 @@ class MapActivity : AppCompatActivity() {
 
         val menuId = intent.getIntExtra("selectedMenuId", -1)
         viewBinding.mapNavView.navItems.selectedItemId = menuId
+        initView()
+
+    }
+
+    private fun initView() {
+        viewBinding.root.setOnClickListener {
+            Intent(this, SearchLocationActivity::class.java).apply {
+                startActivity(this)
+            }
+        }
         navController()
+        val mapUISetting = naverMap.uiSettings.apply {
+        }
+
+
 
     }
 
@@ -76,6 +94,15 @@ class MapActivity : AppCompatActivity() {
         mapView?.onLowMemory()
     }
 
+    override fun onMapReady(map: NaverMap) {
+        naverMap = map
+        naverMap.maxZoom = MapConstants.MIN_ZOOM_KOREA
+
+
+    }
+
+
+
     private fun navController() {
         viewBinding.mapNavView.navItems.setOnItemSelectedListener {
             when (it.itemId) {
@@ -105,8 +132,5 @@ class MapActivity : AppCompatActivity() {
             }
         }
     }
-
-
-
 
 }

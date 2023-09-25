@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -16,22 +18,25 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
+            android:name=".ui.activity.map.SearchLocationActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.map.MapActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.writer.WriteOptionsSelectCategoryActivity"
+            android:name=".ui.activity.writer.options.WriteOptionSelectCategoryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.writer.WriteOptionsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.writer.WriteOptionsSelectFriendActivity"
+            android:name=".ui.activity.writer.options.WriteOptionSelectFriendActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.report.ReportActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.writer.WriteOptionsAddTagActivity"
+            android:name=".ui.activity.writer.options.WriteOptionAddTagActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.setting.AddFriendActivity"

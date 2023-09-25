@@ -46,6 +46,7 @@ class WriteActivity : AppCompatActivity() {
 
                 Intent(this@WriteActivity, WriteOptionsActivity::class.java).apply {
                     // locationId, currentCategoryId
+                    putExtra("currentCategoryId", currentCategoryId)
                     startActivity(this)
                 }
 

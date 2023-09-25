@@ -10,14 +10,13 @@ import studio.hcmc.reminisce.vo.category.CategoryVO
 class CategoryViewHolder(
     private val viewBinding: CardCategoryItemBinding,
     private val delegate: Delegate
-) : ViewHolder(viewBinding.root) {
+): ViewHolder(viewBinding.root) {
     interface Delegate {
         val categories: List<CategoryVO>
-
         fun onCategoryClick(category: CategoryVO)
     }
 
-    constructor(parent: ViewGroup, delegate: Delegate) : this(
+    constructor(parent: ViewGroup, delegate: Delegate): this(
         viewBinding = CardCategoryItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         delegate = delegate
     )

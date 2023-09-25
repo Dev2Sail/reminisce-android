@@ -22,7 +22,6 @@
         android:layout_marginStart="@dimen/margin_small"
         android:fontFamily="@font/pretendard_regular"
         android:text="@string/card_summary_item_body"
-        android:textColor="@color/md_theme_light_primary"
         android:textSize="@dimen/body_small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -6,44 +6,52 @@
     android:layout_height="match_parent"
     tools:context=".ui.activity.map.MapActivity">
 
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/map_header_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_large"
-        android:layout_marginTop="@dimen/margin_large"
-        android:layout_marginEnd="@dimen/margin_2xlarge"
-        android:fontFamily="@font/pretendard_semibold"
-        android:text="@string/home_header"
-        android:textSize="@dimen/headline_medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-<!--    <com.google.android.material.textview.MaterialTextView-->
-<!--        android:id="@+id/map_header_search_"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="@dimen/margin_regular"-->
-<!--        android:layout_marginEnd="@dimen/margin_3xlarge"-->
-<!--        android:layout_marginBottom="@dimen/margin_large"-->
-<!--        android:fontFamily="@font/pretendard_medium"-->
-<!--        android:text="@string/home_header_sub"-->
-<!--        android:textColor="@color/md_theme_light_primary"-->
-<!--        android:textSize="@dimen/title_medium"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/common_header_title" />-->
-
     <com.naver.maps.map.MapView
         android:id="@+id/navermap_map_view"
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:layout_marginHorizontal="@dimen/margin_regular"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/map_nav_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/map_header" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/map_header_search_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_regular"
+            android:layout_marginTop="@dimen/margin_large"
+            android:background="@color/md_theme_light_surface"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/map_header_search_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/margin_regular"
+                android:layout_marginStart="@dimen/margin_regular"
+                android:fontFamily="@font/pretendard_medium"
+                android:text="@string/map_header_search_title"
+                android:textSize="@dimen/body_large"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/map_header_search_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/map_header_search_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_regular"
+                android:src="@drawable/round_search_24"
+                app:layout_constraintBottom_toBottomOf="@id/map_header_search_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/map_header_search_title"
+                app:tint="@color/md_theme_light_primary" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.naver.maps.map.MapView>
 
     <include
         android:id="@+id/map_nav_view"
