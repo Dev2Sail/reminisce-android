@@ -25,35 +25,37 @@ class SettingActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         initView()
-        navController()
     }
 
     private fun initView() {
-        viewBinding.settingHeader.apply {
-            commonHeaderTitle.text = getText(R.string.setting_activity_header)
-            commonHeaderAction1.isVisible = false
-        }
+//        viewBinding.settingHeader.apply {
+//            commonHeaderTitle.text = getText(R.string.setting_activity_header)
+//            commonHeaderAction1.isVisible = false
+//        }
 
-        viewBinding.settingAccountIcon.setOnClickListener { launchAccountSetting() }
-        viewBinding.settingFriendIcon.setOnClickListener { launchFriendSetting() }
-        viewBinding.settingSignOutIcon.setOnClickListener {
-            SignOutDialog(this, signOutDelegate)
+        viewBinding.apply {
+            settingHeader.apply {
+                commonHeaderTitle.text = getText(R.string.setting_activity_header)
+                commonHeaderAction1.isVisible = false
+            }
+            settingAccountIcon.setOnClickListener { launchAccountSetting() }
+            settingFriendIcon.setOnClickListener { launchFriendSetting() }
+            settingSignOutIcon.setOnClickListener { SignOutDialog(this@SettingActivity, signOutDelegate) }
         }
 
         val menuId = intent.getIntExtra("selectedMenuId", -1)
         viewBinding.settingNavView.navItems.selectedItemId = menuId
+        navController()
     }
 
     private fun signOut() = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { UserAuthVO(
-            UserExtension.getUser(this@SettingActivity).email,
-            UserExtension.getUser(this@SettingActivity).password)
+        runCatching { UserAuthVO(UserExtension.getUser(this@SettingActivity).email, UserExtension.getUser(this@SettingActivity).password)
             .delete(this@SettingActivity) }
             .onSuccess { onSignOut() }
             .onFailure {
-            errorSignOut()
-            Log.v("reminisce Logger", "[reminisce > setting > signOut] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
-        }
+                errorSignOut()
+                Log.v("reminisce Logger", "[reminisce > Setting > signOut] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+            }
     }
 
     private fun errorSignOut() = CoroutineScope(Dispatchers.Main).launch {

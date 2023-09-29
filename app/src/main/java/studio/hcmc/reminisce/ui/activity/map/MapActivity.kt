@@ -44,8 +44,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         navController()
-        val mapUISetting = naverMap.uiSettings.apply {
-        }
+//        val mapUISetting = naverMap.uiSettings.apply {
+//        }
 
 
 
@@ -132,5 +132,4 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
-
 }

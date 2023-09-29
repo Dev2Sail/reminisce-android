@@ -28,9 +28,6 @@ class AddFriendDialog(
             dialog.dismiss()
             delegate.onAddClick(opponentId)
         }
-
-        viewBinding.dialogAddFriendCancel.setOnClickListener {
-            dialog.dismiss()
-        }
+        viewBinding.dialogAddFriendCancel.setOnClickListener { dialog.dismiss() }
     }
 }

@@ -42,13 +42,12 @@ class LauncherActivity : AppCompatActivity() {
         val info = UserAuthVO(context)
         Log.v("info", "===== user Info : $info")
         println("123456".sha512)
+
         if (info != null) {
             launchHome()
 
             return@launch
-        } else {
-            launchMain()
-        }
+        } else { launchMain() }
     }
 
     private fun launchHome() {

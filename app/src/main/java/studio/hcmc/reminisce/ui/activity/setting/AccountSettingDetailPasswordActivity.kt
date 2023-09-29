@@ -67,7 +67,7 @@ class AccountSettingDetailPasswordActivity : AppCompatActivity() {
             }
             .onFailure {
                 CommonError.onDialog(this@AccountSettingDetailPasswordActivity)
-                Log.v("reminisce Logger", "[reminisce > accountSetting > password] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                Log.v("reminisce Logger", "[reminisce > Account Setting PW > patch pw] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 }

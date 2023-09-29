@@ -56,12 +56,10 @@ class AddFriendActivity : AppCompatActivity() {
     private fun searchUser() = CoroutineScope(Dispatchers.Main).launch {
         val email = viewBinding.addFriendSearch.string
         runCatching { UserIO.getByEmail(email) }
-            .onSuccess {
-                onResult(it.id, it.nickname, it.email)
-            }
+            .onSuccess { onResult(it.id, it.nickname, it.email) }
             .onFailure {
                 notFoundUser()
-                Log.v("reminisce Logger", "[reminisce > friendSetting > addFriend - searchUser()] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                Log.v("reminisce Logger", "[reminisce > Setting > Add Friend > searchUser] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 
@@ -105,7 +103,7 @@ class AddFriendActivity : AppCompatActivity() {
             }
             .onFailure {
                 onAddFailure()
-                Log.v("reminisce Logger", "[reminisce > friendSetting > addFriend - onAddReady] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                Log.v("reminisce Logger", "[reminisce > Setting > Add Friend > onAddReady] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 

@@ -26,7 +26,6 @@ class AccountSettingActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         initView()
-        navController()
         prepareUser()
     }
 
@@ -39,24 +38,22 @@ class AccountSettingActivity : AppCompatActivity() {
 
         viewBinding.settingAccountNicknameIcon.setOnClickListener { launchNicknameSetting() }
         viewBinding.settingAccountPasswordIcon.setOnClickListener { launchPasswordSetting() }
-        viewBinding.settingAccountWithdraw.setOnClickListener {
-            WithdrawDialog(this, withdrawDelegate)
-        }
+        viewBinding.settingAccountWithdraw.setOnClickListener { WithdrawDialog(this, withdrawDelegate) }
 
         val menuId = intent.getIntExtra("settingMenuId", -1)
         viewBinding.settingAccountNavView.navItems.selectedItemId = menuId
+
+        navController()
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.Main).launch {
         val user = UserExtension.getUser(this@AccountSettingActivity)
         viewBinding.settingAccountEmailBody.text = user.email
         runCatching { UserIO.getByEmail(user.email) }
-            .onSuccess {
-                viewBinding.settingAccountNicknameBody.text = it.nickname
-            }
+            .onSuccess { viewBinding.settingAccountNicknameBody.text = it.nickname }
             .onFailure {
-                viewBinding.settingAccountNicknameBody.text = "닉네임을 로드할 수 없습니다."
-                Log.v("reminisce Logger", "[reminisce > accountSetting ] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                viewBinding.settingAccountNicknameBody.text = "닉네임을 불러올 수 없습니다."
+                Log.v("reminisce Logger", "[reminisce > Account Setting > Prepare user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 
@@ -74,7 +71,7 @@ class AccountSettingActivity : AppCompatActivity() {
                     }
                     .onFailure {
                         CommonError.onDialog(this@AccountSettingActivity)
-                        Log.v("reminisce Logger", "[reminisce > accountSetting > withDraw ] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                        Log.v("reminisce Logger", "[reminisce > Account Setting > onDoneClick] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
                     }
             }
         }

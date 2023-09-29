@@ -10,7 +10,6 @@ class WriteOptionSelectCategoryAdapter(
 ): Adapter<WriteOptionSelectCategoryItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = WriteOptionSelectCategoryItemViewHolder(parent, itemDelegate)
     override fun getItemCount() = itemDelegate.getItemCount()
-
     override fun onBindViewHolder(holder: WriteOptionSelectCategoryItemViewHolder, position: Int) = holder.bind(itemDelegate.getItem(position))
 
 }

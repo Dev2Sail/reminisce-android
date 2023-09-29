@@ -40,9 +40,13 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
-        viewBinding.signUpEmail.editText!!.addTextChangedListener { setNextEnabledState() }
-        viewBinding.signUpPassword.editText!!.addTextChangedListener { setNextEnabledState() }
-        viewBinding.signUpNickname.editText!!.addTextChangedListener { setNextEnabledState() }
+        viewBinding.apply {
+            signUpEmail.editText!!.addTextChangedListener { setNextEnabledState() }
+            signUpPassword.editText!!.addTextChangedListener { setNextEnabledState() }
+            signUpNickname.editText!!.addTextChangedListener { setNextEnabledState() }
+        }
+
+
         viewBinding.signUpNext.setOnClickListener {
             val signUpDTO = UserDTO.Post().apply {
                 email = viewBinding.signUpEmail.string
@@ -56,7 +60,7 @@ class SignUpActivity : AppCompatActivity() {
                     .onFailure {
                         UserIO.signUp(signUpDTO)
                         onSignUpMessage()
-                        Log.v("reminisce Logger", "[reminisce > setting > signUp] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                        Log.v("reminisce Logger", "[reminisce > Sign Up > signup] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
                     }
             }
         }

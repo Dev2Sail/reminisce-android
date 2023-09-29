@@ -45,19 +45,15 @@ class UpdateFriendNicknameDialog(
                 dialog.dismiss()
             }
         }
-        viewBinding.dialogUpdateFriendNicknameCancel.setOnClickListener {
-            dialog.dismiss()
-        }
+        viewBinding.dialogUpdateFriendNicknameCancel.setOnClickListener { dialog.dismiss() }
     }
 
     private fun patchFriend(opponentId: Int, editedNickname: String) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(responseContext)
-        val putDTO = FriendDTO.Put().apply {
-            nickname = editedNickname
-        }
+        val putDTO = FriendDTO.Put().apply { nickname = editedNickname }
         runCatching { FriendIO.put(user.id, opponentId, putDTO) }
             .onFailure {
-                Log.v("reminisce Logger", "[reminisce > friendSetting > update friend nickname] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                Log.v("reminisce Logger", "[reminisce > Friend Setting > patchFriend] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 }

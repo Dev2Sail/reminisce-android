@@ -91,5 +91,4 @@
             android:name=".ui.activity.MainActivity"
             android:exported="false" />
     </application>
-
 </manifest>

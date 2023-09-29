@@ -14,19 +14,17 @@ class SignOutDialog(
         fun onDoneClick()
     }
     init {
-        val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity))
+        val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity)).apply {
+            dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.setting_signout)
+            dialogHomeCategoryDeleteBody.text = activity.getText(R.string.setting_signout_body)
+            dialogHomeCategoryDeleteRemove.text = activity.getText(R.string.dialog_stop_writing_ok)
+            dialogHomeCategoryDeleteCancel.text = activity.getText(R.string.dialog_stop_writing_cancel)
+        }
         val dialog = BottomSheetDialog(activity, viewBinding)
-        viewBinding.dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.setting_signout)
-        viewBinding.dialogHomeCategoryDeleteBody.text = activity.getText(R.string.setting_signout_body)
-        viewBinding.dialogHomeCategoryDeleteRemove.text = activity.getText(R.string.dialog_stop_writing_ok)
-        viewBinding.dialogHomeCategoryDeleteCancel.text = activity.getText(R.string.dialog_stop_writing_cancel)
 
         dialog.show()
 
-        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-
+        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
             dialog.dismiss()
             delegate.onDoneClick()

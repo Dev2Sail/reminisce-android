@@ -22,14 +22,14 @@ class DeleteFriendDialog(
     init {
         viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        viewBinding.dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.dialog_delete_friend_title)
-        viewBinding.dialogHomeCategoryDeleteBody.text = activity.getText(R.string.dialog_delete_friend_body)
+        viewBinding.apply {
+            dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.dialog_delete_friend_title)
+            dialogHomeCategoryDeleteBody.text = activity.getText(R.string.dialog_delete_friend_body)
+        }
 
         dialog.show()
 
-        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener {
-            dialog.dismiss()
-        }
+        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
             deleteFriend(opponentId)
             dialog.dismiss()
@@ -42,7 +42,7 @@ class DeleteFriendDialog(
             .onSuccess { CommonMessage.onMessage(viewBinding.root.context, "친구가 삭제되었어요.") }
             .onFailure {
                 CommonError.onDialog(viewBinding.root.context)
-                Log.v("reminisce Logger", "[reminisce > friendSetting > deleteFriend] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                Log.v("reminisce Logger", "[reminisce > Setting > Delete Friend > deleteFriend] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 }

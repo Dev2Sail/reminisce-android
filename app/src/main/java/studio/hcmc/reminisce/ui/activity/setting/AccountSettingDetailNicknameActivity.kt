@@ -61,7 +61,7 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
             }
             .onFailure {
                 CommonError.onDialog(this@AccountSettingDetailNicknameActivity)
-                Log.v("reminisce Logger", "[reminisce > accountSetting > nickname] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                Log.v("reminisce Logger", "[reminisce > Account Setting Nickname > Prepare user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 
@@ -79,7 +79,7 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
             }
             .onFailure {
                 CommonError.onDialog(this@AccountSettingDetailNicknameActivity)
-                Log.v("reminisce Logger", "[reminisce > accountSetting > nickname] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                Log.v("reminisce Logger", "[reminisce > Account Setting > patch user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 }

@@ -31,22 +31,31 @@ class FriendSettingActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         initView()
-        navController()
         prepareFriends()
     }
 
     private fun initView() {
-        viewBinding.settingFriendAppbar.apply {
-            appbarTitle.text = getText(R.string.setting_friend)
-            appbarActionButton1.isVisible = false
-            appbarBack.setOnClickListener { finish() }
-        }
+//        viewBinding.settingFriendAppbar.apply {
+//            appbarTitle.text = getText(R.string.setting_friend)
+//            appbarActionButton1.isVisible = false
+//            appbarBack.setOnClickListener { finish() }
+//        }
+//        viewBinding.settingFriendAdd.setOnClickListener { launchSearchFriend() }
+//        viewBinding.settingFriendItems.removeAllViews()
 
-        viewBinding.settingFriendAdd.setOnClickListener { launchSearchFriend() }
-        viewBinding.settingFriendItems.removeAllViews()
+        viewBinding.apply {
+            settingFriendAppbar.apply {
+                appbarTitle.text = getText(R.string.setting_friend)
+                appbarActionButton1.isVisible = false
+                appbarBack.setOnClickListener { finish() }
+            }
+            settingFriendAdd.setOnClickListener { launchSearchFriend() }
+            settingFriendItems.removeAllViews()
+        }
 
         val menuId = intent.getIntExtra("settingMenuId", -1)
         viewBinding.settingFriendNavView.navItems.selectedItemId = menuId
+        navController()
     }
 
     private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
@@ -62,7 +71,7 @@ class FriendSettingActivity : AppCompatActivity() {
                 }
             }
             .onFailure {
-                Log.v("reminisce Logger", "[reminisce > friendSetting] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
+                Log.v("reminisce Logger", "[reminisce > Setting > Friend > prepareFriends] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 
