@@ -1,7 +1,6 @@
 package studio.hcmc.reminisce
 
 // * Map
-// TODO 기본 Home으로 이동 (아이콘 및 Nav 수정)
 // TODO 주소 검색 : kakao(주소) -> 좌표 받아 naver 변환
 
 // * Folder
@@ -22,7 +21,6 @@ package studio.hcmc.reminisce
 
 // * Setting
 // TODO 회원탈퇴 시 모든 activity 종료 후 launch 화면으로 이동
-// TODO FriendSettingActivity에 recyclerView
 
 // * Common
 // TODO RecyclerView Notify()

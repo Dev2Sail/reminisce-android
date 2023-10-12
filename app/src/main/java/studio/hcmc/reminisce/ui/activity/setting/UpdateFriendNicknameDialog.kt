@@ -24,6 +24,7 @@ class UpdateFriendNicknameDialog(
     opponentEmail: String
 ) {
     private val responseContext = context
+
     init {
         val viewBinding = DialogUpdateFriendNicknameBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)

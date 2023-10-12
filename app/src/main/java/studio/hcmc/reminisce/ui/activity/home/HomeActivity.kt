@@ -42,8 +42,16 @@ class HomeActivity : AppCompatActivity() {
         viewBinding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        initView()
+//        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
+    }
+
+    private fun initView() {
         val menuId = intent.getIntExtra("selectedMenuId", -1)
-        viewBinding.homeNavView.navItems.selectedItemId = menuId
+        viewBinding.apply {
+            homeNavView.navItems.selectedItemId = menuId
+        }
+
         navController()
         CoroutineScope(Dispatchers.IO).launch { fetchContents() }
     }
@@ -83,28 +91,25 @@ class HomeActivity : AppCompatActivity() {
     private fun navController() {
         viewBinding.homeNavView.navItems.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.nav_main_home -> {
-                    true
-                }
-
+                R.id.nav_main_home -> { true }
                 R.id.nav_main_map -> {
                     startActivity(Navigation.onNextMap(applicationContext, it.itemId))
                     finish()
+
                     true
                 }
-
                 R.id.nav_main_report -> {
                     startActivity(Navigation.onNextReport(applicationContext, it.itemId))
                     finish()
+
                     true
                 }
-
                 R.id.nav_main_setting -> {
                     startActivity(Navigation.onNextSetting(applicationContext, it.itemId))
                     finish()
+
                     true
                 }
-
                 else -> false
             }
         }
@@ -134,7 +139,6 @@ class HomeActivity : AppCompatActivity() {
 
     private val tagDelegate = object : TagViewHolder.Delegate {
         override val tags get() = this@HomeActivity.tags
-
         override fun onTagClick(tag: TagVO) {
             Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
                 putExtra("tagId", tag.id)

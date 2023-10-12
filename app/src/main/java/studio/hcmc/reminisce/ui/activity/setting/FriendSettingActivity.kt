@@ -5,13 +5,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySettingFriendBinding
-import studio.hcmc.reminisce.databinding.LayoutSettingFriendItemBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
@@ -35,13 +35,7 @@ class FriendSettingActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-//        viewBinding.settingFriendAppbar.apply {
-//            appbarTitle.text = getText(R.string.setting_friend)
-//            appbarActionButton1.isVisible = false
-//            appbarBack.setOnClickListener { finish() }
-//        }
-//        viewBinding.settingFriendAdd.setOnClickListener { launchSearchFriend() }
-//        viewBinding.settingFriendItems.removeAllViews()
+        val menuId = intent.getIntExtra("settingMenuId", -1)
 
         viewBinding.apply {
             settingFriendAppbar.apply {
@@ -50,12 +44,16 @@ class FriendSettingActivity : AppCompatActivity() {
                 appbarBack.setOnClickListener { finish() }
             }
             settingFriendAdd.setOnClickListener { launchSearchFriend() }
-            settingFriendItems.removeAllViews()
+            settingFriendNavView.navItems.selectedItemId = menuId
         }
 
-        val menuId = intent.getIntExtra("settingMenuId", -1)
-        viewBinding.settingFriendNavView.navItems.selectedItemId = menuId
+//        viewBinding.settingFriendNavView.navItems.selectedItemId = menuId
         navController()
+    }
+
+    private fun onContentsReady() {
+        viewBinding.settingFriendItems.layoutManager = LinearLayoutManager(this)
+        viewBinding.settingFriendItems.adapter = FriendSettingAdapter(friendItemDelegate)
     }
 
     private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
@@ -66,39 +64,18 @@ class FriendSettingActivity : AppCompatActivity() {
                 for (friend in it) {
                     val opponent = UserIO.getById(friend.opponentId)
                     users[opponent.id] = opponent
-
-                    withContext(Dispatchers.Main) { addFriendView(friend)}
                 }
-            }
-            .onFailure {
-                Log.v("reminisce Logger", "[reminisce > Setting > Friend > prepareFriends] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+
+                withContext(Dispatchers.Main) { onContentsReady() }
+            }.onFailure {
+                Log.v(
+                    "reminisce Logger",
+                    "[reminisce > Setting > Friend > prepareFriends] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}"
+                )
             }
     }
 
     private fun getFriend(userId: Int): UserVO { return users[userId]!! }
-
-    private fun addFriendView(friend: FriendVO) {
-        val cardView = LayoutSettingFriendItemBinding.inflate(layoutInflater).apply {
-            settingFriendTitle.text = friend.nickname ?: getFriend(friend.opponentId).nickname
-            settingFriendItemIcon.setOnClickListener {
-                UpdateFriendNicknameDialog(
-                    this@FriendSettingActivity,
-                    this@FriendSettingActivity,
-                    friend,
-                    getFriend(friend.opponentId).nickname,
-                    getFriend(friend.opponentId).email
-                )
-            }
-        }
-
-        cardView.root.setOnLongClickListener {
-            DeleteFriendDialog(this, friend.opponentId)
-
-            false
-        }
-
-        viewBinding.settingFriendItems.addView(cardView.root)
-    }
 
     private fun navController() {
         viewBinding.settingFriendNavView.navItems.setOnItemSelectedListener {
@@ -125,6 +102,27 @@ class FriendSettingActivity : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+
+    private val friendItemDelegate = object : FriendSettingItemViewHolder.Delegate {
+        override val friends: List<FriendVO>
+            get() = this@FriendSettingActivity.friends
+        override val users: HashMap<Int, UserVO>
+            get() = this@FriendSettingActivity.users
+
+        override fun onItemClick(opponentId: Int, friend: FriendVO) {
+            UpdateFriendNicknameDialog(
+                this@FriendSettingActivity,
+                this@FriendSettingActivity,
+                friend,
+                getFriend(friend.opponentId).nickname,
+                getFriend(friend.opponentId).email
+            )
+        }
+
+        override fun onItemLongClick(opponentId: Int) { DeleteFriendDialog(this@FriendSettingActivity, opponentId) }
+        override fun getItemCount() = friends.size
+        override fun getItem(position: Int) = friends[position]
     }
 
     private fun launchSearchFriend() {

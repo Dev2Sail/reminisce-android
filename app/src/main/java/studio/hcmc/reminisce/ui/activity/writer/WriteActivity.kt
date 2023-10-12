@@ -12,6 +12,7 @@ import studio.hcmc.reminisce.dto.location.LocationDTO
 import studio.hcmc.reminisce.dto.tag.TagDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.TagIO
+import studio.hcmc.reminisce.ui.activity.map.MapActivity
 import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -25,6 +26,7 @@ class WriteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityWriteBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
         initView()
     }
 
@@ -53,10 +55,17 @@ class WriteActivity : AppCompatActivity() {
             }
         }
 
-        viewBinding.writeVisitedAt.rootView.setOnClickListener {
+        viewBinding.writeVisitedAt.setOnClickListener {
             WriteSelectVisitedAtDialog(this@WriteActivity, visitedAtDelegate)
         }
-        viewBinding.writeMarkerEmoji.rootView.setOnClickListener {
+
+        viewBinding.writeLocation.setOnClickListener {
+            Intent(this, MapActivity::class.java).apply {
+                startActivity(this)
+            }
+        }
+
+        viewBinding.writeMarkerEmoji.setOnClickListener {
             WriteSelectEmojiDialog(this@WriteActivity, emojiDelegate)
         }
     }

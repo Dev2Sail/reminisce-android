@@ -14,11 +14,17 @@ class ReportActivity : AppCompatActivity() {
         viewBinding = ActivityReportBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.reportHeader.commonHeaderTitle.text = getText(R.string.activity_report_title)
-        viewBinding.reportHeader.commonHeaderAction1.isVisible = false
+        initView()
+    }
 
+    private fun initView() {
         val menuId = intent.getIntExtra("selectedMenuId", -1)
-        viewBinding.reportNavView.navItems.selectedItemId = menuId
+        viewBinding.apply {
+            reportHeader.commonHeaderTitle.text = getText(R.string.activity_report_title)
+            reportHeader.commonHeaderAction1.isVisible = false
+            reportNavView.navItems.selectedItemId = menuId
+        }
+
         navController()
     }
 
@@ -32,11 +38,12 @@ class ReportActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_main_map -> {
+                    startActivity(Navigation.onNextMap(applicationContext, it.itemId))
+                    finish()
+
                     true
                 }
-                R.id.nav_main_report -> {
-                    true
-                }
+                R.id.nav_main_report -> { true }
                 R.id.nav_main_setting -> {
                     startActivity(Navigation.onNextSetting(applicationContext, it.itemId))
                     finish()

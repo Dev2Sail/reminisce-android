@@ -12,7 +12,6 @@ class SearchLocationActivity : AppCompatActivity() {
         viewBinding = ActivitySearchLocationBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-
         initView()
     }
 

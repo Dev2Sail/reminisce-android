@@ -28,23 +28,17 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-//        viewBinding.settingHeader.apply {
-//            commonHeaderTitle.text = getText(R.string.setting_activity_header)
-//            commonHeaderAction1.isVisible = false
-//        }
+        val menuId = intent.getIntExtra("selectedMenuId", -1)
 
         viewBinding.apply {
-            settingHeader.apply {
-                commonHeaderTitle.text = getText(R.string.setting_activity_header)
-                commonHeaderAction1.isVisible = false
-            }
+            settingHeader.commonHeaderTitle.text = getText(R.string.setting_activity_header)
+            settingHeader.commonHeaderAction1.isVisible = false
             settingAccountIcon.setOnClickListener { launchAccountSetting() }
             settingFriendIcon.setOnClickListener { launchFriendSetting() }
             settingSignOutIcon.setOnClickListener { SignOutDialog(this@SettingActivity, signOutDelegate) }
+            settingNavView.navItems.selectedItemId = menuId
         }
 
-        val menuId = intent.getIntExtra("selectedMenuId", -1)
-        viewBinding.settingNavView.navItems.selectedItemId = menuId
         navController()
     }
 
@@ -77,7 +71,12 @@ class SettingActivity : AppCompatActivity() {
 
                     true
                 }
-                R.id.nav_main_map -> { true }
+                R.id.nav_main_map -> {
+                    startActivity(Navigation.onNextMap(applicationContext, it.itemId))
+                    finish()
+
+                    true
+                }
                 R.id.nav_main_report -> {
                     startActivity(Navigation.onNextReport(applicationContext, it.itemId))
                     finish()
@@ -91,9 +90,7 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private val signOutDelegate = object : SignOutDialog.Delegate {
-        override fun onDoneClick() {
-            signOut()
-        }
+        override fun onDoneClick() { signOut() }
     }
 
     private fun launchAccountSetting() {

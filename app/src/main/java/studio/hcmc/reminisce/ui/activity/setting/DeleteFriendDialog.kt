@@ -25,15 +25,15 @@ class DeleteFriendDialog(
         viewBinding.apply {
             dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.dialog_delete_friend_title)
             dialogHomeCategoryDeleteBody.text = activity.getText(R.string.dialog_delete_friend_body)
+            dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
+            dialogHomeCategoryDeleteRemove.setOnClickListener {
+                deleteFriend(opponentId)
+                dialog.dismiss()
+            }
         }
 
         dialog.show()
 
-        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
-        viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
-            deleteFriend(opponentId)
-            dialog.dismiss()
-        }
     }
 
     private fun deleteFriend(opponentId: Int) = CoroutineScope(Dispatchers.IO).launch {
@@ -42,7 +42,10 @@ class DeleteFriendDialog(
             .onSuccess { CommonMessage.onMessage(viewBinding.root.context, "친구가 삭제되었어요.") }
             .onFailure {
                 CommonError.onDialog(viewBinding.root.context)
-                Log.v("reminisce Logger", "[reminisce > Setting > Delete Friend > deleteFriend] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                Log.v(
+                    "reminisce Logger",
+                    "[reminisce > Setting > Delete Friend > deleteFriend] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}"
+                )
             }
     }
 }

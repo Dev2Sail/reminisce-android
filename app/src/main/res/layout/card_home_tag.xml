@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_3xlarge"
-        android:fontFamily="@font/pretendard_regular"
+        android:fontFamily="@font/pretendard_medium"
         android:text="@string/card_home_tag_title"
         android:textSize="@dimen/title_large" />
 
