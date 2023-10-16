@@ -49,11 +49,11 @@ object LocationIO {
     }
 
     // user의 모든 location count 조회
-    suspend fun getTotalCountByUserId(userId: Int) {
-        httpClient
-            .get("/location/report")
-            .bodyAsText()
-    }
+//    suspend fun getTotalCountByUserId(userId: Int) {
+//        httpClient
+//            .get("/location/report") { parameter("userId", userId) }
+//            .bodyAsText()
+//    }
 
     // userId의 category별로 저장된 location 조회
     suspend fun listByCategoryId(categoryId: Int): List<LocationVO> {

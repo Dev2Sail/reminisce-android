@@ -18,6 +18,15 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
+            android:name=".ui.activity.category.CategoryTitleEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.category.editable.CategoryEditableDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.writer.detail.WriteDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.map.SearchLocationActivity"
             android:exported="false" />
         <activity
@@ -91,4 +100,5 @@
             android:name=".ui.activity.MainActivity"
             android:exported="false" />
     </application>
+
 </manifest>

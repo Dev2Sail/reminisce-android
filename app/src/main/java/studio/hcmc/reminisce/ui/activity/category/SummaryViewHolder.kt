@@ -3,7 +3,6 @@ package studio.hcmc.reminisce.ui.activity.category
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardCategoryDetailSummaryBinding
@@ -26,7 +25,6 @@ class SummaryViewHolder(
 
     fun bind(location: LocationVO) {
         viewBinding.cardCategoryDetailSummaryTitle.text = location.title
-        val checkBox = viewBinding.cardCategoryDetailSummaryCheckbox.isVisible
 
         // visitedAt
         viewBinding.cardCategoryDetailSummaryVisitedAt.cardCategoryDetailSummaryItemTitle.text = location.createdAt.toString()

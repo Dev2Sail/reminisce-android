@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/card_category_detail_summary_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="-8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:clickable="true"
+        app:layout_constraintEnd_toStartOf="@id/card_category_detail_summary_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_category_detail_summary_container"
@@ -12,9 +23,11 @@
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_regular"
         app:cardElevation="@dimen/card_elevation_standard"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/card_category_detail_summary_checkbox"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,7 +38,6 @@
                 android:id="@+id/card_category_detail__summary_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_regular"
                 android:layout_marginTop="@dimen/margin_regular"
                 android:fontFamily="@font/pretendard_medium"
                 android:text="@string/card_summary_title"
@@ -39,7 +51,6 @@
                 layout="@layout/card_category_detail_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_regular"
                 android:layout_marginTop="@dimen/margin_regular"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +61,6 @@
                 layout="@layout/card_category_detail_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_regular"
                 android:layout_marginTop="@dimen/margin_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +71,6 @@
                 layout="@layout/card_category_detail_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_regular"
                 android:layout_marginTop="@dimen/margin_small"
                 android:layout_marginBottom="@dimen/margin_regular"
                 app:layout_constraintBottom_toBottomOf="parent"

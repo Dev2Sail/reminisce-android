@@ -2,13 +2,13 @@ package studio.hcmc.reminisce.ui.activity.home
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.databinding.DialogDeleteHomeCategoryBinding
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
+import studio.hcmc.reminisce.util.Logger
 
 class DeleteCategoryDialog(
     context: Context,
@@ -22,25 +22,21 @@ class DeleteCategoryDialog(
 
         dialog.show()
 
-        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
-        viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
-            dialog.dismiss()
-            deleteCategory()
-        }
+       viewBinding.apply {
+           dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
+           dialogHomeCategoryDeleteRemove.setOnClickListener {
+               dialog.dismiss()
+               deleteCategory()
+           }
+       }
     }
     private fun deleteCategory() = CoroutineScope(Dispatchers.IO).launch {
         runCatching { CategoryIO.delete(selectedCategoryId) }
             .onSuccess {
-                onDeleteMessage(viewBinding.root.context)
+                // TODO recyclerView notify()
             }
             .onFailure {
-                it.cause
-                it.message
-                it.stackTrace
+                Logger.v("reminisce Logger", "[reminisce > Delete Category > deleteCategory] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
-    }
-
-    private fun onDeleteMessage(context: Context) = CoroutineScope(Dispatchers.Main).launch {
-        Toast.makeText(context, "폴더가 삭제되었어요", Toast.LENGTH_SHORT).show()
     }
 }

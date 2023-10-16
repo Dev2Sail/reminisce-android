@@ -1,6 +1,7 @@
 package studio.hcmc.reminisce.io.ktor_client
 
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -47,11 +48,15 @@ object CategoryIO {
             .body()
     }
 
-    // userId의 category별로 저장된 location count 조회
-    suspend fun getCountByCategoryIdAndUserId(userId: Int, categoryId: Int) {
-        httpClient
-            .get("/user/${userId}/category") {
-                parameter("categoryId", categoryId)
-            }.bodyAsText()
+    suspend fun getCountByCategoryIdAndUserId(userId: Int, categoryId: Int): JsonObject {
+        return httpClient
+            .get("/user/${userId}/category/count") { parameter("categoryId", categoryId) }
+            .body()
+    }
+
+    suspend fun getTotalCountByUserId(userId: Int): JsonObject {
+        return httpClient
+            .get("/user/${userId}/category/count/all")
+            .body()
     }
 }

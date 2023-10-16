@@ -58,6 +58,7 @@ class SignInActivity : AppCompatActivity() {
                         UserAuthVO(email, plainPassword).save(this@SignInActivity)
                         Intent(this@SignInActivity, HomeActivity::class.java).apply {
                             startActivity(this)
+                            finish()
                         }
                     }.onFailure {
                         onSignInError()

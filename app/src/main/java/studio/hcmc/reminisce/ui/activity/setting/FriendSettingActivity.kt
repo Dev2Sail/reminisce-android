@@ -31,7 +31,6 @@ class FriendSettingActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         initView()
-        prepareFriends()
     }
 
     private fun initView() {
@@ -47,7 +46,7 @@ class FriendSettingActivity : AppCompatActivity() {
             settingFriendNavView.navItems.selectedItemId = menuId
         }
 
-//        viewBinding.settingFriendNavView.navItems.selectedItemId = menuId
+        prepareFriends()
         navController()
     }
 
@@ -87,6 +86,9 @@ class FriendSettingActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_main_map -> {
+                    startActivity(Navigation.onNextMap(applicationContext, it.itemId))
+                    finish()
+
                     true
                 }
                 R.id.nav_main_report -> {

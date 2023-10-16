@@ -13,6 +13,7 @@ class CategoryDetailHeaderViewHolder (
     interface Delegate {
         val title: String
         fun onClick()
+        fun onTitleClick()
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -25,6 +26,10 @@ class CategoryDetailHeaderViewHolder (
             viewBinding.cardCategoryDetailHeaderTitle.text = viewBinding.root.context.getText(R.string.category_view_holder_title)
         } else {
             viewBinding.cardCategoryDetailHeaderTitle.text = delegate.title
+        }
+
+        viewBinding.cardCategoryDetailHeaderEdit.setOnClickListener {
+            delegate.onTitleClick()
         }
 
         viewBinding.cardCategoryDetailHeaderAction1.setOnClickListener {

@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
-import studio.hcmc.reminisce.databinding.LayoutWriteOptionsSelectCategoryItemBinding
+import studio.hcmc.reminisce.databinding.CardWriteOptionsSelectCategoryItemBinding
 import studio.hcmc.reminisce.ui.view.SingleTypeAdapterDelegate
 import studio.hcmc.reminisce.vo.category.CategoryVO
 
 class WriteOptionSelectCategoryItemViewHolder(
-    private val viewBinding: LayoutWriteOptionsSelectCategoryItemBinding,
+    private val viewBinding: CardWriteOptionsSelectCategoryItemBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate: SingleTypeAdapterDelegate<CategoryVO> {
@@ -20,7 +20,7 @@ class WriteOptionSelectCategoryItemViewHolder(
     }
 
     constructor(parent: ViewGroup, delegate: Delegate) : this(
-        viewBinding = LayoutWriteOptionsSelectCategoryItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+        viewBinding = CardWriteOptionsSelectCategoryItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         delegate = delegate
     )
 

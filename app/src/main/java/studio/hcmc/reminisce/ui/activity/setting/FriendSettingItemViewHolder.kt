@@ -3,13 +3,13 @@ package studio.hcmc.reminisce.ui.activity.setting
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import studio.hcmc.reminisce.databinding.LayoutSettingFriendItemBinding
+import studio.hcmc.reminisce.databinding.CardSettingFriendItemBinding
 import studio.hcmc.reminisce.ui.view.SingleTypeAdapterDelegate
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
 class FriendSettingItemViewHolder(
-    private val viewBinding: LayoutSettingFriendItemBinding,
+    private val viewBinding: CardSettingFriendItemBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate: SingleTypeAdapterDelegate<FriendVO> {
@@ -20,7 +20,7 @@ class FriendSettingItemViewHolder(
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
-        viewBinding = LayoutSettingFriendItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+        viewBinding = CardSettingFriendItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         delegate = delegate
     )
 

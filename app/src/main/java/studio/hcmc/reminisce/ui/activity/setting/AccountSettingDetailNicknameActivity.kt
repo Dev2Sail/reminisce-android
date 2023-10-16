@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import kotlinx.coroutines.CoroutineScope
@@ -14,7 +13,7 @@ import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.view.CommonError
-import studio.hcmc.reminisce.ui.view.CommonMessage
+import studio.hcmc.reminisce.util.Logger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
@@ -27,7 +26,6 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         initView()
-        prepareUser()
     }
 
     private fun initView() {
@@ -49,6 +47,8 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
         inputField.editText!!.addTextChangedListener {
             appBar.appbarActionButton1.isEnabled = inputField.text.isNotEmpty() && inputField.string.length <= 20
         }
+
+        prepareUser()
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.Main).launch {
@@ -61,7 +61,7 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
             }
             .onFailure {
                 CommonError.onDialog(this@AccountSettingDetailNicknameActivity)
-                Log.v("reminisce Logger", "[reminisce > Account Setting Nickname > Prepare user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                Logger.v("reminisce Logger", "[reminisce > Account Setting Nickname > Prepare user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 
@@ -72,14 +72,14 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
         }
         runCatching { UserIO.patch(user.id, patchDTO) }
             .onSuccess {
-                CommonMessage.onMessage(this@AccountSettingDetailNicknameActivity, "닉네임이 변경되었어요.")
                 Intent(this@AccountSettingDetailNicknameActivity, AccountSettingActivity::class.java).apply {
                     startActivity(this)
+                    finish()
                 }
             }
             .onFailure {
                 CommonError.onDialog(this@AccountSettingDetailNicknameActivity)
-                Log.v("reminisce Logger", "[reminisce > Account Setting > patch user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                Logger.v("reminisce Logger", "[reminisce > Account Setting > patch user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 }

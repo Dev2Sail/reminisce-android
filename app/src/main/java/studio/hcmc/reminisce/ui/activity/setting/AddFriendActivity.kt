@@ -16,6 +16,7 @@ import studio.hcmc.reminisce.dto.friend.FriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
+import studio.hcmc.reminisce.util.Logger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
@@ -103,7 +104,7 @@ class AddFriendActivity : AppCompatActivity() {
             }
             .onFailure {
                 onAddFailure()
-                Log.v("reminisce Logger", "[reminisce > Setting > Add Friend > onAddReady] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                Logger.v("reminisce Logger", "[reminisce > Setting > Add Friend > onAddReady] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
             }
     }
 

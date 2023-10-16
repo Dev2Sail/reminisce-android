@@ -39,6 +39,8 @@ class CategoryDetailAdapter(
             else -> throw AssertionError()
         }
     }
+
+
 }
 /*
 override fun getItemViewType(position: Int): Int {

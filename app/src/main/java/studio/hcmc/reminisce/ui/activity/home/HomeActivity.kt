@@ -20,6 +20,7 @@ import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.ui.view.Navigation
+import studio.hcmc.reminisce.util.Logger
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.tag.TagVO
@@ -33,8 +34,7 @@ class HomeActivity : AppCompatActivity() {
     private val cityTags = ArrayList<String>()
 
     private val users = HashMap<Int /* UserId */, UserVO>()
-//    private val categoryInfo = HashMap<Int /* categoryId */, Int /* count */>()
-
+    private val categoryInfo = HashMap<Int /* categoryId */, Int /* countById */>()
 
     // TODO contents들 arrayList로 만들어 adapter에게 넘길 것
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +71,22 @@ class HomeActivity : AppCompatActivity() {
                     users[opponent.id] = opponent
                 }
             }
+
+            for (category in categories) {
+                if (category.title == "Default") {
+                    val totalCount = CategoryIO.getTotalCountByUserId(user.id).get("totalCount")
+                    categoryInfo[category.id] = totalCount.asInt
+                } else {
+                    val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, category.id).get("count")
+                    categoryInfo[category.id] = count.asInt
+                }
+            }
+
+
+            for (info in categoryInfo) {
+                Logger.v("hcmc logger", "=== ${info.key}, ${info.value}")
+            }
+
         }
 
         if (result.isSuccess) {
@@ -127,6 +143,8 @@ class HomeActivity : AppCompatActivity() {
     private val categoryDelegate = object : CategoryViewHolder.Delegate {
         override val categories: List<CategoryVO>
             get() = this@HomeActivity.categories
+        override val categoryInfo: Map<Int, Int>
+            get() = this@HomeActivity.categoryInfo
 
         override fun onCategoryClick(category: CategoryVO) {
             Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {

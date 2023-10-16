@@ -13,6 +13,7 @@ class CategoryViewHolder(
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
         val categories: List<CategoryVO>
+        val categoryInfo: Map<Int, Int>
         fun onCategoryClick(category: CategoryVO)
     }
 
@@ -22,15 +23,14 @@ class CategoryViewHolder(
     )
 
     fun bind(category: CategoryVO) {
-        if (category.title == "Default") {
-            viewBinding.homeCategoryTitle.text = viewBinding.root.context.getText(R.string.category_view_holder_title)
-        } else {
-            viewBinding.homeCategoryTitle.text = category.title
+        when(category.title) {
+            "Default" -> viewBinding.homeCategoryTitle.text = viewBinding.root.context.getText(R.string.category_view_holder_title)
+            "new" -> viewBinding.homeCategoryTitle.text = viewBinding.root.context.getText(R.string.add_category_body)
+            else -> viewBinding.homeCategoryTitle.text = category.title
         }
-//        viewBinding.homeCategoryBody.text = delegate.getCount(category.id).toString()
-        viewBinding.homeCategoryAction1.setOnClickListener {
-            delegate.onCategoryClick(category)
-        }
+
+        viewBinding.homeCategoryBody.text = delegate.categoryInfo[category.id].toString()
+        viewBinding.homeCategoryAction1.setOnClickListener { delegate.onCategoryClick(category) }
         viewBinding.root.setOnLongClickListener {
             DeleteCategoryDialog(it.context, category.id)
             false
