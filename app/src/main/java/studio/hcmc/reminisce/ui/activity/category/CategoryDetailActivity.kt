@@ -67,7 +67,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         if (categoryTitle == "Default") {
             runCatching { LocationIO.listByUserId(user.id) }
                 .onSuccess {
-                    locations = it
+                    locations = it!!
                     withContext(Dispatchers.Main) { onContentsReady() }
                 }
                 .onFailure {
@@ -77,7 +77,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         } else {
             runCatching { LocationIO.listByCategoryId(categoryId) }
                 .onSuccess {
-                    locations = it
+                    locations = it!!
                     withContext(Dispatchers.Main) { onContentsReady() }
                 }
                 .onFailure {

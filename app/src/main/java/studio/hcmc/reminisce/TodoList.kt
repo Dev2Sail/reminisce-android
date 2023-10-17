@@ -36,10 +36,28 @@ package studio.hcmc.reminisce
 // TODO error handling
 
 // * BackEnd
-// TODO locationService 중 put과 patch 개별 작성
+// TODO locationService 중 put과 patch 개별 작성\
+
+
+
+// add location -> locationId
+// tag가 여러 개일 경우
+// tag가 저장될 때 location_tag에도 한 트랜잭션에서 동시에 저장
+
+
+// location_friend -> friend list ->
+// location_tag
+
+
+
 
 // LocationDTO Post, Patch, Put
-//
+/*
+ * location 저장 시
+ * locationId, title, body, visitedAt, markerEmoji, latitude, longitude 저장
+ * 이후 location_tag or location_friend 저장 가능
+ * 저장했던 location을
+ */
 
 
 

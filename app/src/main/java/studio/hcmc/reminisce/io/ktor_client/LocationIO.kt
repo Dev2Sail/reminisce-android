@@ -34,37 +34,30 @@ object LocationIO {
     }
 
     // 하나의 location 조회
-    suspend fun getById(locationId: Int): LocationVO {
+    suspend fun getById(locationId: Int): LocationVO? {
         return httpClient
             .get("/location/${locationId}")
             .body()
     }
 
     // user의 모든 location 조회
-    suspend fun listByUserId(userId: Int): List<LocationVO> {
+    suspend fun listByUserId(userId: Int): List<LocationVO>? {
         return httpClient
             .get("/location/list/all") {
                 parameter("userId", userId)
             }.body()
     }
 
-    // user의 모든 location count 조회
-//    suspend fun getTotalCountByUserId(userId: Int) {
-//        httpClient
-//            .get("/location/report") { parameter("userId", userId) }
-//            .bodyAsText()
-//    }
-
     // userId의 category별로 저장된 location 조회
-    suspend fun listByCategoryId(categoryId: Int): List<LocationVO> {
+    suspend fun listByCategoryId(categoryId: Int): List<LocationVO>? {
         return httpClient
             .get("/location/list") {
                 parameter("categoryId", categoryId)
             }.body()
     }
 
-    // userId에 동일 opponentId가 등록된 location 조회
-    suspend fun listByUserIdAndOpponentId(userId: Int, opponentId: Int): List<LocationVO> {
+    // Friend에 존재하는 opponentId가 등록된 location 조회
+    suspend fun listByUserIdAndOpponentId(userId: Int, opponentId: Int): List<LocationVO>? {
         return httpClient
             .get("/location/friend/list") {
                 parameter("userId", userId)
@@ -72,8 +65,17 @@ object LocationIO {
             }.body()
     }
 
+    // tagId가 등록된 location list 조회
+    suspend fun listByUserIdAndTagId(userId: Int, tagId: Int): List<LocationVO>? {
+        return httpClient
+            .get("/location/tag/list") {
+                parameter("userId", userId)
+                parameter("tagId", tagId)
+            }.body()
+    }
+
     // userId에 저장된 location 중 동일 title로 저장된 location 조회
-    suspend fun listByUserIdAndTitle(userId: Int, title: String): List<LocationVO> {
+    suspend fun listByUserIdAndTitle(userId: Int, title: String): List<LocationVO>? {
         return httpClient
             .get("/location/list") {
                 parameter("userId", userId)

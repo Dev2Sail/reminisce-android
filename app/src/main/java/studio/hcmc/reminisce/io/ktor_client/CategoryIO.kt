@@ -17,23 +17,20 @@ import studio.hcmc.reminisce.vo.category.CategoryVO
 object CategoryIO {
     suspend fun post(dto: CategoryDTO.Post) {
         httpClient
-            .post("/user/category") {
-                setBody(Gson().toJsonTree(dto))
-            }.bodyAsText()
+            .post("/user/category") { setBody(Gson().toJsonTree(dto)) }
+                .bodyAsText()
     }
 
     suspend fun put(userId: Int, dto: CategoryDTO.Put) {
         httpClient
-            .put("/user/${userId}/category") {
-                setBody(Gson().toJsonTree(dto))
-            }.bodyAsText()
+            .put("/user/${userId}/category") { setBody(Gson().toJsonTree(dto)) }
+            .bodyAsText()
     }
 
     suspend fun patch(userId: Int, categoryId: Int, dto: CategoryDTO.Patch) {
         httpClient
-            .patch("/user/${userId}/category/${categoryId}") {
-                setBody(Gson().toJsonTree(dto))
-            }.bodyAsText()
+            .patch("/user/${userId}/category/${categoryId}") { setBody(Gson().toJsonTree(dto)) }
+            .bodyAsText()
     }
 
     suspend fun delete(categoryId: Int) {

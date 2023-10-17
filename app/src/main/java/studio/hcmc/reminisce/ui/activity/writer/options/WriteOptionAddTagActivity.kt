@@ -1,6 +1,5 @@
 package studio.hcmc.reminisce.ui.activity.writer.options
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -15,7 +14,6 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityWriteOptionsAddTagBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
@@ -43,10 +41,11 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
             appbarActionButton1.isEnabled = false
             appbarBack.setOnClickListener { finish() }
             appbarActionButton1.setOnClickListener {
-                Intent(this@WriteOptionAddTagActivity, WriteActivity::class.java).apply {
-                    putStringArrayListExtra("tags", newTags)
-                    startActivity(this)
-                }
+//                Intent(this@WriteOptionAddTagActivity, WriteActivity::class.java).apply {
+//                    putStringArrayListExtra("tags", newTags)
+//                    startActivity(this)
+//                    finish()
+//                }
             }
         }
 
@@ -77,10 +76,15 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
                 }
             }
             .onFailure {
+                CommonError.onMessageDialog(this@WriteOptionAddTagActivity, "태그 불러오기 오류", "태그를 불러오는 데 실패했어요. \n 다시 실행해 주세요.")
                 CommonError.debugError(it)
                 Log.v("reminisce Logger", "[reminisce > tag] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
                 CommonError.onDialog(this@WriteOptionAddTagActivity)
             }
+    }
+
+    private fun postContents() = CoroutineScope(Dispatchers.IO).launch {
+
     }
 
     private fun addNewChip(value: String) {
@@ -92,7 +96,6 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
             isCloseIconVisible = true
             setCloseIconResource(R.drawable.round_close_12)
         }
-
         newChip.setOnCloseIconClickListener {
             field.removeView(it)
             newTags.remove(value)

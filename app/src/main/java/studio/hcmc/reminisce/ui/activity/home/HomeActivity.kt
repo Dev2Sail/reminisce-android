@@ -14,15 +14,17 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityHomeBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
-import studio.hcmc.reminisce.io.ktor_client.FriendIO
+import studio.hcmc.reminisce.io.ktor_client.LocationFriendIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
+import studio.hcmc.reminisce.ui.activity.category.FriendTagDetailActivity
+import studio.hcmc.reminisce.ui.activity.category.TagDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.ui.view.Navigation
-import studio.hcmc.reminisce.util.Logger
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
+import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
@@ -30,7 +32,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var categories: List<CategoryVO>
     private lateinit var tags: List<TagVO>
-    private lateinit var friends: List<FriendVO>
+    private lateinit var friends: List<LocationFriendVO>
     private val cityTags = ArrayList<String>()
 
     private val users = HashMap<Int /* UserId */, UserVO>()
@@ -44,13 +46,14 @@ class HomeActivity : AppCompatActivity() {
 
         initView()
 //        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
+        // TODO location_friend 조회 -> nickname null check 필요하니까 location_friend 조회 시 friend join -> userId && opponentId로 location 조회
+        // TODO location_tag 조회 -> userId && tagId로 location 조회
+        // TODO IO코드 Nullable 체크
     }
 
     private fun initView() {
         val menuId = intent.getIntExtra("selectedMenuId", -1)
-        viewBinding.apply {
-            homeNavView.navItems.selectedItemId = menuId
-        }
+        viewBinding.apply { homeNavView.navItems.selectedItemId = menuId }
 
         navController()
         CoroutineScope(Dispatchers.IO).launch { fetchContents() }
@@ -62,7 +65,8 @@ class HomeActivity : AppCompatActivity() {
             listOf(
                 launch { categories = CategoryIO.listByUserId(user.id) },
                 launch { tags = TagIO.listByUserId(user.id) },
-                launch { friends = FriendIO.listByUserId(user.id) }
+//                launch { friends = FriendIO.listByUserId(user.id) }
+                launch { friends = LocationFriendIO.listByUserId(user.id) }
             ).joinAll()
 
             for (friend in friends) {
@@ -81,12 +85,6 @@ class HomeActivity : AppCompatActivity() {
                     categoryInfo[category.id] = count.asInt
                 }
             }
-
-
-            for (info in categoryInfo) {
-                Logger.v("hcmc logger", "=== ${info.key}, ${info.value}")
-            }
-
         }
 
         if (result.isSuccess) {
@@ -101,7 +99,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.homeItems.layoutManager = LinearLayoutManager(this)
-        viewBinding.homeItems.adapter = HomeAdapter(headerDelegate, categoryDelegate, personTagDelegate, cityDelegate, tagDelegate)
+        viewBinding.homeItems.adapter = HomeAdapter(headerDelegate, categoryDelegate, friendTagDelegate, cityDelegate, tagDelegate)
     }
 
     private fun navController() {
@@ -158,14 +156,15 @@ class HomeActivity : AppCompatActivity() {
     private val tagDelegate = object : TagViewHolder.Delegate {
         override val tags get() = this@HomeActivity.tags
         override fun onTagClick(tag: TagVO) {
-            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
+            // TODO intent -> ActivityTagDetail
+            Intent(this@HomeActivity, TagDetailActivity::class.java).apply {
                 putExtra("tagId", tag.id)
                 startActivity(this)
             }
         }
     }
 
-    private val personTagDelegate = object : FriendTagViewHolder.Delegate {
+    private val friendTagDelegate = object : FriendTagViewHolder.Delegate {
         override val friends: List<FriendVO>
             get() = this@HomeActivity.friends
 
@@ -174,10 +173,10 @@ class HomeActivity : AppCompatActivity() {
         }
 
         override fun onTagClick(friendTag: FriendVO) {
-//            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
-//                putExtra("locationId", friendTag.locationId)
-//                startActivity(this)
-//            }
+            Intent(this@HomeActivity, FriendTagDetailActivity::class.java).apply {
+                putExtra("opponentId", friendTag.opponentId)
+                startActivity(this)
+            }
         }
     }
 
