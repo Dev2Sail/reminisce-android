@@ -12,7 +12,7 @@
         android:fontFamily="@font/pretendard_medium"
         android:text="@string/card_date_separator"
         android:textColor="@color/md_theme_light_secondary"
-        android:textSize="@dimen/body_medium"
+        android:textSize="@dimen/title_medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

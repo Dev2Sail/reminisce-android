@@ -22,9 +22,10 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 class WriteOptionAddTagActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteOptionsAddTagBinding
     private lateinit var tags: List<TagVO>
-    // 저장할 태그
+    // 저장할 태그 body
     private val newTags = ArrayList<String>()
     private val savedTagIds = HashSet<Int>()
+    // 저장돼있던 태그 중 해당 location에 저장할 tagId
     private val selectedTagIds = HashSet<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

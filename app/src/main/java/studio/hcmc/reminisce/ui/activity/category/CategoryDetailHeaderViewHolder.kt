@@ -9,7 +9,7 @@ import studio.hcmc.reminisce.databinding.CardCategoryDetailHeaderBinding
 class CategoryDetailHeaderViewHolder (
     private val viewBinding: CardCategoryDetailHeaderBinding,
     private val delegate: Delegate
-) : ViewHolder(viewBinding.root) {
+): ViewHolder(viewBinding.root) {
     interface Delegate {
         val title: String
         fun onClick()
@@ -22,18 +22,8 @@ class CategoryDetailHeaderViewHolder (
     )
 
     fun bind() {
-        if (delegate.title == "Default") {
-            viewBinding.cardCategoryDetailHeaderTitle.text = viewBinding.root.context.getText(R.string.category_view_holder_title)
-        } else {
-            viewBinding.cardCategoryDetailHeaderTitle.text = delegate.title
-        }
-
-        viewBinding.cardCategoryDetailHeaderEdit.setOnClickListener {
-            delegate.onTitleClick()
-        }
-
-        viewBinding.cardCategoryDetailHeaderAction1.setOnClickListener {
-            delegate.onClick()
-        }
+        viewBinding.cardCommonUneditableHeaderTitle.text = if (delegate.title == "Default") viewBinding.root.context.getText(R.string.category_view_holder_title) else delegate.title
+        viewBinding.cardCategoryDetailHeaderEdit.setOnClickListener { delegate.onTitleClick() }
+        viewBinding.cardCommonUneditableHeaderAction1.setOnClickListener { delegate.onClick() }
     }
 }

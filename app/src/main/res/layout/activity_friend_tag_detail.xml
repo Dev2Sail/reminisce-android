@@ -4,18 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.category.FriendTagDetailActivity">
+    tools:context=".ui.activity.friend_tag.FriendTagDetailActivity">
 
     <include
-        android:id="@+id/friend_tag_appbar"
+        android:id="@+id/friend_tag_detail_appbar"
         layout="@layout/layout_appbar" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/friend_tag_detail_items"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/friend_tag_appbar">
+        app:layout_constraintTop_toBottomOf="@id/friend_tag_detail_appbar">
     </androidx.recyclerview.widget.RecyclerView>
 </androidx.constraintlayout.widget.ConstraintLayout>

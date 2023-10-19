@@ -14,12 +14,13 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityHomeBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
+import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationFriendIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
-import studio.hcmc.reminisce.ui.activity.category.FriendTagDetailActivity
-import studio.hcmc.reminisce.ui.activity.category.TagDetailActivity
+import studio.hcmc.reminisce.ui.activity.friend_tag.FriendTagDetailActivity
+import studio.hcmc.reminisce.ui.activity.tag.TagDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.ui.view.Navigation
 import studio.hcmc.reminisce.vo.category.CategoryVO
@@ -32,7 +33,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var categories: List<CategoryVO>
     private lateinit var tags: List<TagVO>
-    private lateinit var friends: List<LocationFriendVO>
+    private lateinit var friendsInfo: List<FriendVO>
+    private lateinit var friendTags: List<LocationFriendVO>
     private val cityTags = ArrayList<String>()
 
     private val users = HashMap<Int /* UserId */, UserVO>()
@@ -46,9 +48,6 @@ class HomeActivity : AppCompatActivity() {
 
         initView()
 //        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
-        // TODO location_friend 조회 -> nickname null check 필요하니까 location_friend 조회 시 friend join -> userId && opponentId로 location 조회
-        // TODO location_tag 조회 -> userId && tagId로 location 조회
-        // TODO IO코드 Nullable 체크
     }
 
     private fun initView() {
@@ -65,12 +64,13 @@ class HomeActivity : AppCompatActivity() {
             listOf(
                 launch { categories = CategoryIO.listByUserId(user.id) },
                 launch { tags = TagIO.listByUserId(user.id) },
-//                launch { friends = FriendIO.listByUserId(user.id) }
-                launch { friends = LocationFriendIO.listByUserId(user.id) }
+                launch { friendsInfo = FriendIO.listByUserId(user.id) },
+                launch { friendTags = LocationFriendIO.listByUserId(user.id) }
             ).joinAll()
 
-            for (friend in friends) {
+            for (friend in friendsInfo) {
                 if (friend.nickname == null) {
+                    // IO 코드 호출하는 애가 try catch, runCatching 해줘야 함
                     val opponent = UserIO.getById(friend.opponentId)
                     users[opponent.id] = opponent
                 }
@@ -99,8 +99,79 @@ class HomeActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.homeItems.layoutManager = LinearLayoutManager(this)
-        viewBinding.homeItems.adapter = HomeAdapter(headerDelegate, categoryDelegate, friendTagDelegate, cityDelegate, tagDelegate)
+        viewBinding.homeItems.adapter = HomeAdapter(
+            headerDelegate,
+            categoryDelegate,
+            friendTagDelegate,
+//            cityDelegate,
+            tagDelegate
+        )
     }
+
+    private val headerDelegate = object : HeaderViewHolder.Delegate {
+        override fun onClick() {
+            Intent(this@HomeActivity, AddCategoryActivity::class.java).apply {
+                startActivity(this)
+            }
+        }
+    }
+
+    private val categoryDelegate = object : CategoryViewHolder.Delegate {
+        override val categories: List<CategoryVO>
+            get() = this@HomeActivity.categories
+        override val categoryInfo: Map<Int, Int>
+            get() = this@HomeActivity.categoryInfo
+
+        override fun onCategoryClick(category: CategoryVO) {
+            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
+                putExtra("categoryId", category.id)
+                putExtra("categoryTitle", category.title)
+                startActivity(this)
+            }
+        }
+    }
+
+    private val tagDelegate = object : TagViewHolder.Delegate {
+        override val tags get() = this@HomeActivity.tags
+        override fun onTagClick(tag: TagVO) {
+            Intent(this@HomeActivity, TagDetailActivity::class.java).apply {
+                putExtra("tagId", tag.id)
+                putExtra("tagTitle", tag.body)
+
+
+//                putExtra("Tag", TagModal::class.java)
+                startActivity(this)
+            }
+        }
+    }
+
+    private val friendTagDelegate = object : FriendTagViewHolder.Delegate {
+        override val friends: List<FriendVO>
+            get() = this@HomeActivity.friendsInfo
+
+        override fun getUser(userId: Int): UserVO {
+            return users[userId]!!
+        }
+
+        override fun onTagClick(friendTag: FriendVO) {
+            Intent(this@HomeActivity, FriendTagDetailActivity::class.java).apply {
+                putExtra("opponentId", friendTag.opponentId)
+                startActivity(this)
+            }
+        }
+    }
+
+//    private val cityDelegate = object : CityTagViewHolder.Delegate {
+//        override val cityTags: List<String>
+//            get() = this@HomeActivity.cityTags
+//
+//        override fun onTagClick(cityTag: String) {
+//            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
+//                putExtra("cityId", cityTag)
+//                startActivity(this)
+//            }
+//        }
+//    }
 
     private fun navController() {
         viewBinding.homeNavView.navItems.setOnItemSelectedListener {
@@ -125,69 +196,6 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
                 else -> false
-            }
-        }
-    }
-
-    private val headerDelegate = object : HeaderViewHolder.Delegate {
-        override fun onClick() {
-            Intent(this@HomeActivity, AddCategoryActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                startActivity(this)
-            }
-        }
-    }
-
-    private val categoryDelegate = object : CategoryViewHolder.Delegate {
-        override val categories: List<CategoryVO>
-            get() = this@HomeActivity.categories
-        override val categoryInfo: Map<Int, Int>
-            get() = this@HomeActivity.categoryInfo
-
-        override fun onCategoryClick(category: CategoryVO) {
-            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
-                putExtra("categoryId", category.id)
-                putExtra("categoryTitle", category.title)
-                startActivity(this)
-            }
-        }
-    }
-
-    private val tagDelegate = object : TagViewHolder.Delegate {
-        override val tags get() = this@HomeActivity.tags
-        override fun onTagClick(tag: TagVO) {
-            // TODO intent -> ActivityTagDetail
-            Intent(this@HomeActivity, TagDetailActivity::class.java).apply {
-                putExtra("tagId", tag.id)
-                startActivity(this)
-            }
-        }
-    }
-
-    private val friendTagDelegate = object : FriendTagViewHolder.Delegate {
-        override val friends: List<FriendVO>
-            get() = this@HomeActivity.friends
-
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
-        }
-
-        override fun onTagClick(friendTag: FriendVO) {
-            Intent(this@HomeActivity, FriendTagDetailActivity::class.java).apply {
-                putExtra("opponentId", friendTag.opponentId)
-                startActivity(this)
-            }
-        }
-    }
-
-    private val cityDelegate = object : CityTagViewHolder.Delegate {
-        override val cityTags: List<String>
-            get() = this@HomeActivity.cityTags
-
-        override fun onTagClick(cityTag: String) {
-            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
-                putExtra("cityId", cityTag)
-                startActivity(this)
             }
         }
     }

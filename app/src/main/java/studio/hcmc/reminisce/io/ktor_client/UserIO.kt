@@ -12,13 +12,14 @@ import io.ktor.client.statement.bodyAsText
 import studio.hcmc.kotlin.crypto.sha512
 import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
+import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
 object UserIO {
-    suspend fun signUp(dto: UserDTO.Post) {
-        httpClient
+    suspend fun signUp(dto: UserDTO.Post): CategoryVO {
+        return httpClient
             .post("/user") { setBody(Gson().toJsonTree(dto)) }
-            .bodyAsText()
+            .body()
     }
 
     suspend fun login(dto: UserAuthVO): UserVO {

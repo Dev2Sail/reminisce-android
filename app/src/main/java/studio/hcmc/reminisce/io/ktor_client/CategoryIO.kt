@@ -15,10 +15,10 @@ import studio.hcmc.reminisce.dto.category.CategoryDTO
 import studio.hcmc.reminisce.vo.category.CategoryVO
 
 object CategoryIO {
-    suspend fun post(dto: CategoryDTO.Post) {
-        httpClient
+    suspend fun post(dto: CategoryDTO.Post): CategoryVO {
+        return httpClient
             .post("/user/category") { setBody(Gson().toJsonTree(dto)) }
-                .bodyAsText()
+            .body()
     }
 
     suspend fun put(userId: Int, dto: CategoryDTO.Put) {

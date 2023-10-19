@@ -36,9 +36,11 @@ class SummaryViewHolder(
         addressBuilder.append(" longitude ")
         addressBuilder.append(location.longitude)
         viewBinding.cardCategoryDetailSummaryAddress.cardCategoryDetailSummaryItemTitle.text = addressBuilder.toString()
-        // visitedCount
-        viewBinding.cardCategoryDetailSummaryVisitCount.cardCategoryDetailSummaryItemIcon.setImageResource(R.drawable.round_push_pin_12)
-        viewBinding.cardCategoryDetailSummaryVisitCount.cardCategoryDetailSummaryItemTitle.text = "~시 ~구 n번째 방문"
+
+
+        // TODO visitedCount
+//        viewBinding.cardCategoryDetailSummaryVisitCount.cardCategoryDetailSummaryItemIcon.setImageResource(R.drawable.round_push_pin_12)
+//        viewBinding.cardCategoryDetailSummaryVisitCount.cardCategoryDetailSummaryItemTitle.text = "~시 ~구 n번째 방문"
 
 
         viewBinding.root.setOnClickListener {

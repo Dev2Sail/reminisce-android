@@ -11,8 +11,6 @@ import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityCategoryEditableDetailBinding
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
-import studio.hcmc.reminisce.ui.activity.category.EditableCategoryDetail
-import studio.hcmc.reminisce.ui.activity.category.SummaryModal
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.Logger
 import studio.hcmc.reminisce.vo.location.LocationVO
@@ -20,6 +18,10 @@ import studio.hcmc.reminisce.vo.location.LocationVO
 class CategoryEditableDetailActivity : AppCompatActivity() {
     lateinit var viewBinding: ActivityCategoryEditableDetailBinding
     private lateinit var locations: List<LocationVO>
+    private lateinit var adapter: CategoryEditableDetailAdapter
+
+    private val contents = ArrayList<CategoryEditableDetailAdapter.EditableCategoryDetailContents>()
+
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val categoryTitle by lazy { intent.getStringExtra("categoryTitle") }
 
@@ -51,17 +53,24 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     }
 
     // buildContents
-    private fun buildContents(): List<EditableCategoryDetail> {
-        val contents = ArrayList<EditableCategoryDetail>()
-        val sortedList = locations.sortedByDescending { it.createdAt }
-        for ((summaryIdx, content) in sortedList.withIndex()) {
-            contents.add(SummaryModal(
-                content.id, content.title, content.visitedAt, content.latitude, content.longitude
-            ))
-        }
+    private fun buildContents(): List<CategoryEditableDetailAdapter.EditableCategoryDetailContents> {
+        val contents = ArrayList<CategoryEditableDetailAdapter.EditableCategoryDetailContents>()
+
 
         return contents
     }
+
+//    private fun buildContents(): List<EditableCategoryDetail> {
+//        val contents = ArrayList<EditableCategoryDetail>()
+//        val sortedList = locations.sortedByDescending { it.createdAt }
+//        for ((summaryIdx, content) in sortedList.withIndex()) {
+//            contents.add(SummaryModal(
+//                content.id, content.title, content.visitedAt, content.latitude, content.longitude
+//            ))
+//        }
+//
+//        return contents
+//    }
 
 
     private fun prepareContents() = CoroutineScope(Dispatchers.IO).launch {
@@ -78,7 +87,8 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.categoryEditableDetailItems.layoutManager = LinearLayoutManager(this)
-        viewBinding.categoryEditableDetailItems.adapter = CategoryEditableDetailAdapter(buildContents())
+//        viewBinding.categoryEditableDetailItems.adapter = CategoryEditableDetailAdapter(buildContents())
+        viewBinding.categoryEditableDetailItems.adapter = adapter
     }
 
 

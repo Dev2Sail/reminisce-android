@@ -8,18 +8,19 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import studio.hcmc.reminisce.dto.tag.TagDTO
 import studio.hcmc.reminisce.vo.location.LocationTagVO
 
 object LocationTagIO {
-    suspend fun post(locationId: Int, tagId: Int) {
-        httpClient
-            .post("/location/${locationId}/tag/${tagId}")
-            .bodyAsText()
+    suspend fun post(locationId: Int, dto: TagDTO.Post): LocationTagVO {
+        return httpClient
+            .post("/location/${locationId}/tag") { setBody(Gson().toJsonTree(dto)) }
+            .body()
     }
 
     suspend fun postAll(locationId: Int, tagIds: List<IntArray>): List<LocationTagVO> {
         return httpClient
-            .post("/location/${locationId}/tag") { setBody(Gson().toJsonTree(tagIds)) }
+            .post("/location/${locationId}/tags") { setBody(Gson().toJsonTree(tagIds)) }
             .body()
     }
 
@@ -32,6 +33,12 @@ object LocationTagIO {
     suspend fun listByUserId(userId: Int): List<LocationTagVO> {
         return httpClient
             .get("location/tag/list/all") { parameter("userId", userId) }
+            .body()
+    }
+
+    suspend fun listByLocationId(locationId: Int): List<LocationTagVO> {
+        return httpClient
+            .get("/location/${locationId}/tag/list")
             .body()
     }
 }

@@ -9,10 +9,10 @@ import io.ktor.client.statement.bodyAsText
 import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
 
 object LocationFriendIO {
-    suspend fun post(locationId: Int, opponentId: Int) {
-        httpClient
+    suspend fun post(locationId: Int, opponentId: Int): LocationFriendVO {
+        return httpClient
             .post("/location/${locationId}/friend/${opponentId}")
-            .bodyAsText()
+            .body()
     }
 
     suspend fun delete(locationId: Int, opponentId: Int) {
@@ -21,9 +21,15 @@ object LocationFriendIO {
             .bodyAsText()
     }
 
-    suspend fun listByUserId(userId: Int) : List<LocationFriendVO> {
+    suspend fun listByUserId(userId: Int): List<LocationFriendVO> {
         return httpClient
             .get("/location/friend/list/all") { parameter("userId", userId) }
+            .body()
+    }
+
+    suspend fun listByLocationId(locationId: Int): List<LocationFriendVO> {
+        return httpClient
+            .get("/location/${locationId}/friend/list")
             .body()
     }
 }

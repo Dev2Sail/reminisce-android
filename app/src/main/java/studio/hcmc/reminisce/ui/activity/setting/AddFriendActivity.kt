@@ -95,7 +95,6 @@ class AddFriendActivity : AppCompatActivity() {
         val user = UserExtension.getUser(this@AddFriendActivity)
         val opponentInfo = FriendDTO.Post().apply {
             opponentId = friendId
-            nickname = null
         }
         runCatching { FriendIO.post(user.id, opponentInfo) }
             .onSuccess {

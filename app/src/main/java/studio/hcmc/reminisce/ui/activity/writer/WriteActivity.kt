@@ -9,9 +9,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.databinding.ActivityWriteBinding
 import studio.hcmc.reminisce.dto.location.LocationDTO
-import studio.hcmc.reminisce.dto.tag.TagDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
-import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.ui.activity.map.MapActivity
 import java.sql.Date
 import java.text.SimpleDateFormat
@@ -88,12 +86,12 @@ class WriteActivity : AppCompatActivity() {
 
     private fun postTags(value: String) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@WriteActivity)
-        val postDTO = TagDTO.Post().apply {
-            userId = user.id
-            body = value
-        }
-        runCatching { TagIO.post(postDTO) }
-            .onSuccess {  }
+//        val postDTO = TagDTO.Post().apply {
+//            userId = user.id
+//            body = value
+//        }
+//        runCatching { TagIO.post(postDTO) }
+//            .onSuccess {  }
     }
 
     private val visitedAtDelegate = object : WriteSelectVisitedAtDialog.Delegate {

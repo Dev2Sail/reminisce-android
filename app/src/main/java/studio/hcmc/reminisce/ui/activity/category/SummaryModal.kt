@@ -9,10 +9,6 @@ data class SummaryModal(
     val visitedAt: String,
     val latitude: Double,
     val longitude: Double
-//    val visitedCount: Int,
-//    val withFriends: String?,
-//    val hashtags: String?,
-//    val checkFlag: Boolean
 ): EditableCategoryDetail
 
 data class FriendModal(

@@ -35,9 +35,7 @@ package studio.hcmc.reminisce
 //  Logger.v("reminisce Logger", "[reminisce > Account Setting > Prepare user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
 // TODO error handling
 
-// * BackEnd
-// TODO locationService 중 put과 patch 개별 작성\
-
+// TODO network error 판별
 
 
 // add location -> locationId
@@ -57,7 +55,11 @@ package studio.hcmc.reminisce
  * locationId, title, body, visitedAt, markerEmoji, latitude, longitude 저장
  * 이후 location_tag or location_friend 저장 가능
  * 저장했던 location을
+ *
+ *
+ tag 저장시 LocationTagIO
  */
+
 
 
 
@@ -81,14 +83,6 @@ location_tag 도 삭제,
 tag 도 삭제
 - 한 트랜잭션 안에서 해야 하는데
 
- */
-
-
-/*
-userId, locationId, tagId
-tagService add
-locationService add
-location_tag add 한 트랜잭셩~~~
  */
 
 /*

@@ -10,15 +10,15 @@ class HomeAdapter(
     private val headerDelegate: HeaderViewHolder.Delegate,
     private val categoryDelegate: CategoryViewHolder.Delegate,
     private val friendTagDelegate: FriendTagViewHolder.Delegate,
-    private val cityTagDelegate: CityTagViewHolder.Delegate,
+//    private val cityTagDelegate: CityTagViewHolder.Delegate,
     private val tagDelegate: TagViewHolder.Delegate
 ) : Adapter<ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int):ViewHolder = when(viewType) {
         0 -> HeaderViewHolder(parent, headerDelegate)
         1 -> CategoryViewHolder(parent, categoryDelegate)
         2 -> FriendTagViewHolder(parent, friendTagDelegate)
-        3 -> CityTagViewHolder(parent, cityTagDelegate)
-        4 -> TagViewHolder(parent, tagDelegate)
+//        3 -> CityTagViewHolder(parent, cityTagDelegate)
+        3 -> TagViewHolder(parent, tagDelegate)
         else -> unknownViewType(viewType)
     }
 
@@ -29,7 +29,7 @@ class HomeAdapter(
         is CategoryViewHolder -> holder.bind(categoryDelegate.categories[position - 1])
         is TagViewHolder -> holder.bind()
         is FriendTagViewHolder -> holder.bind()
-        is CityTagViewHolder -> holder.bind()
+//        is CityTagViewHolder -> holder.bind()
         else -> unknownViewHolder(holder, position)
     }
 
@@ -40,7 +40,7 @@ class HomeAdapter(
             in 1..categorySize -> 1
             categorySize + 1 -> 2
             categorySize + 2 -> 3
-            categorySize + 3 -> 4
+//            categorySize + 3 -> 4
             else -> throw AssertionError()
         }
     }

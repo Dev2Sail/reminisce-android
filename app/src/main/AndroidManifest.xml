@@ -18,10 +18,13 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
+            android:name=".ui.activity.friend_tag.FriendTagDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.category.FriendTagDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.category.TagDetailActivity"
+            android:name=".ui.activity.tag.TagDetailActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.category.CategoryTitleEditActivity"
