@@ -120,3 +120,47 @@ public int update(
         return databaseProcessor.runParameterizedUpdate(builder.toString(), arguments.toArray());
     }
  */
+
+/*
+SELECT *
+FROM location AS l
+JOIN location_tag AS lt ON
+	l._id = lt.location_id AND
+    l._id = 2
+JOIN location_friend AS lf ON
+	l._id = lf.location_id
+WHERE l.is_deleted = 0
+ORDER BY l.created_at DESC
+LIMIT 10;
+ */
+
+/*
+TagDetailActivity
+
+//    private fun prepareContents() = CoroutineScope(Dispatchers.IO).launch {
+////        val user = UserExtension.getUser(this@TagDetailActivity)
+//        val result = runCatching { LocationIO.listByTagId(tagId) }
+//            .onSuccess {
+//                // class TagDetailHeaderContent(val title: String): TagDetailContents
+//                contents.add(TagDetailAdapter.TagDetailHeaderContent(tagBody!!))
+//
+//                val sortedLocations = it.sortedByDescending { it.createdAt }
+//                tagDetailLocations = sortedLocations
+//                for (location in tagDetailLocations.withIndex()) {
+//                    contents.add(TagDetailAdapter.TagDetailSummaryContent(tag, locaion))
+//                }
+//
+//
+//
+//            }.onFailure {
+//
+//            }
+//
+//        if (result.isSuccess) {
+//
+//        } else {
+//
+//        }
+//    }
+
+ */

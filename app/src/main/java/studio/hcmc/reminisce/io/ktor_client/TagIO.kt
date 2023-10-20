@@ -19,4 +19,10 @@ object TagIO {
             .get("/user/tag/list/all") { parameter("userId", userId) }
             .body()
     }
+
+    suspend fun listByLocationId(locationId: Int): List<TagVO> {
+        return httpClient
+            .get("/tag/list") { parameter("locationId", locationId) }
+            .body()
+    }
 }

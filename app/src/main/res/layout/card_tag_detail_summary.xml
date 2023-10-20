@@ -5,28 +5,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_tag_detail_summary_container"
         style="@style/Widget.Material3.CardView.Elevated"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
-        android:layout_marginBottom="@dimen/margin_regular"
+        android:layout_marginBottom="@dimen/margin_small"
         app:cardElevation="@dimen/card_elevation_standard"
+        app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card_tag_detail_summary_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/margin_regular"
+            android:paddingHorizontal="@dimen/margin_regular">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/card_tag_detail_summary_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_regular"
-                android:layout_marginTop="@dimen/margin_regular"
                 android:fontFamily="@font/pretendard_medium"
                 android:text="@string/card_summary_title"
                 android:textSize="@dimen/title_medium"
@@ -39,7 +40,6 @@
                 layout="@layout/card_category_detail_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_regular"
                 android:layout_marginTop="@dimen/margin_regular"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -50,24 +50,10 @@
                 layout="@layout/card_category_detail_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_regular"
                 android:layout_marginTop="@dimen/margin_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/card_tag_detail_summary_visited_at" />
-
-            <include
-                android:id="@+id/card_tag_detail_summary_hashtag"
-                layout="@layout/card_category_detail_summary_item"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_regular"
-                android:layout_marginTop="@dimen/margin_small"
-                android:layout_marginBottom="@dimen/margin_regular"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_tag_detail_summary_address" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

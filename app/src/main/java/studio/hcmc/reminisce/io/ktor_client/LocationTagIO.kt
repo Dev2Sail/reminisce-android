@@ -18,11 +18,11 @@ object LocationTagIO {
             .body()
     }
 
-    suspend fun postAll(locationId: Int, tagIds: List<IntArray>): List<LocationTagVO> {
-        return httpClient
-            .post("/location/${locationId}/tags") { setBody(Gson().toJsonTree(tagIds)) }
-            .body()
-    }
+//    suspend fun postAll(locationId: Int, tagIds: List<IntArray>): List<LocationTagVO> {
+//        return httpClient
+//            .post("/location/${locationId}/tags") { setBody(Gson().toJsonTree(tagIds)) }
+//            .body()
+//    }
 
     suspend fun delete(locationId: Int, tagId: Int) {
         httpClient
@@ -36,9 +36,9 @@ object LocationTagIO {
             .body()
     }
 
-    suspend fun listByLocationId(locationId: Int): List<LocationTagVO> {
-        return httpClient
-            .get("/location/${locationId}/tag/list")
-            .body()
-    }
+//    suspend fun listByLocationId(locationId: Int): List<LocationTagVO> {
+//        return httpClient
+//            .get("/location/${locationId}/tag/list")
+//            .body()
+//    }
 }

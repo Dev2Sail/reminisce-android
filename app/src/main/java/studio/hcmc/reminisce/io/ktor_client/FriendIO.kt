@@ -11,7 +11,6 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import studio.hcmc.reminisce.dto.friend.FriendDTO
 import studio.hcmc.reminisce.vo.friend.FriendVO
-import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
 
 object FriendIO {
     suspend fun post(userId: Int, dto: FriendDTO.Post): FriendVO {
@@ -34,14 +33,22 @@ object FriendIO {
 
     suspend fun listByUserId(userId: Int): List<FriendVO> {
         return httpClient
-            .get("/user/${userId}/friend/list/all")
+            .get("/friend/list/all") {parameter("userId", userId) }
             .body()
     }
 
-    suspend fun mostAddedOpponentIdByUserId(userId: Int): List<LocationFriendVO> {
+    suspend fun listByUserIdAndLocationId(userId: Int, locationId: Int): List<FriendVO> {
         return httpClient
-            .get("/location/friend/list") {
+            .get("/friend/list") {
                 parameter("userId", userId)
+                parameter("locationId", locationId)
             }.body()
     }
+
+//    suspend fun mostAddedOpponentIdByUserId(userId: Int): List<LocationFriendVO> {
+//        return httpClient
+//            .get("/location/friend/list") {
+//                parameter("userId", userId)
+//            }.body()
+//    }
 }

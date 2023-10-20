@@ -3,7 +3,6 @@ package studio.hcmc.reminisce.ui.activity.tag
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import studio.hcmc.reminisce.ui.common.DateDividerViewHolder
 import studio.hcmc.reminisce.ui.view.SingleTypeAdapterDelegate
 import studio.hcmc.reminisce.ui.view.unknownViewHolder
 import studio.hcmc.reminisce.ui.view.unknownViewType
@@ -18,7 +17,7 @@ class TagDetailAdapter(
     interface Delegate: SingleTypeAdapterDelegate<TagContents> {
         fun getTag(): TagVO
         fun getLocation(): LocationVO
-        fun getFriend(): FriendVO?
+        fun getFriend(): FriendVO
     }
 
     sealed interface TagContents
@@ -27,23 +26,28 @@ class TagDetailAdapter(
     class TagDetailDateDividerContent(val body: String): TagContents
     class TagDetailContent(val location: LocationVO): TagContents
 
-    class TagDetailTagItemContent(val tag: TagVO): TagContents
-    class TagDetailFriendItemContent(val friend: FriendVO): TagContents
+//    class TagDetailTagItemContent(val tag: TagVO): TagContents
+    class TagDetailTagItemContent(private val o: Any? = null): TagContents
+
+//    class TagDetailFriendItemContent(val friend: FriendVO): TagContents
+    class TagDetailFriendItemContent(private val o: Any? = null): TagContents
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
         0 -> TagDetailHeaderViewHolder(parent)
-        1 -> DateDividerViewHolder(parent)
+        1 -> TagDateDividerViewHolder(parent)
         2 -> TagDetailSummaryViewHolder(parent, summaryDelegate)
+        3 -> TagDetailItemViewHolder(parent)
         else -> unknownViewType(viewType)
     }
 
     override fun getItemCount() = adapterDelegate.getItemCount()
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when (holder) {
-        is TagDetailHeaderViewHolder -> holder.bind(adapterDelegate.getTag())
-        is DateDividerViewHolder -> holder.bind(adapterDelegate.getLocation().createdAt.toString().substring(0, 7))
-        is TagDetailSummaryViewHolder -> holder.bind(adapterDelegate.getLocation())
+        is TagDetailHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position))
+        is TagDateDividerViewHolder -> holder.bind(adapterDelegate.getItem(position))
+        is TagDetailSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position))
+        is TagDetailItemViewHolder -> holder.bind(adapterDelegate.getItem(position))
         else -> unknownViewHolder(holder, position)
     }
 
@@ -51,6 +55,7 @@ class TagDetailAdapter(
         is TagDetailHeaderContent -> 0
         is TagDetailDateDividerContent -> 1
         is TagDetailContent -> 2
-        else -> unknownViewType(position)
+        is TagDetailTagItemContent -> 3
+        is TagDetailFriendItemContent -> 4
     }
 }

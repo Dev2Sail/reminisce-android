@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardTagDetailSummaryBinding
-import studio.hcmc.reminisce.vo.location.LocationVO
 
 class TagDetailSummaryViewHolder(
     private val viewBinding: CardTagDetailSummaryBinding,
@@ -20,20 +19,17 @@ class TagDetailSummaryViewHolder(
         delegate = delegate
     )
 
-    fun bind(location: LocationVO) {
-        viewBinding.cardTagDetailSummaryVisitedAt.cardCategoryDetailSummaryItemTitle.text = location.visitedAt
-
-        // address
-        viewBinding.cardTagDetailSummaryAddress.cardCategoryDetailSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+    fun bind(content: TagDetailAdapter.TagContents) {
+        val summaryContent = (content as? TagDetailAdapter.TagDetailContent)?.location ?: return
         val addressBuilder = StringBuilder()
-        addressBuilder.append(location.latitude)
-        addressBuilder.append(location.longitude)
-        viewBinding.cardTagDetailSummaryAddress.cardCategoryDetailSummaryItemTitle.text = addressBuilder.toString()
+        addressBuilder.append(summaryContent.latitude)
+        addressBuilder.append(summaryContent.longitude)
 
-        // hashtag
-        viewBinding.cardTagDetailSummaryHashtag.cardCategoryDetailSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
-
-        // click
-        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id) }
+        viewBinding.apply {
+            cardTagDetailSummaryVisitedAt.cardCategoryDetailSummaryItemTitle.text = summaryContent.visitedAt
+            cardTagDetailSummaryAddress.cardCategoryDetailSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+            cardTagDetailSummaryAddress.cardCategoryDetailSummaryItemTitle.text = addressBuilder.toString()
+        }
+        viewBinding.root.setOnClickListener { delegate.onItemClick(summaryContent.id) }
     }
 }

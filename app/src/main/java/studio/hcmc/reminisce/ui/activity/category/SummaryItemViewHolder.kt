@@ -31,6 +31,8 @@ class SummaryItemViewHolder(
     )
 
     fun bind() {
+//        val itemView = CardCategoryDetailSummaryItemBinding.inflate(LayoutInflater.from(viewBinding.root.context))
+
 
     }
 
