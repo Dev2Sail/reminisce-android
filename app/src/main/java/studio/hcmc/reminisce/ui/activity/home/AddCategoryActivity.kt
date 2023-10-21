@@ -12,7 +12,7 @@ import studio.hcmc.reminisce.dto.category.CategoryDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.ui.view.CommonError
-import studio.hcmc.reminisce.util.Logger
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.stringOrNull
 import studio.hcmc.reminisce.util.text
@@ -58,7 +58,7 @@ class AddCategoryActivity : AppCompatActivity() {
                 }
             }.onFailure {
                 CommonError.onMessageDialog(this@AddCategoryActivity, "폴더 생성 실패", "폴더를 추가하는데 실패했어요. \n다시 시도해 주세요.")
-                Logger.v("reminisce Logger", "[reminisce > Account Setting > Prepare user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                LocalLogger.e(it)
             }
     }
 }

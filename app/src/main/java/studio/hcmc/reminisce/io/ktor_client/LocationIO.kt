@@ -26,7 +26,7 @@ object LocationIO {
             .bodyAsText()
     }
 
-    suspend fun patch(locationId: Int, categoryId: Int) {
+    suspend fun patchCategoryId(locationId: Int, categoryId: Int) {
         httpClient
             .patch("/location/${locationId}") { parameter("categoryId", categoryId) }
             .bodyAsText()

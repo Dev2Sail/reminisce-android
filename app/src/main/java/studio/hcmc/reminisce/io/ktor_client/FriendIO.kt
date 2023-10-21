@@ -44,11 +44,4 @@ object FriendIO {
                 parameter("locationId", locationId)
             }.body()
     }
-
-//    suspend fun mostAddedOpponentIdByUserId(userId: Int): List<LocationFriendVO> {
-//        return httpClient
-//            .get("/location/friend/list") {
-//                parameter("userId", userId)
-//            }.body()
-//    }
 }

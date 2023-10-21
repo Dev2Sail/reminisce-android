@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.databinding.DialogDeleteHomeCategoryBinding
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
-import studio.hcmc.reminisce.util.Logger
+import studio.hcmc.reminisce.util.LocalLogger
 
 class DeleteCategoryDialog(
     context: Context,
@@ -36,7 +36,7 @@ class DeleteCategoryDialog(
                 // TODO recyclerView notify()
             }
             .onFailure {
-                Logger.v("reminisce Logger", "[reminisce > Delete Category > deleteCategory] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                LocalLogger.e(it)
             }
     }
 }

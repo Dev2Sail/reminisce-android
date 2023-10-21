@@ -26,10 +26,4 @@ object LocationFriendIO {
             .get("/location/friend/list/all") { parameter("userId", userId) }
             .body()
     }
-
-//    suspend fun listByLocationId(locationId: Int): List<LocationFriendVO> {
-//        return httpClient
-//            .get("/location/${locationId}/friend/list")
-//            .body()
-//    }
 }

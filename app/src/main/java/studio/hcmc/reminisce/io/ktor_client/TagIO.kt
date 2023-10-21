@@ -16,7 +16,7 @@ object TagIO {
 
     suspend fun listByUserId(userId: Int): List<TagVO> {
         return httpClient
-            .get("/user/tag/list/all") { parameter("userId", userId) }
+            .get("/tag/list/all") { parameter("userId", userId) }
             .body()
     }
 

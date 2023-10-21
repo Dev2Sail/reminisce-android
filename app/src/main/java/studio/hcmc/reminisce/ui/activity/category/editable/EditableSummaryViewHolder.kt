@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardCategoryEditableDetailSummaryBinding
 import studio.hcmc.reminisce.ui.activity.category.SummaryModal
-import studio.hcmc.reminisce.util.Logger
 
 class EditableSummaryViewHolder(
     private val viewBinding: CardCategoryEditableDetailSummaryBinding,
@@ -49,11 +48,10 @@ class EditableSummaryViewHolder(
             if (!selectedLocationIds.add(summary.id)) {
                 selectedLocationIds.remove(summary.id)
             }
-            Logger.v("check set", "=== $selectedLocationIds")
         }
 
-        viewBinding.cardCategoryDetailSummaryCheckbox.addOnCheckedStateChangedListener { checkBox, state ->
-
-        }
+//        viewBinding.cardCategoryDetailSummaryCheckbox.addOnCheckedStateChangedListener { checkBox, state ->
+//
+//        }
     }
 }

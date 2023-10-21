@@ -24,7 +24,7 @@
         android:layout_marginEnd="@dimen/margin_3xlarge"
         android:layout_marginBottom="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
-        android:text="@string/dialog_remove"
+        android:text="@string/header_action"
         android:textColor="@color/md_theme_light_primary"
         android:textSize="@dimen/title_medium"
         app:layout_constraintBottom_toBottomOf="parent"

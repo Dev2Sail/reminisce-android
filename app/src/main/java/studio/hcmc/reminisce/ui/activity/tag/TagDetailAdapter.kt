@@ -12,42 +12,34 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 
 class TagDetailAdapter(
     private val adapterDelegate: Delegate,
+    private val headerDelegate: TagDetailHeaderViewHolder.Delegate,
     private val summaryDelegate: TagDetailSummaryViewHolder.Delegate
 ): Adapter<ViewHolder>() {
-    interface Delegate: SingleTypeAdapterDelegate<TagContents> {
-        fun getTag(): TagVO
-        fun getLocation(): LocationVO
-        fun getFriend(): FriendVO
-    }
+    interface Delegate: SingleTypeAdapterDelegate<TagContents>
 
     sealed interface TagContents
 
     class TagDetailHeaderContent(val title: String): TagContents
     class TagDetailDateDividerContent(val body: String): TagContents
-    class TagDetailContent(val location: LocationVO): TagContents
-
-//    class TagDetailTagItemContent(val tag: TagVO): TagContents
-    class TagDetailTagItemContent(private val o: Any? = null): TagContents
-
-//    class TagDetailFriendItemContent(val friend: FriendVO): TagContents
-    class TagDetailFriendItemContent(private val o: Any? = null): TagContents
-
+    data class TagDetailContent(
+        val location: LocationVO,
+        val tags: List<TagVO>,
+        val friends: List<FriendVO>
+    ): TagContents
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
-        0 -> TagDetailHeaderViewHolder(parent)
+        0 -> TagDetailHeaderViewHolder(parent, headerDelegate)
         1 -> TagDateDividerViewHolder(parent)
         2 -> TagDetailSummaryViewHolder(parent, summaryDelegate)
-        3 -> TagDetailItemViewHolder(parent)
         else -> unknownViewType(viewType)
     }
 
     override fun getItemCount() = adapterDelegate.getItemCount()
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when (holder) {
-        is TagDetailHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position))
+        is TagDetailHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position) as TagDetailHeaderContent)
         is TagDateDividerViewHolder -> holder.bind(adapterDelegate.getItem(position))
-        is TagDetailSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position))
-        is TagDetailItemViewHolder -> holder.bind(adapterDelegate.getItem(position))
+        is TagDetailSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position) as TagDetailContent)
         else -> unknownViewHolder(holder, position)
     }
 
@@ -55,7 +47,5 @@ class TagDetailAdapter(
         is TagDetailHeaderContent -> 0
         is TagDetailDateDividerContent -> 1
         is TagDetailContent -> 2
-        is TagDetailTagItemContent -> 3
-        is TagDetailFriendItemContent -> 4
     }
 }

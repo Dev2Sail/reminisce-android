@@ -24,7 +24,7 @@ class WriteOptionSelectFriendItemViewHolder(
         delegate = delegate
     )
 
-    private fun getFriend(userId: Int): UserVO { return delegate.users[userId]!!}
+    private fun getFriend(userId: Int): UserVO { return delegate.users[userId]!! }
 
     fun bind(friend: FriendVO) {
         viewBinding.writeSelectFriendTitle.text = friend.nickname ?: getFriend(friend.opponentId).nickname

@@ -12,7 +12,7 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityCategoryEditableDetailBinding
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.ui.view.CommonError
-import studio.hcmc.reminisce.util.Logger
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.location.LocationVO
 
 class CategoryEditableDetailActivity : AppCompatActivity() {
@@ -81,7 +81,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             }
             .onFailure {
                 CommonError.onDialog(this@CategoryEditableDetailActivity)
-                Logger.v("reminisce Logger", "[reminisce > Category Detail > prepareContents] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                LocalLogger.e(it)
             }
     }
 

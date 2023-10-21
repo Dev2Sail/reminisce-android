@@ -4,8 +4,19 @@ import android.util.Log
 import org.slf4j.Logger
 import studio.hcmc.reminisce.BuildConfig
 
-object Logger {
-    lateinit var remoteLogger: Logger
+object RemoteLogger {
+    private lateinit var remoteLogger: Logger
+
+    fun makeFailMsg(currentPosition: String, currentFn: String, body: Throwable): String {
+        val loggerBuilder = StringBuilder()
+        loggerBuilder.append("[reminisce > $currentPosition > $currentFn] :: ")
+        loggerBuilder.append("msg -> ${body.message} \n")
+        loggerBuilder.append("localMsg -> ${body.localizedMessage} \n")
+        loggerBuilder.append("cause -> ${body.cause} \n")
+        loggerBuilder.append("stackTrace -> ${body.stackTrace}")
+
+        return loggerBuilder.toString()
+    }
 
     fun v(tag: String, msg: String) {
         if (BuildConfig.DEBUG) {

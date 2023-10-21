@@ -13,7 +13,7 @@ import studio.hcmc.reminisce.dto.category.CategoryDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.ui.view.CommonError
-import studio.hcmc.reminisce.util.Logger
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
@@ -31,7 +31,7 @@ class CategoryTitleEditActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        Logger.v("original value", "=== $originalCategoryTitle")
+//        LocalLogger.v("original value", "=== $originalCategoryTitle")
         viewBinding.apply {
             categoryTitleEditAppbar.appbarTitle.text = getText(R.string.category_title_edit_appbar)
             categoryTitleEditAppbar.appbarActionButton1.isEnabled = false
@@ -64,7 +64,7 @@ class CategoryTitleEditActivity : AppCompatActivity() {
             }
             .onFailure {
                 CommonError.onDialog(this@CategoryTitleEditActivity)
-                Logger.v("reminisce Logger", "[reminisce > Category Title Edit > fetchCategoryTitle] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                LocalLogger.e(it)
             }
     }
 }

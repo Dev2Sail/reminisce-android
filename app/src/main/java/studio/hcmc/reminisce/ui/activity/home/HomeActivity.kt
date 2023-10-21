@@ -23,6 +23,7 @@ import studio.hcmc.reminisce.ui.activity.friend_tag.FriendTagDetailActivity
 import studio.hcmc.reminisce.ui.activity.tag.TagDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.ui.view.Navigation
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
@@ -85,6 +86,8 @@ class HomeActivity : AppCompatActivity() {
                     categoryInfo[category.id] = count.asInt
                 }
             }
+        }.onFailure {
+            LocalLogger.e(it)
         }
 
         if (result.isSuccess) {
@@ -103,7 +106,7 @@ class HomeActivity : AppCompatActivity() {
             headerDelegate,
             categoryDelegate,
             friendTagDelegate,
-//            cityDelegate,
+            cityDelegate,
             tagDelegate
         )
     }
@@ -161,17 +164,17 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-//    private val cityDelegate = object : CityTagViewHolder.Delegate {
-//        override val cityTags: List<String>
-//            get() = this@HomeActivity.cityTags
-//
-//        override fun onTagClick(cityTag: String) {
-//            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
-//                putExtra("cityId", cityTag)
-//                startActivity(this)
-//            }
-//        }
-//    }
+    private val cityDelegate = object : CityTagViewHolder.Delegate {
+        override val cityTags: List<String>
+            get() = this@HomeActivity.cityTags
+
+        override fun onTagClick(cityTag: String) {
+            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
+                putExtra("cityId", cityTag)
+                startActivity(this)
+            }
+        }
+    }
 
     private fun navController() {
         viewBinding.homeNavView.navItems.setOnItemSelectedListener {

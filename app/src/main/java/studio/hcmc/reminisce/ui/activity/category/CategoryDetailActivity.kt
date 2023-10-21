@@ -17,7 +17,7 @@ import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.ui.activity.category.editable.CategoryEditableDetailActivity
 import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
 import studio.hcmc.reminisce.ui.view.CommonError
-import studio.hcmc.reminisce.util.Logger
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.location.LocationVO
 
 class CategoryDetailActivity : AppCompatActivity() {
@@ -72,7 +72,7 @@ class CategoryDetailActivity : AppCompatActivity() {
                 }
                 .onFailure {
                     CommonError.onMessageDialog(this@CategoryDetailActivity, "불러오기 오류", "추억을 불러오는데 실패했어요. \n 어플을 재실행해 주세요.")
-                    Logger.v("reminisce Logger", "[reminisce > Category Detail > prepareContents(Default)] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                    LocalLogger.e(it)
                 }
         } else {
             runCatching { LocationIO.listByCategoryId(categoryId) }
@@ -82,7 +82,7 @@ class CategoryDetailActivity : AppCompatActivity() {
                 }
                 .onFailure {
                     CommonError.onMessageDialog(this@CategoryDetailActivity, "불러오기 오류", "추억을 불러오는데 실패했어요. \n 어플을 재실행해 주세요.")
-                    Logger.v("reminisce Logger", "[reminisce > Category Detail > prepareContents] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                    LocalLogger.e(it)
                 }
         }
     }
