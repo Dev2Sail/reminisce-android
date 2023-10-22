@@ -11,9 +11,8 @@ class CategoryDetailHeaderViewHolder (
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        val title: String
-        fun onClick()
-        fun onTitleClick()
+        fun onItemClick()
+        fun onTitleEditClick(title: String, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -21,9 +20,15 @@ class CategoryDetailHeaderViewHolder (
         delegate = delegate
     )
 
-    fun bind() {
-        viewBinding.cardCommonUneditableHeaderTitle.text = if (delegate.title == "Default") viewBinding.root.context.getText(R.string.category_view_holder_title) else delegate.title
-        viewBinding.cardCategoryDetailHeaderEdit.setOnClickListener { delegate.onTitleClick() }
-        viewBinding.cardCommonUneditableHeaderAction1.setOnClickListener { delegate.onClick() }
+    fun bind(content: CategoryDetailAdapter.HeaderContent) {
+        viewBinding.apply {
+            cardCategoryDetailHeaderTitle.text = when(content.title) {
+                "Default" -> viewBinding.root.context.getString(R.string.category_view_holder_title)
+                "new" -> viewBinding.root.context.getString(R.string.add_category_body)
+                else -> content.title
+            }
+            cardCategoryDetailHeaderEditIcon.setOnClickListener { delegate.onTitleEditClick(content.title, bindingAdapterPosition) }
+            cardCategoryDetailHeaderAction1.setOnClickListener { delegate.onItemClick() }
+        }
     }
 }

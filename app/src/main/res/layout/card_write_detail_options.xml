@@ -17,20 +17,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    
 
     <ImageView
-        android:id="@+id/write_detail_friend_icon"
+        android:id="@+id/write_detail_options_friend_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_2xlarge"
         android:src="@drawable/round_group_add_16"
-        app:layout_constraintBottom_toBottomOf="@id/write_detail_friend"
+        app:layout_constraintBottom_toBottomOf="@id/write_detail_options_friend"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/write_detail_friend"
+        app:layout_constraintTop_toTopOf="@id/write_detail_options_friend"
         app:tint="@color/md_theme_light_primary" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/write_detail_friend"
+        android:id="@+id/write_detail_options_friend"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_small"
@@ -41,22 +42,22 @@
         android:textColor="@color/md_theme_light_onSurfaceVariant"
         android:textSize="@dimen/body_medium"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/write_detail_friend_icon"
+        app:layout_constraintStart_toEndOf="@id/write_detail_options_friend_icon"
         app:layout_constraintTop_toBottomOf="@id/write_detail_options" />
 
     <ImageView
-        android:id="@+id/write_detail_tag_icon"
+        android:id="@+id/write_detail_options_tag_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_2xlarge"
         android:src="@drawable/round_tag_16"
-        app:layout_constraintBottom_toBottomOf="@id/write_detail_tag"
+        app:layout_constraintBottom_toBottomOf="@id/write_detail_options_tag"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/write_detail_tag"
+        app:layout_constraintTop_toTopOf="@id/write_detail_options_tag"
         app:tint="@color/md_theme_light_primary" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/write_detail_tag"
+        android:id="@+id/write_detail_options_tag"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_small"
@@ -67,6 +68,6 @@
         android:textColor="@color/md_theme_light_onSurfaceVariant"
         android:textSize="@dimen/body_medium"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/write_detail_tag_icon"
-        app:layout_constraintTop_toBottomOf="@id/write_detail_friend" />
+        app:layout_constraintStart_toEndOf="@id/write_detail_options_friend_icon"
+        app:layout_constraintTop_toBottomOf="@id/write_detail_options_friend" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,13 +18,13 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
+            android:name=".ui.activity.tag.editable.TestCheckActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.tag.editable.TagEditableDetailActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.friend_tag.FriendTagDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.category.FriendTagDetailActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.tag.TagDetailActivity"

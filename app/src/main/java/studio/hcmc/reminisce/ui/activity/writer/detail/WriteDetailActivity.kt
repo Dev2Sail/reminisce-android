@@ -10,7 +10,7 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 
 class WriteDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteDetailBinding
-    // locationId getExtra
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,8 +34,3 @@ class WriteDetailActivity : AppCompatActivity() {
 
     }
 }
-/*
-WriterActivity 밑으로 동일 형식으로 Options text 구분자 아래 다녀온 사람, 해시태그, 현재 카테고리
-
-
- */

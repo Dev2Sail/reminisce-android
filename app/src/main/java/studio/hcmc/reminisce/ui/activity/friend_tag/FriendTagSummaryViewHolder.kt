@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.tag
+package studio.hcmc.reminisce.ui.activity.friend_tag
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,7 +9,7 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardSummaryBinding
 import studio.hcmc.reminisce.vo.user.UserVO
 
-class TagDetailSummaryViewHolder(
+class FriendTagSummaryViewHolder(
     private val viewBinding: CardSummaryBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
@@ -24,8 +24,10 @@ class TagDetailSummaryViewHolder(
         delegate = delegate
     )
 
-    fun bind(content: TagDetailAdapter.DetailContent) {
+    fun bind(content: FriendTagAdapter.DetailContent) {
         val (location, tags, friends) = content
+        viewBinding.cardSummaryVisitedCount.root.isGone = true
+
         val addressBuilder = StringBuilder()
         // TODO 좌표 -> 주소로 변환 후 getString에서 정해둔 포맷으로 넣으셈! (date_separator) 참고
         addressBuilder.append(location.latitude)

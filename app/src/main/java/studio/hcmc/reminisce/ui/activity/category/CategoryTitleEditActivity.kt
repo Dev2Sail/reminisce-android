@@ -20,7 +20,7 @@ import studio.hcmc.reminisce.util.text
 class CategoryTitleEditActivity : AppCompatActivity() {
     lateinit var viewBinding: ActivityCategoryTitleEditBinding
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
-    private val originalCategoryTitle by lazy { intent.getStringExtra("originalCategoryTitle") }
+    private val originalTitle by lazy { intent.getStringExtra("originalTitle") }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +31,10 @@ class CategoryTitleEditActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-//        LocalLogger.v("original value", "=== $originalCategoryTitle")
         viewBinding.apply {
             categoryTitleEditAppbar.appbarTitle.text = getText(R.string.category_title_edit_appbar)
             categoryTitleEditAppbar.appbarActionButton1.isEnabled = false
-            categoryTitleEditField.editText!!.hint = originalCategoryTitle
+            categoryTitleEditField.editText!!.hint = originalTitle
             categoryTitleEditAppbar.appbarBack.setOnClickListener { finish() }
             categoryTitleEditAppbar.appbarActionButton1.setOnClickListener {
                 if (categoryTitleEditField.string.length <= 15) {
@@ -57,12 +56,18 @@ class CategoryTitleEditActivity : AppCompatActivity() {
         runCatching { CategoryIO.patch(user.id, categoryId, patchDTO) }
             .onSuccess {
                 Intent(this@CategoryTitleEditActivity, CategoryDetailActivity::class.java).apply {
-                    putExtra("titleFetchResult", true)
-                    startActivity(this)
+                    putExtra("fetchResult", true)
+                    putExtra("fetchTitle", editedTitle)
                     finish()
+                    startActivity(this)
                 }
             }
             .onFailure {
+//                Intent(this@CategoryTitleEditActivity, CategoryDetailActivity::class.java).apply {
+//                    putExtra("fetchResult", false)
+//                    startActivity(this)
+//                    finish()
+//                }
                 CommonError.onDialog(this@CategoryTitleEditActivity)
                 LocalLogger.e(it)
             }

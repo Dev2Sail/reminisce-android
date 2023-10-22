@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.category.editable
+package studio.hcmc.reminisce.ui.activity.tag.editable
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -9,7 +9,7 @@ import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class CategoryEditableDetailAdapter(
+class TagEditableAdapter(
     private val adapterDelegate: Delegate,
     private val summaryDelegate: SummaryViewHolder.Delegate
 ): Adapter<ViewHolder>() {

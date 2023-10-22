@@ -4,38 +4,27 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/card_tag_editable_summary_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/margin_small"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="@id/card_tag_editable_container"
-        app:layout_constraintEnd_toStartOf="@id/card_tag_editable_container"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/card_tag_editable_container" />
-
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_tag_editable_container"
         style="@style/Widget.Material3.CardView.Elevated"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/margin_regular"
+        android:layout_marginHorizontal="@dimen/margin_regular"
         app:cardElevation="@dimen/card_elevation_standard"
         app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/card_tag_editable_summary_checkbox"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card_summary_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/margin_regular"
             android:paddingHorizontal="@dimen/margin_regular">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/card_tag_editable_summary_title"
+                android:id="@+id/card_summary_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pretendard_medium"
@@ -46,54 +35,64 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/card_tag_editable_summary_visited_at"
-                layout="@layout/card_category_detail_summary_item"
+                android:id="@+id/card_summary_visited_at"
+                layout="@layout/layout_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_regular"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_tag_editable_summary_title" />
+                app:layout_constraintTop_toBottomOf="@id/card_summary_title" />
 
             <include
-                android:id="@+id/card_tag_editable_summary_address"
-                layout="@layout/card_category_detail_summary_item"
+                android:id="@+id/card_summary_address"
+                layout="@layout/layout_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_tag_editable_summary_visited_at" />
+                app:layout_constraintTop_toBottomOf="@id/card_summary_visited_at" />
 
             <include
-                android:id="@+id/card_tag_editable_summary_markerEmoji"
-                layout="@layout/card_category_detail_summary_item"
+                android:id="@+id/card_summary_visited_count"
+                layout="@layout/layout_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_tag_editable_summary_address" />
+                app:layout_constraintTop_toBottomOf="@id/card_summary_address" />
 
             <include
-                android:id="@+id/card_tag_editable_summary_tags"
-                layout="@layout/card_category_detail_summary_item"
+                android:id="@+id/card_summary_markerEmoji"
+                layout="@layout/layout_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_tag_editable_summary_markerEmoji" />
+                app:layout_constraintTop_toBottomOf="@id/card_summary_visited_count" />
 
             <include
-                android:id="@+id/card_tag_editable_summary_friends"
-                layout="@layout/card_category_detail_summary_item"
+                android:id="@+id/card_summary_tags"
+                layout="@layout/layout_summary_item"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_tag_editable_summary_tags" />
+                app:layout_constraintTop_toBottomOf="@id/card_summary_markerEmoji" />
+
+            <include
+                android:id="@+id/card_summary_friends"
+                layout="@layout/layout_summary_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_summary_tags" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

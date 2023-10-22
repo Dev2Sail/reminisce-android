@@ -1,17 +1,16 @@
-package studio.hcmc.reminisce.ui.activity.home
+package studio.hcmc.reminisce.ui.activity.friend_tag
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardCommonHeaderBinding
 
-class HeaderViewHolder(
+class FriendTagHeaderViewHolder(
     private val viewBinding: CardCommonHeaderBinding,
     private val delegate: Delegate
-) : ViewHolder(viewBinding.root) {
+): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onClick()
+        fun onEditClick(title: String)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -19,11 +18,10 @@ class HeaderViewHolder(
         delegate = delegate
     )
 
-    fun bind() {
-        viewBinding.commonHeaderTitle.text = viewBinding.root.context.getText(R.string.header_view_holder_title)
-        viewBinding.commonHeaderAction1.text = viewBinding.root.context.getText(R.string.header_view_holder_action)
+    fun bind(content: FriendTagAdapter.HeaderContent) {
+        viewBinding.commonHeaderTitle.text = content.title
         viewBinding.commonHeaderAction1.setOnClickListener {
-            delegate.onClick()
+            delegate.onEditClick(content.title)
         }
     }
 }

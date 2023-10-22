@@ -8,10 +8,7 @@ package studio.hcmc.reminisce
 // TODO WriteDetail recyclerView (writeDetailDate + writeDetailLocation + writeDetailMemo + writeDetailOptions)
 
 // * Folder
-// TODO categoryDetail contents 필요 (adapter, viewHolder)
-// TODO categoryDetail 편집 setONclick 새로운 header와 summary담긴 리싸이클러뷰
-// TODO categoryDetail 전체 선택 및 해제 (편집 화면)
-// TODO category에 해당하는 location 이 존재하지 않을 경우 header는 카테고리 이름 출력 && '아직 저장된 추억이 없어요' textView 출력
+
 // TODO 단일 location 화면 제작
 
 // * Folder > Write > WriteOptions
@@ -31,11 +28,19 @@ package studio.hcmc.reminisce
 // TODO activity 이동 시 activityResult 써서 완전히 종료 (appbarBack)
 
 // TODO logger 통일 :
-//  Logger.v("reminisce Logger", "[reminisce > Account Setting > Prepare user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
-// Logger.v("HCMC logger", Logger.makeMsg("tagDetail", "prepareSummary", it))
+
 // TODO error handling
 
 // TODO network error 판별
+
+
+// TODO XML make standard
+// card_common_header -> activity header
+// card_common_detail_header -> detail activity header -> tag activity or Friend activity에서 사용 (편집 불가능한 헤더)
+// card_category_detail_editable_header -> detail activity header -> category Detail에서만 사용 (편집 가능한 헤더)
+// card_summary -> 모든 summary 통일
+// card_checkable_summary -> 모든 activity 편집 화면에서 사용
+// layout_summary_item -> 모든 summary 내 아이템
 
 
 // add location -> locationId

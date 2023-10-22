@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.databinding.CardHomeTagBinding
 import studio.hcmc.reminisce.databinding.ChipTagBinding
@@ -12,9 +13,7 @@ class TagViewHolder(
     private val delegate: Delegate
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
-        val tags: List<TagVO>
-
-        fun onTagClick(tag: TagVO)
+        fun onItemClick(tag: TagVO)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -22,19 +21,24 @@ class TagViewHolder(
         delegate = delegate
     )
 
-    fun bind() {
-        viewBinding.homeTagChips.removeAllViews()
-        for (tag in delegate.tags) {
-            viewBinding.homeTagChips.addView(LayoutInflater.from(viewBinding.root.context)
-                .let { ChipTagBinding.inflate(it, viewBinding.homeTagChips, false) }
-                .root
-                .apply {
-                    text = tag.body
-                    isCheckable = false
-                    isSelected = true
-                    setOnClickListener { delegate.onTagClick(tag) }
-                }
-            )
+    fun bind(content: HomeAdapter.TagContent) {
+        val tags = content.tags
+        if (!tags.isNullOrEmpty()) {
+            viewBinding.homeTagChips.removeAllViews()
+            for (tag in tags) {
+                viewBinding.homeTagChips.addView(LayoutInflater.from(viewBinding.root.context)
+                    .let { ChipTagBinding.inflate(it, viewBinding.homeTagChips, false) }
+                    .root
+                    .apply {
+                        text = tag.body
+                        isCheckable = false
+                        isSelected = true
+                        setOnClickListener { delegate.onItemClick(tag) }
+                    }
+                )
+            }
+        } else {
+            viewBinding.root.isGone = true
         }
     }
 }

@@ -36,7 +36,7 @@ class TagDetailActivity : AppCompatActivity() {
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
 
-    private val contents = ArrayList<TagDetailAdapter.TagContents>()
+    private val contents = ArrayList<TagDetailAdapter.Content>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,9 +47,11 @@ class TagDetailActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.tagDetailAppbar.appbarTitle.text = getText(R.string.header_view_holder_title)
-        viewBinding.tagDetailAppbar.appbarActionButton1.isVisible = false
-        viewBinding.tagDetailAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.tagDetailAppbar.apply {
+            appbarTitle.text = getString(R.string.header_view_holder_title)
+            appbarActionButton1.isVisible = false
+            appbarBack.setOnClickListener { finish() }
+        }
 
         loadContents()
     }
@@ -73,27 +75,25 @@ class TagDetailActivity : AppCompatActivity() {
                     }
                 }
 
-                prepareContents()
-                withContext(Dispatchers.Main) { onContentsReady() }
-            }.onFailure {
-                LocalLogger.e(it)
-            }
+//                prepareContents()
+//                withContext(Dispatchers.Main) { onContentsReady() }
+            }.onFailure { LocalLogger.e(it) }
 
         if (result.isSuccess) {
-//            prepareContents()
-//            withContext(Dispatchers.Main) { onContentsReady() }
+            prepareContents()
+            withContext(Dispatchers.Main) { onContentsReady() }
         } else {
             CommonError.onMessageDialog(this@TagDetailActivity, "", "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
         }
     }
 
     private fun prepareContents() {
-        contents.add(TagDetailAdapter.TagDetailHeaderContent(tagBody!!))
+        contents.add(TagDetailAdapter.HeaderContent(tagBody!!))
         for ((date, locations) in locations.groupBy { it.createdAt.toString().substring(0, 7) }.entries) {
             val (year, month) = date.split("-")
-            contents.add(TagDetailAdapter.TagDetailDateDividerContent(getString(R.string.card_date_separator, year, month.trim('0'))))
+            contents.add(TagDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
             for (location in locations.sortedByDescending { it.id }) {
-                contents.add(TagDetailAdapter.TagDetailContent(
+                contents.add(TagDetailAdapter.DetailContent(
                     location,
                     tagInfo[location.id].orEmpty(),
                     friendInfo[location.id].orEmpty()
@@ -105,9 +105,9 @@ class TagDetailActivity : AppCompatActivity() {
     private fun onContentsReady() {
         viewBinding.tagDetailItems.layoutManager = LinearLayoutManager(this)
         adapter = TagDetailAdapter(
-            adapterDelegate = adapterDelegate,
-            headerDelegate = headerDelegate,
-            summaryDelegate = summaryDelegate
+            adapterDelegate,
+            headerDelegate,
+            summaryDelegate
         )
         viewBinding.tagDetailItems.adapter = adapter
     }
@@ -119,11 +119,11 @@ class TagDetailActivity : AppCompatActivity() {
 
     private val headerDelegate = object : TagDetailHeaderViewHolder.Delegate {
         override fun onEditClick(title: String) {
-//            Intent(this@TagDetailActivity, TagEditableDetailActivity::class.java).apply {
-//                putExtra("tagId", tagId)
-//                putExtra("tagTitle", tagBody)
-//                startActivity(this)
-//            }
+            Intent(this@TagDetailActivity, TagEditableDetailActivity::class.java).apply {
+                putExtra("tagId", tagId)
+                putExtra("tagTitle", tagBody)
+                startActivity(this)
+            }
         }
     }
 
