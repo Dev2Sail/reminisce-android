@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +15,7 @@ import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.launcher.LauncherActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.ui.view.Navigation
+import studio.hcmc.reminisce.util.LocalLogger
 
 class AccountSettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingAccountBinding
@@ -26,7 +26,6 @@ class AccountSettingActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         initView()
-        prepareUser()
     }
 
     private fun initView() {
@@ -38,11 +37,14 @@ class AccountSettingActivity : AppCompatActivity() {
 
         viewBinding.settingAccountNicknameIcon.setOnClickListener { launchNicknameSetting() }
         viewBinding.settingAccountPasswordIcon.setOnClickListener { launchPasswordSetting() }
-        viewBinding.settingAccountWithdraw.setOnClickListener { WithdrawDialog(this, withdrawDelegate) }
+        viewBinding.settingAccountWithdraw.setOnClickListener {
+            WithdrawDialog(this, withdrawDelegate)
+        }
 
         val menuId = intent.getIntExtra("settingMenuId", -1)
         viewBinding.settingAccountNavView.navItems.selectedItemId = menuId
 
+        prepareUser()
         navController()
     }
 
@@ -53,7 +55,7 @@ class AccountSettingActivity : AppCompatActivity() {
             .onSuccess { viewBinding.settingAccountNicknameBody.text = it.nickname }
             .onFailure {
                 viewBinding.settingAccountNicknameBody.text = "닉네임을 불러올 수 없습니다."
-                Log.v("reminisce Logger", "[reminisce > Account Setting > Prepare user] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                LocalLogger.e(it)
             }
     }
 
@@ -71,7 +73,7 @@ class AccountSettingActivity : AppCompatActivity() {
                     }
                     .onFailure {
                         CommonError.onDialog(this@AccountSettingActivity)
-                        Log.v("reminisce Logger", "[reminisce > Account Setting > onDoneClick] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                        LocalLogger.e(it)
                     }
             }
         }
@@ -106,13 +108,13 @@ class AccountSettingActivity : AppCompatActivity() {
     }
 
     private fun launchNicknameSetting() {
-        Intent(this, AccountSettingDetailNicknameActivity::class.java).apply {
+        Intent(this, AccountSettingEditNicknameActivity::class.java).apply {
             startActivity(this)
         }
     }
 
     private fun launchPasswordSetting() {
-        Intent(this, AccountSettingDetailPasswordActivity::class.java).apply {
+        Intent(this, AccountSettingEditPasswordActivity::class.java).apply {
             startActivity(this)
         }
     }

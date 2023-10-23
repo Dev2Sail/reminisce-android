@@ -101,7 +101,7 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun launchFriendSetting() {
-        Intent(this, FriendSettingActivity::class.java).apply {
+        Intent(this, FriendListActivity::class.java).apply {
             putExtra("settingMenuId", viewBinding.settingNavView.navItems.selectedItemId)
             startActivity(this)
         }

@@ -14,7 +14,7 @@ class TagDetailSummaryViewHolder(
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(locationId: Int)
+        fun onItemClick(locationId: Int, title: String)
 
         fun getUser(userId: Int): UserVO
     }
@@ -31,9 +31,10 @@ class TagDetailSummaryViewHolder(
         addressBuilder.append(location.latitude)
         addressBuilder.append(location.longitude)
 
+        val (year, month, day) = location.visitedAt.split("-")
         viewBinding.apply {
             cardSummaryTitle.text = location.title
-            cardSummaryVisitedAt.layoutSummaryItemBody.text = location.visitedAt
+            cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
             cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
             cardSummaryAddress.layoutSummaryItemBody.text = addressBuilder.toString()
             cardSummaryVisitedCount.root.isGone = true
@@ -72,7 +73,7 @@ class TagDetailSummaryViewHolder(
         }
 
         viewBinding.root.setOnClickListener {
-            delegate.onItemClick(location.id)
+            delegate.onItemClick(location.id, location.title)
         }
     }
 }

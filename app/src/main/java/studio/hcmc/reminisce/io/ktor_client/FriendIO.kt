@@ -15,19 +15,23 @@ import studio.hcmc.reminisce.vo.friend.FriendVO
 object FriendIO {
     suspend fun post(userId: Int, dto: FriendDTO.Post): FriendVO {
         return httpClient
-            .post("/user/${userId}/friend") { setBody(Gson().toJsonTree(dto)) }
-            .body()
+            .post("/friend") {
+                parameter("userId", userId)
+                setBody(Gson().toJsonTree(dto))
+            }.body()
     }
 
     suspend fun put(userId: Int, opponentId: Int, dto: FriendDTO.Put) {
         httpClient
-            .put("/user/${userId}/friend") { setBody(Gson().toJsonTree(dto)) }
-            .bodyAsText()
+            .put("/friend") {
+                parameter("userId", userId)
+                setBody(Gson().toJsonTree(dto))
+            }.bodyAsText()
     }
 
     suspend fun delete(userId: Int, opponentId: Int) {
         httpClient
-            .delete("/user/${userId}/friend/${opponentId}")
+            .delete("/friend/${opponentId}") { parameter("userId", userId) }
             .bodyAsText()
     }
 
@@ -43,5 +47,11 @@ object FriendIO {
                 parameter("userId", userId)
                 parameter("locationId", locationId)
             }.body()
+    }
+
+    suspend fun addedListByUserId(userId: Int): List<FriendVO> {
+        return httpClient
+            .get("/report/${userId}/friend/list")
+            .body()
     }
 }

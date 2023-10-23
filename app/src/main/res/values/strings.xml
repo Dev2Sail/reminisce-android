@@ -25,6 +25,7 @@
     <string name="card_summary_title">남동 오피스파크</string>
     <string name="card_summary_item_body">인천광역시 남동구 은청로 18 남동상공센타 2층</string>
     <string name="card_date_separator">%s년 %s월</string>
+    <string name="card_visited_at">%s년 %s월 %s일</string>
 
     <string name="appbar_title">Title</string>
     <string name="appbar_button_text">완료</string>
@@ -152,5 +153,7 @@
     <string name="message_account_setting_detail_nickname">닉네임이 변경되었어요.</string>
     <string name="map_header_title">지도</string>
     <string name="map_header_search_title">어디를 다녀오셨나요?</string>
+
+    <string name="most_added_friend">가장 많이 등록된 친구</string>
 
 </resources>

@@ -18,6 +18,7 @@ import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.category.editable.CategoryEditableDetailActivity
 import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
+import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.friend.FriendVO
@@ -130,8 +131,7 @@ class CategoryDetailActivity : AppCompatActivity() {
             val (year, month) = date.split("-")
             contents.add(CategoryDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
             for (location in locations.sortedByDescending { it.id }) {
-                contents.add(
-                    CategoryDetailAdapter.DetailContent(
+                contents.add(CategoryDetailAdapter.DetailContent(
                     location,
                     tagInfo[location.id].orEmpty(),
                     friendInfo[location.id].orEmpty()
@@ -174,14 +174,19 @@ class CategoryDetailActivity : AppCompatActivity() {
             val result by lazy { intent.getBooleanExtra("fetchResult", false) }
             if (result) {
 //                adapter.notifyItemChanged(position)
-                adapter.notifyDataSetChanged()
+//                adapter.notifyDataSetChanged()
             }
         }
     }
 
     private val summaryDelegate= object : CategoryDetailSummaryViewHolder.Delegate {
-        override fun onItemClick(locationId: Int) {
-            prepareSummaryOnClick(locationId)
+        override fun onItemClick(location: LocationVO) {
+            Intent(this@CategoryDetailActivity, WriteDetailActivity::class.java).apply {
+                putExtra("locationId", location.id)
+                putExtra("title", location.title)
+//                putExtra("class", WriteDetailAdapter.DetailContent(location))
+                startActivity(this)
+            }
         }
 
         override fun getUser(userId: Int): UserVO {

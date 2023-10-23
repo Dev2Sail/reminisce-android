@@ -63,13 +63,13 @@
             android:name=".ui.activity.setting.AddFriendActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.setting.FriendSettingActivity"
+            android:name=".ui.activity.setting.FriendListActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.setting.AccountSettingDetailPasswordActivity"
+            android:name=".ui.activity.setting.AccountSettingEditPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.setting.AccountSettingDetailNicknameActivity"
+            android:name=".ui.activity.setting.AccountSettingEditNicknameActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.setting.AccountSettingActivity"

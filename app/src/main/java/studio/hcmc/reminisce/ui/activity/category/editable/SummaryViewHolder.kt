@@ -31,9 +31,10 @@ class SummaryViewHolder(
         addressBuilder.append(location.latitude)
         addressBuilder.append(location.longitude)
 
+        val (year, month, day) = location.visitedAt.split("-")
         viewBinding.apply {
             cardCheckableSummaryTitle.text = location.title
-            cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = location.visitedAt
+            cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
             cardCheckableSummaryVisitedCount.root.isGone = true
             cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
             cardCheckableSummaryAddress.layoutSummaryItemBody.text = addressBuilder.toString()

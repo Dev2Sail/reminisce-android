@@ -4,19 +4,17 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.databinding.CardSettingFriendItemBinding
-import studio.hcmc.reminisce.ui.view.SingleTypeAdapterDelegate
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
-class FriendSettingItemViewHolder(
+class FriendListViewHolder(
     private val viewBinding: CardSettingFriendItemBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
-    interface Delegate: SingleTypeAdapterDelegate<FriendVO> {
-        val friends: List<FriendVO>
-        val users: HashMap<Int /* userId */, UserVO>
+    interface Delegate {
         fun onItemClick(opponentId: Int, friend: FriendVO)
         fun onItemLongClick(opponentId: Int)
+        fun getUser(userId: Int): UserVO
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -24,11 +22,9 @@ class FriendSettingItemViewHolder(
         delegate = delegate
     )
 
-    private fun getFriend(userId: Int): UserVO { return delegate.users[userId]!!}
-
     fun bind(friend: FriendVO) {
         viewBinding.apply {
-            settingFriendTitle.text = friend.nickname ?: getFriend(friend.opponentId).nickname
+            settingFriendTitle.text = friend.nickname ?: delegate.getUser(friend.opponentId).nickname
             settingFriendItemIcon.setOnClickListener {
                 delegate.onItemClick(friend.opponentId, friend)
             }

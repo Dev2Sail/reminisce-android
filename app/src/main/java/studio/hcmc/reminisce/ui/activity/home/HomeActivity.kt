@@ -87,9 +87,7 @@ class HomeActivity : AppCompatActivity() {
                     categoryInfo[category.id] = count.asInt
                 }
             }
-        }.onFailure {
-            LocalLogger.e(it)
-        }
+        }.onFailure { LocalLogger.e(it) }
 
         if (result.isSuccess) {
             prepareContents()
@@ -112,11 +110,10 @@ class HomeActivity : AppCompatActivity() {
         }
 
         contents.add(HomeAdapter.HeaderContent())
-        for (category in categories) {
+        for (category in categories.sortedBy { it.sortOrder }) {
             contents.add(HomeAdapter.CategoryContent(category, categoryInfo[category.id] ?: 0 ))
         }
         contents.add(HomeAdapter.TagContent(tags))
-//        contents.add(HomeAdapter.FriendContent(friends))
         contents.add(HomeAdapter.FriendContent(friendContent.distinct()))
     }
 
@@ -130,13 +127,11 @@ class HomeActivity : AppCompatActivity() {
             friendTagDelegate
         )
         viewBinding.homeItems.adapter = adapter
-
     }
 
     private val adapterDelegate = object : HomeAdapter.Delegate {
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
-
     }
 
     private val headerDelegate = object : HeaderViewHolder.Delegate {

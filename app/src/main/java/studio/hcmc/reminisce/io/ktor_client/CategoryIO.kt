@@ -17,43 +17,53 @@ import studio.hcmc.reminisce.vo.category.CategoryVO
 object CategoryIO {
     suspend fun post(dto: CategoryDTO.Post): CategoryVO {
         return httpClient
-            .post("/user/category") { setBody(Gson().toJsonTree(dto)) }
+            .post("/category") { setBody(Gson().toJsonTree(dto)) }
             .body()
     }
 
     suspend fun put(userId: Int, dto: CategoryDTO.Put) {
         httpClient
-            .put("/user/${userId}/category") { setBody(Gson().toJsonTree(dto)) }
-            .bodyAsText()
+            .put("/category") {
+                parameter("userId", userId)
+                setBody(Gson().toJsonTree(dto))
+            }.bodyAsText()
     }
 
     suspend fun patch(userId: Int, categoryId: Int, dto: CategoryDTO.Patch) {
         httpClient
-            .patch("/user/${userId}/category/${categoryId}") { setBody(Gson().toJsonTree(dto)) }
-            .bodyAsText()
+            .patch("/category/${categoryId}") {
+                parameter("userId", userId)
+                setBody(Gson().toJsonTree(dto))
+            }.bodyAsText()
     }
 
     suspend fun delete(categoryId: Int) {
         httpClient
-            .delete("/user/category/${categoryId}")
+            .delete("/category/${categoryId}")
             .bodyAsText()
+    }
+
+    suspend fun getById(categoryId: Int): CategoryVO {
+        return httpClient
+            .get("/category/${categoryId}")
+            .body()
     }
 
     suspend fun listByUserId(userId: Int): List<CategoryVO> {
         return httpClient
-            .get("/user/${userId}/category/list/all")
+            .get("/category/list/all") { parameter("userId", userId) }
             .body()
     }
 
     suspend fun getCountByCategoryIdAndUserId(userId: Int, categoryId: Int): JsonObject {
         return httpClient
-            .get("/user/${userId}/category/count") { parameter("categoryId", categoryId) }
+            .get("/category/${categoryId}/count") { parameter("userId", userId) }
             .body()
     }
 
     suspend fun getTotalCountByUserId(userId: Int): JsonObject {
         return httpClient
-            .get("/user/${userId}/category/count/all")
+            .get("/category/all/count") { parameter("userId", userId) }
             .body()
     }
 }

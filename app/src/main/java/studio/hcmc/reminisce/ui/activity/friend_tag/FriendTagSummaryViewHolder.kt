@@ -33,9 +33,10 @@ class FriendTagSummaryViewHolder(
         addressBuilder.append(location.latitude)
         addressBuilder.append(location.longitude)
 
+        val (year, month, day) = location.visitedAt.split("-")
         viewBinding.apply {
             cardSummaryTitle.text = location.title
-            cardSummaryVisitedAt.layoutSummaryItemBody.text = location.visitedAt
+            cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
             cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
             cardSummaryAddress.layoutSummaryItemBody.text = addressBuilder.toString()
             cardSummaryVisitedCount.root.isGone = true

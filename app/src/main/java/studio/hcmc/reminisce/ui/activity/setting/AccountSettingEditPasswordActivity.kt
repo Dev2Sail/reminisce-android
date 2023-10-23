@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import kotlinx.coroutines.CoroutineScope
@@ -10,22 +9,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import studio.hcmc.kotlin.crypto.sha512
 import studio.hcmc.reminisce.R
-import studio.hcmc.reminisce.databinding.ActivitySettingAccountDetailPasswordBinding
+import studio.hcmc.reminisce.databinding.ActivitySettingAccountEditPasswordBinding
 import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.view.CommonError
-import studio.hcmc.reminisce.ui.view.CommonMessage
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
-class AccountSettingDetailPasswordActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivitySettingAccountDetailPasswordBinding
+class AccountSettingEditPasswordActivity : AppCompatActivity() {
+    private lateinit var viewBinding: ActivitySettingAccountEditPasswordBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivitySettingAccountDetailPasswordBinding.inflate(layoutInflater)
+        viewBinding = ActivitySettingAccountEditPasswordBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
         initView()
@@ -53,21 +52,21 @@ class AccountSettingDetailPasswordActivity : AppCompatActivity() {
     }
 
     private fun patchPassword(editedPassword: String) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@AccountSettingDetailPasswordActivity)
+        val user = UserExtension.getUser(this@AccountSettingEditPasswordActivity)
         val patchDTO = UserDTO.Patch().apply {
             password = editedPassword.sha512
         }
         runCatching { UserIO.patch(user.id, patchDTO) }
             .onSuccess {
-                UserAuthVO(user.email, editedPassword).save(this@AccountSettingDetailPasswordActivity)
-                CommonMessage.onMessage(this@AccountSettingDetailPasswordActivity, "비밀번호가 변경되었어요.")
-                Intent(this@AccountSettingDetailPasswordActivity, AccountSettingActivity::class.java).apply {
+                UserAuthVO(user.email, editedPassword).save(this@AccountSettingEditPasswordActivity)
+                Intent(this@AccountSettingEditPasswordActivity, AccountSettingActivity::class.java).apply {
+                    finish()
                     startActivity(this)
                 }
             }
             .onFailure {
-                CommonError.onDialog(this@AccountSettingDetailPasswordActivity)
-                Log.v("reminisce Logger", "[reminisce > Account Setting PW > patch pw] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                CommonError.onDialog(this@AccountSettingEditPasswordActivity)
+                LocalLogger.e(it)
             }
     }
 }

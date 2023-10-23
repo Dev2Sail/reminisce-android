@@ -2,36 +2,40 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import androidx.core.widget.addTextChangedListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import studio.hcmc.reminisce.databinding.DialogUpdateFriendNicknameBinding
+import studio.hcmc.reminisce.databinding.DialogEditFriendBinding
 import studio.hcmc.reminisce.dto.friend.FriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.vo.friend.FriendVO
+import studio.hcmc.reminisce.vo.user.UserVO
 
-class UpdateFriendNicknameDialog(
+class EditFriendDialog(
     activity: Activity,
     context: Context,
     friend: FriendVO,
-    opponentNickname: String,
-    opponentEmail: String
+    delegate: Delegate
 ) {
     private val responseContext = context
 
+    interface Delegate {
+        fun getUser(userId: Int): UserVO
+    }
+
     init {
-        val viewBinding = DialogUpdateFriendNicknameBinding.inflate(LayoutInflater.from(activity))
+        val viewBinding = DialogEditFriendBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
         val inputField = viewBinding.dialogUpdateFriendNicknameField.apply {
-            hint = friend.nickname ?: ""
-            helperText = opponentEmail
-            placeholderText = opponentNickname
+            hint = friend.nickname ?: delegate.getUser(friend.opponentId).nickname
+            helperText = delegate.getUser(friend.opponentId).email
+            placeholderText = friend.nickname ?: delegate.getUser(friend.opponentId).nickname
         }
 
         dialog.show()
@@ -54,7 +58,7 @@ class UpdateFriendNicknameDialog(
         val putDTO = FriendDTO.Put().apply { nickname = editedNickname }
         runCatching { FriendIO.put(user.id, opponentId, putDTO) }
             .onFailure {
-                Log.v("reminisce Logger", "[reminisce > Friend Setting > patchFriend] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                LocalLogger.e(it)
             }
     }
 }

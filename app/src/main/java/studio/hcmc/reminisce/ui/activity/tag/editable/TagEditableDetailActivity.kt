@@ -79,8 +79,6 @@ class TagEditableDetailActivity : AppCompatActivity() {
                         }
                     }
                 }
-//                prepareContents()
-//                withContext(Dispatchers.Main) { onContentsReady() }
             }.onFailure {
                 LocalLogger.e(it)
             }

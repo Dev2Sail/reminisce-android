@@ -17,6 +17,7 @@ import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.tag.editable.TagEditableDetailActivity
+import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.friend.FriendVO
@@ -128,18 +129,16 @@ class TagDetailActivity : AppCompatActivity() {
     }
 
     private val summaryDelegate = object : TagDetailSummaryViewHolder.Delegate {
-        override fun onItemClick(locationId: Int) {
-            prepareSummaryOnClick(locationId)
+        override fun onItemClick(locationId: Int, title: String) {
+            Intent(this@TagDetailActivity, WriteDetailActivity::class.java).apply {
+                putExtra("locationId", locationId)
+                putExtra("title", title)
+                startActivity(this)
+            }
         }
 
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
         }
-    }
-
-    private fun prepareSummaryOnClick(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { LocationIO.getById(locationId) }
-            .onSuccess { LocalLogger.v(it.toString()) }
-            .onFailure { LocalLogger.e(it) }
     }
 }

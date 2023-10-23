@@ -34,6 +34,14 @@ package studio.hcmc.reminisce
 // TODO network error 판별
 
 
+// 요청 경로, method, protocol, query결과
+// 1) 클라이언트에서 요청
+// 2) tomcat에서 filter에서 catch 후 readByte를 wrapper로 감싸고
+// 3) filter -> interceptor 에서 logger 호출
+// 4) 최종적으로 들어온 요청을 interceptor에서 controller 호출
+
+
+
 // TODO XML make standard
 // card_common_header -> activity header
 // card_common_detail_header -> detail activity header -> tag activity or Friend activity에서 사용 (편집 불가능한 헤더)

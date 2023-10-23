@@ -14,60 +14,48 @@
         android:text="@string/write_option"
         android:textColor="@color/md_theme_light_secondary"
         android:textSize="@dimen/title_large"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    
 
-    <ImageView
-        android:id="@+id/write_detail_options_friend_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_2xlarge"
-        android:src="@drawable/round_group_add_16"
-        app:layout_constraintBottom_toBottomOf="@id/write_detail_options_friend"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/write_detail_options_friend"
-        app:tint="@color/md_theme_light_primary" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/write_detail_options_friend"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/write_detail_options_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
         android:layout_marginTop="@dimen/margin_regular"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:fontFamily="@font/pretendard_regular"
-        android:text="@string/card_home_tag_friend_title"
-        android:textColor="@color/md_theme_light_onSurfaceVariant"
-        android:textSize="@dimen/body_medium"
+        android:paddingStart="@dimen/margin_2xlarge"
+        android:paddingEnd="@dimen/margin_large"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/write_detail_options_friend_icon"
-        app:layout_constraintTop_toBottomOf="@id/write_detail_options" />
-
-    <ImageView
-        android:id="@+id/write_detail_options_tag_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_2xlarge"
-        android:src="@drawable/round_tag_16"
-        app:layout_constraintBottom_toBottomOf="@id/write_detail_options_tag"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/write_detail_options_tag"
-        app:tint="@color/md_theme_light_primary" />
+        app:layout_constraintTop_toBottomOf="@id/write_detail_options">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/write_detail_options_tag"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginTop="@dimen/margin_regular"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:fontFamily="@font/pretendard_regular"
-        android:text="@string/card_home_tag_title"
-        android:textColor="@color/md_theme_light_onSurfaceVariant"
-        android:textSize="@dimen/body_medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/write_detail_options_friend_icon"
-        app:layout_constraintTop_toBottomOf="@id/write_detail_options_friend" />
+        <include
+            android:id="@+id/card_write_detail_options_category"
+            layout="@layout/layout_write_detail_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/card_write_detail_options_tags"
+            layout="@layout/layout_write_detail_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_write_detail_options_category" />
+
+        <include
+            android:id="@+id/card_write_detail_options_friends"
+            layout="@layout/layout_write_detail_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_write_detail_options_tags" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

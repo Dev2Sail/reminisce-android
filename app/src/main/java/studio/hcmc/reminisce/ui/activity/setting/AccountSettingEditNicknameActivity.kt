@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.R
-import studio.hcmc.reminisce.databinding.ActivitySettingAccountDetailNicknameBinding
+import studio.hcmc.reminisce.databinding.ActivitySettingAccountEditNicknameBinding
 import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.UserIO
@@ -17,12 +17,12 @@ import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
-class AccountSettingDetailNicknameActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivitySettingAccountDetailNicknameBinding
+class AccountSettingEditNicknameActivity : AppCompatActivity() {
+    private lateinit var viewBinding: ActivitySettingAccountEditNicknameBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivitySettingAccountDetailNicknameBinding.inflate(layoutInflater)
+        viewBinding = ActivitySettingAccountEditNicknameBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
         initView()
@@ -52,7 +52,7 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.Main).launch {
-        val user = UserExtension.getUser(this@AccountSettingDetailNicknameActivity)
+        val user = UserExtension.getUser(this@AccountSettingEditNicknameActivity)
         val field = viewBinding.settingAccountDetailNicknameField
         runCatching { UserIO.getByEmail(user.email) }
             .onSuccess {
@@ -60,25 +60,25 @@ class AccountSettingDetailNicknameActivity : AppCompatActivity() {
                 field.hint = it.nickname
             }
             .onFailure {
-                CommonError.onDialog(this@AccountSettingDetailNicknameActivity)
+                CommonError.onDialog(this@AccountSettingEditNicknameActivity)
                 LocalLogger.e(it)
             }
     }
 
     private fun patchNickname(editedNickname: String) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@AccountSettingDetailNicknameActivity)
+        val user = UserExtension.getUser(this@AccountSettingEditNicknameActivity)
         val patchDTO = UserDTO.Patch().apply {
             nickname = editedNickname
         }
         runCatching { UserIO.patch(user.id, patchDTO) }
             .onSuccess {
-                Intent(this@AccountSettingDetailNicknameActivity, AccountSettingActivity::class.java).apply {
-                    startActivity(this)
+                Intent(this@AccountSettingEditNicknameActivity, AccountSettingActivity::class.java).apply {
                     finish()
+                    startActivity(this)
                 }
             }
             .onFailure {
-                CommonError.onDialog(this@AccountSettingDetailNicknameActivity)
+                CommonError.onDialog(this@AccountSettingEditNicknameActivity)
                 LocalLogger.e(it)
             }
     }

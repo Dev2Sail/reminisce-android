@@ -14,34 +14,19 @@
         android:text="@string/write_date"
         android:textColor="@color/md_theme_light_secondary"
         android:textSize="@dimen/title_large"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/card_write_detail_content_visited_at_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_2xlarge"
-        android:src="@drawable/outline_calendar_month_16"
-        app:layout_constraintBottom_toBottomOf="@id/card_write_detail_content_visited_at"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/card_write_detail_content_visited_at"
-        app:tint="@color/md_theme_light_primary" />
-
-    <com.google.android.material.textview.MaterialTextView
+    <include
         android:id="@+id/card_write_detail_content_visited_at"
+        layout="@layout/layout_write_detail_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginStart="@dimen/margin_2xlarge"
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginEnd="@dimen/margin_large"
-        android:fontFamily="@font/pretendard_regular"
-        android:text="@string/write_visited_at"
-        android:textColor="@color/md_theme_light_onSurfaceVariant"
-        android:textSize="@dimen/body_medium"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/card_write_detail_content_visited_at_icon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/write_date" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -58,57 +43,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/card_write_detail_content_visited_at" />
 
-    <ImageView
-        android:id="@+id/card_write_detail_content_location_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_2xlarge"
-        android:src="@drawable/outline_add_location_alt_16"
-        app:layout_constraintBottom_toBottomOf="@id/card_write_detail_content_location"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/card_write_detail_content_location"
-        app:tint="@color/md_theme_light_primary" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/card_write_detail_content_location"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card_write_detail_content_location_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
         android:layout_marginTop="@dimen/margin_regular"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:fontFamily="@font/pretendard_regular"
-        android:text="@string/write_location"
-        android:textColor="@color/md_theme_light_onSurfaceVariant"
-        android:textSize="@dimen/body_medium"
+        android:paddingStart="@dimen/margin_2xlarge"
+        android:paddingEnd="@dimen/margin_large"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/card_write_detail_content_location_icon"
-        app:layout_constraintTop_toBottomOf="@id/card_write_detail_content_location_title" />
-
-    <ImageView
-        android:id="@+id/card_write_detail_content_marker_emoji_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_2xlarge"
-        android:src="@drawable/outline_add_reaction_16"
-        app:layout_constraintBottom_toBottomOf="@id/card_write_detail_content_marker_emoji"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/card_write_detail_content_marker_emoji"
-        app:tint="@color/md_theme_light_primary" />
+        app:layout_constraintTop_toBottomOf="@id/card_write_detail_content_location_title">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/card_write_detail_content_marker_emoji"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginTop="@dimen/margin_regular"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:fontFamily="@font/pretendard_regular"
-        android:text="@string/write_emoji"
-        android:textColor="@color/md_theme_light_onSurfaceVariant"
-        android:textSize="@dimen/body_medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/card_write_detail_content_marker_emoji_icon"
-        app:layout_constraintTop_toBottomOf="@id/card_write_detail_content_location" />
+        <include
+            android:id="@+id/card_write_detail_content_location"
+            layout="@layout/layout_write_detail_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/card_write_detail_content_marker_emoji"
+            layout="@layout/layout_write_detail_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_write_detail_content_location" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/card_write_detail_content_divider1"
@@ -119,7 +83,7 @@
         android:layout_marginBottom="@dimen/margin_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/card_write_detail_content_marker_emoji" />
+        app:layout_constraintTop_toBottomOf="@id/card_write_detail_content_location_container" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/card_write_detail_content"
@@ -135,6 +99,7 @@
         app:layout_constraintTop_toBottomOf="@id/card_write_detail_content_divider1" />
 
     <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/card_write_detail_content_divider2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
