@@ -13,6 +13,7 @@ class CategoryViewHolder(
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(category: CategoryVO)
+        fun onItemLongClick(categoryId: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -31,9 +32,11 @@ class CategoryViewHolder(
 
         viewBinding.apply {
             homeCategoryBody.text = count.toString()
-            homeCategoryAction1.setOnClickListener { delegate.onItemClick(category) }
+            homeCategoryAction1.setOnClickListener {
+                delegate.onItemClick(category)
+            }
             root.setOnLongClickListener {
-                DeleteCategoryDialog(it.context, category.id)
+                delegate.onItemLongClick(category.id)
 
                 false
             }

@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -14,7 +13,8 @@ import studio.hcmc.reminisce.databinding.ActivitySettingBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.ui.activity.MainActivity
-import studio.hcmc.reminisce.ui.view.Navigation
+import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.navigationController
 
 class SettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingBinding
@@ -28,27 +28,28 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val menuId = intent.getIntExtra("selectedMenuId", -1)
+        val menuId = intent.getIntExtra("menuId", -1)
+        navigationController(viewBinding.settingNavView, menuId)
 
-        viewBinding.apply {
-            settingHeader.commonHeaderTitle.text = getText(R.string.setting_activity_header)
-            settingHeader.commonHeaderAction1.isVisible = false
-            settingAccountIcon.setOnClickListener { launchAccountSetting() }
-            settingFriendIcon.setOnClickListener { launchFriendSetting() }
-            settingSignOutIcon.setOnClickListener { SignOutDialog(this@SettingActivity, signOutDelegate) }
-            settingNavView.navItems.selectedItemId = menuId
+        viewBinding.settingHeader.apply {
+            commonHeaderTitle.text = getString(R.string.setting_activity_header)
+            commonHeaderAction1.isVisible = false
         }
-
-        navController()
+        viewBinding.settingAccountIcon.setOnClickListener { launchAccountSetting() }
+        viewBinding.settingFriendIcon.setOnClickListener { launchFriendSetting() }
+        viewBinding.settingSignOutIcon.setOnClickListener {
+            SignOutDialog(this@SettingActivity, signOutDelegate)
+        }
     }
 
     private fun signOut() = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { UserAuthVO(UserExtension.getUser(this@SettingActivity).email, UserExtension.getUser(this@SettingActivity).password)
+        runCatching { UserAuthVO(UserExtension
+            .getUser(this@SettingActivity).email, UserExtension.getUser(this@SettingActivity).password)
             .delete(this@SettingActivity) }
             .onSuccess { onSignOut() }
             .onFailure {
                 errorSignOut()
-                Log.v("reminisce Logger", "[reminisce > Setting > signOut] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                LocalLogger.e(it)
             }
     }
 
@@ -59,50 +60,26 @@ class SettingActivity : AppCompatActivity() {
     private fun onSignOut() = CoroutineScope(Dispatchers.IO).launch {
         Intent(this@SettingActivity, MainActivity::class.java).apply {
             startActivity(this)
-        }
-    }
-
-    private fun navController() {
-        viewBinding.settingNavView.navItems.setOnItemSelectedListener {
-            when(it.itemId) {
-                R.id.nav_main_home -> {
-                    startActivity(Navigation.onNextHome(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_map -> {
-                    startActivity(Navigation.onNextMap(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_report -> {
-                    startActivity(Navigation.onNextReport(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_setting -> { true }
-                else -> false
-            }
+            finish()
         }
     }
 
     private val signOutDelegate = object : SignOutDialog.Delegate {
-        override fun onDoneClick() { signOut() }
+        override fun onDoneClick() {
+            signOut()
+        }
     }
 
     private fun launchAccountSetting() {
         Intent(this, AccountSettingActivity::class.java).apply {
-            putExtra("settingMenuId", viewBinding.settingNavView.navItems.selectedItemId)
+            putExtra("menuId", viewBinding.settingNavView.navItems.selectedItemId)
             startActivity(this)
         }
     }
 
     private fun launchFriendSetting() {
-        Intent(this, FriendListActivity::class.java).apply {
-            putExtra("settingMenuId", viewBinding.settingNavView.navItems.selectedItemId)
+        Intent(this, FriendsActivity::class.java).apply {
+            putExtra("menuId", viewBinding.settingNavView.navItems.selectedItemId)
             startActivity(this)
         }
     }

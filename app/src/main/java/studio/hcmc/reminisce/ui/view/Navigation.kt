@@ -8,26 +8,26 @@ import studio.hcmc.reminisce.ui.activity.report.ReportActivity
 import studio.hcmc.reminisce.ui.activity.setting.SettingActivity
 
 object Navigation {
-    fun onNextHome(context: Context, selectedId: Int): Intent {
+    fun onNextHome(context: Context, menuId: Int): Intent {
         return Intent(context, HomeActivity::class.java).apply {
-            putExtra("selectedMenuId", selectedId)
+            putExtra("menuId", menuId)
         }
     }
-    fun onNextMap(context: Context, selectedId: Int): Intent {
+    fun onNextMap(context: Context, menuId: Int): Intent {
         return Intent(context, MapActivity::class.java).apply {
-            putExtra("selectedMenuId", selectedId)
+            putExtra("menuId", menuId)
         }
     }
 
-    fun onNextReport(context: Context, selectedId: Int): Intent {
+    fun onNextReport(context: Context, menuId: Int): Intent {
         return Intent(context, ReportActivity::class.java).apply {
-            putExtra("selectedMenuId", selectedId)
+            putExtra("menuId", menuId)
         }
     }
 
-    fun onNextSetting(context: Context, selectedId: Int): Intent {
+    fun onNextSetting(context: Context, menuId: Int): Intent {
         return Intent(context, SettingActivity::class.java).apply {
-            putExtra("selectedMenuId", selectedId)
+            putExtra("menuId", menuId)
         }
     }
 }

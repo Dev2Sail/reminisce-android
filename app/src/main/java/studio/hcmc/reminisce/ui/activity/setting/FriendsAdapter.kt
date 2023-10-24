@@ -5,11 +5,11 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import studio.hcmc.reminisce.ui.view.SingleTypeAdapterDelegate
 import studio.hcmc.reminisce.vo.friend.FriendVO
 
-class FriendListAdapter(
+class FriendsAdapter(
     private val adapterDelegate: SingleTypeAdapterDelegate<FriendVO>,
-    private val itemDelegate: FriendListViewHolder.Delegate
-): Adapter<FriendListViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FriendListViewHolder(parent, itemDelegate)
+    private val itemDelegate: FriendsItemViewHolder.Delegate
+): Adapter<FriendsItemViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FriendsItemViewHolder(parent, itemDelegate)
     override fun getItemCount() = adapterDelegate.getItemCount()
-    override fun onBindViewHolder(holder: FriendListViewHolder, position: Int) = holder.bind(adapterDelegate.getItem(position))
+    override fun onBindViewHolder(holder: FriendsItemViewHolder, position: Int) = holder.bind(adapterDelegate.getItem(position))
 }

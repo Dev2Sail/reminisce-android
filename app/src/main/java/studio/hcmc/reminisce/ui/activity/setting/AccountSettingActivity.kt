@@ -14,8 +14,8 @@ import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.launcher.LauncherActivity
 import studio.hcmc.reminisce.ui.view.CommonError
-import studio.hcmc.reminisce.ui.view.Navigation
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.navigationController
 
 class AccountSettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingAccountBinding
@@ -41,11 +41,10 @@ class AccountSettingActivity : AppCompatActivity() {
             WithdrawDialog(this, withdrawDelegate)
         }
 
-        val menuId = intent.getIntExtra("settingMenuId", -1)
-        viewBinding.settingAccountNavView.navItems.selectedItemId = menuId
+        val menuId = intent.getIntExtra("menuId", -1)
+        navigationController(viewBinding.settingAccountNavView, menuId)
 
         prepareUser()
-        navController()
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.Main).launch {
@@ -75,34 +74,6 @@ class AccountSettingActivity : AppCompatActivity() {
                         CommonError.onDialog(this@AccountSettingActivity)
                         LocalLogger.e(it)
                     }
-            }
-        }
-    }
-
-
-    private fun navController() {
-        viewBinding.settingAccountNavView.navItems.setOnItemSelectedListener {
-            when(it.itemId) {
-                R.id.nav_main_home -> {
-                    startActivity(Navigation.onNextHome(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_map -> {
-                    true
-                }
-                R.id.nav_main_report -> {
-                    startActivity(Navigation.onNextReport(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_setting -> {
-                    true
-                }
-
-                else -> false
             }
         }
     }

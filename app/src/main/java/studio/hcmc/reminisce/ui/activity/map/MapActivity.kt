@@ -11,7 +11,7 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.MapConstants
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityMapBinding
-import studio.hcmc.reminisce.ui.view.Navigation
+import studio.hcmc.reminisce.util.navigationController
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var viewBinding: ActivityMapBinding
@@ -37,17 +37,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun initView() {
-        val menuId = intent.getIntExtra("selectedMenuId", -1)
-        viewBinding.apply {
-            mapNavView.navItems.selectedItemId = menuId
-            mapHeaderSearchField.setOnClickListener {
-                Intent(this@MapActivity, SearchLocationActivity::class.java).apply {
-                    startActivity(this)
-                }
+        val menuId = intent.getIntExtra("menuId", -1)
+        navigationController(viewBinding.mapNavView, menuId)
+        viewBinding.mapHeaderSearchField.setOnClickListener {
+            Intent(this@MapActivity, SearchLocationActivity::class.java).apply {
+                startActivity(this)
             }
         }
 
-        navController()
         val marker = Marker()
 
 //        val mapUISetting = naverMap.uiSettings.apply {
@@ -101,32 +98,5 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(map: NaverMap) {
         naverMap = map
         naverMap.maxZoom = MapConstants.MIN_ZOOM_KOREA
-    }
-
-    private fun navController() {
-        viewBinding.mapNavView.navItems.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.nav_main_home -> {
-                    startActivity(Navigation.onNextHome(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_map -> { true }
-                R.id.nav_main_report -> {
-                    startActivity(Navigation.onNextReport(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_setting -> {
-                    startActivity(Navigation.onNextSetting(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                else -> false
-            }
-        }
     }
 }

@@ -10,7 +10,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityHomeBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
@@ -22,8 +21,8 @@ import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.activity.friend_tag.FriendTagDetailActivity
 import studio.hcmc.reminisce.ui.activity.tag.TagDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
-import studio.hcmc.reminisce.ui.view.Navigation
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.navigationController
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
@@ -34,6 +33,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var adapter: HomeAdapter
 
+    private val result by lazy { intent.getBooleanExtra("addResult", false) }
     private lateinit var categories: List<CategoryVO>
     private lateinit var friends: List<FriendVO>
     private lateinit var friendTags: List<LocationFriendVO>
@@ -53,12 +53,13 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val menuId = intent.getIntExtra("selectedMenuId", -1)
-        viewBinding.apply { homeNavView.navItems.selectedItemId = menuId }
+        val menuId = intent.getIntExtra("menuId", -1)
+        navigationController(viewBinding.homeNavView, menuId)
 
-        navController()
         CoroutineScope(Dispatchers.IO).launch { fetchContents() }
+
     }
+
 
     private suspend fun fetchContents() = coroutineScope {
         val result = runCatching {
@@ -139,16 +140,39 @@ class HomeActivity : AppCompatActivity() {
             Intent(this@HomeActivity, AddCategoryActivity::class.java).apply {
                 startActivity(this)
             }
+            if (result) {
+                adapter.notifyItemInserted(1)
+            }
         }
     }
 
     private val categoryDelegate = object : CategoryViewHolder.Delegate {
+        //        override fun onItemClick(category: CategoryVO) {
+//            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
+//                putExtra("categoryId", category.id)
+//                putExtra("categoryTitle", category.title)
+//                startActivity(this)
+//            }
+//        }
         override fun onItemClick(category: CategoryVO) {
             Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
                 putExtra("categoryId", category.id)
                 putExtra("categoryTitle", category.title)
                 startActivity(this)
             }
+        }
+
+        override fun onItemLongClick(categoryId: Int) {
+            DeleteCategoryDialog(this@HomeActivity, dialogDelegate)
+
+
+        }
+    }
+
+    private val dialogDelegate = object : DeleteCategoryDialog.Delegate {
+        override fun onDeleteClick() {
+
+
         }
     }
 
@@ -187,31 +211,4 @@ class HomeActivity : AppCompatActivity() {
 //            }
 //        }
 //    }
-
-    private fun navController() {
-        viewBinding.homeNavView.navItems.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.nav_main_home -> { true }
-                R.id.nav_main_map -> {
-                    startActivity(Navigation.onNextMap(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_report -> {
-                    startActivity(Navigation.onNextReport(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                R.id.nav_main_setting -> {
-                    startActivity(Navigation.onNextSetting(applicationContext, it.itemId))
-                    finish()
-
-                    true
-                }
-                else -> false
-            }
-        }
-    }
 }

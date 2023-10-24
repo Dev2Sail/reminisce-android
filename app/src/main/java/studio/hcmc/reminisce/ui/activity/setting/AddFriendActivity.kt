@@ -1,7 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.setting
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -29,7 +28,6 @@ class AddFriendActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         initView()
-        CoroutineScope(Dispatchers.IO).launch { prepareUser() }
     }
 
     private fun initView() {
@@ -43,6 +41,8 @@ class AddFriendActivity : AppCompatActivity() {
             endIconDrawable = getDrawable(R.drawable.round_search_24)
             setEndIconOnClickListener { searchUser() }
         }
+
+        CoroutineScope(Dispatchers.IO).launch { prepareUser() }
     }
 
     private suspend fun prepareUser() = CoroutineScope(Dispatchers.IO).launch {
@@ -60,7 +60,7 @@ class AddFriendActivity : AppCompatActivity() {
             .onSuccess { onResult(it.id, it.nickname, it.email) }
             .onFailure {
                 notFoundUser()
-                Log.v("reminisce Logger", "[reminisce > Setting > Add Friend > searchUser] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                LocalLogger.e(it)
             }
     }
 
@@ -109,6 +109,7 @@ class AddFriendActivity : AppCompatActivity() {
 
     private fun onAddSuccess() = CoroutineScope(Dispatchers.Main).launch {
         Toast.makeText(this@AddFriendActivity, "친구로 등록되었어요", Toast.LENGTH_SHORT).show()
+        // TODO 친구 추가 성공 시 intent로 friends activity 이동 후 friends에 notify
     }
 
     private fun onAddFailure() = CoroutineScope(Dispatchers.Main).launch {
