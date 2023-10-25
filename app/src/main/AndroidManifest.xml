@@ -30,9 +30,6 @@
             android:name=".ui.activity.tag.TagDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.category.CategoryTitleEditActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.activity.category.editable.CategoryEditableDetailActivity"
             android:exported="false" />
         <activity

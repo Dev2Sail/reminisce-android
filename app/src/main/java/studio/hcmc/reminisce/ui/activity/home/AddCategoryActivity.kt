@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.home
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
@@ -10,6 +11,7 @@ import studio.hcmc.reminisce.databinding.ActivityCategoryAddBinding
 import studio.hcmc.reminisce.dto.category.CategoryDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
+import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
@@ -52,14 +54,13 @@ class AddCategoryActivity : AppCompatActivity() {
 
         runCatching { CategoryIO.post(postDTO) }
             .onSuccess {
-                // add category 성공 시 categoryDetail로 이동
-//                Intent(this@AddCategoryActivity, HomeActivity::class.java).apply {
-//                    putExtra("addResult", true)
-//                    startActivity(this)
-//                    finish()
-//                }
-            }
-            .onFailure {
+                Intent(this@AddCategoryActivity, CategoryDetailActivity::class.java).apply {
+                    putExtra("categoryId", it.id)
+                    putExtra("categoryTitle", it.title)
+                    startActivity(this)
+                    finish()
+                }
+            }.onFailure {
                 CommonError.onMessageDialog(this@AddCategoryActivity, "폴더 생성 실패", "폴더를 추가하는데 실패했어요. \n다시 시도해 주세요.")
                 LocalLogger.e(it)
             }

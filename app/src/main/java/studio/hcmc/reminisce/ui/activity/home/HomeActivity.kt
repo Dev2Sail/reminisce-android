@@ -57,9 +57,7 @@ class HomeActivity : AppCompatActivity() {
         navigationController(viewBinding.homeNavView, menuId)
 
         CoroutineScope(Dispatchers.IO).launch { fetchContents() }
-
     }
-
 
     private suspend fun fetchContents() = coroutineScope {
         val result = runCatching {
@@ -147,13 +145,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val categoryDelegate = object : CategoryViewHolder.Delegate {
-        //        override fun onItemClick(category: CategoryVO) {
-//            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
-//                putExtra("categoryId", category.id)
-//                putExtra("categoryTitle", category.title)
-//                startActivity(this)
-//            }
-//        }
         override fun onItemClick(category: CategoryVO) {
             Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
                 putExtra("categoryId", category.id)
@@ -163,17 +154,20 @@ class HomeActivity : AppCompatActivity() {
         }
 
         override fun onItemLongClick(categoryId: Int) {
-            DeleteCategoryDialog(this@HomeActivity, dialogDelegate)
-
-
+            DeleteCategoryDialog(this@HomeActivity, dialogDelegate, categoryId)
         }
     }
 
     private val dialogDelegate = object : DeleteCategoryDialog.Delegate {
-        override fun onDeleteClick() {
-
-
+        override fun onDeleteClick(categoryId: Int) {
+            onDeleteContent(categoryId)
         }
+    }
+
+    private fun onDeleteContent(categoryId: Int) = CoroutineScope(Dispatchers.IO).launch{
+        runCatching { CategoryIO.delete(categoryId) }
+            .onSuccess { adapter.notifyItemChanged(1) }
+            .onFailure { LocalLogger.e(it) }
     }
 
     private val tagDelegate = object : TagViewHolder.Delegate {

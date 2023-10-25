@@ -2,9 +2,10 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.databinding.CardFriendsItemBinding
-import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
 class FriendsItemViewHolder(
@@ -12,8 +13,8 @@ class FriendsItemViewHolder(
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(opponentId: Int, friend: FriendVO)
-        fun onItemLongClick(opponentId: Int)
+        fun onItemClick(opponentId: Int, savedNickname: String?, position: Int)
+        fun onItemLongClick(opponentId: Int, position: Int)
         fun getUser(userId: Int): UserVO
     }
 
@@ -22,17 +23,23 @@ class FriendsItemViewHolder(
         delegate = delegate
     )
 
-    fun bind(friend: FriendVO) {
-        viewBinding.apply {
-            friendsItemTitle.text = friend.nickname ?: delegate.getUser(friend.opponentId).nickname
-            friendsItemIcon.setOnClickListener {
-                delegate.onItemClick(friend.opponentId, friend)
+    fun bind(content: FriendsAdapter.DetailContent) {
+        val friend = content.friend
+        if (content.friend != null) {
+            viewBinding.root.isVisible = true
+            viewBinding.apply {
+                friendsItemTitle.text = friend!!.nickname ?: delegate.getUser(friend.opponentId).nickname
+                friendsItemIcon.setOnClickListener {
+                    delegate.onItemClick(friend.opponentId, friend.nickname, bindingAdapterPosition)
+                }
             }
-            root.setOnLongClickListener {
-                delegate.onItemLongClick(friend.opponentId)
+            viewBinding.root.setOnLongClickListener {
+                delegate.onItemLongClick(friend!!.opponentId, bindingAdapterPosition)
 
                 false
             }
+        } else {
+            viewBinding.root.isGone = true
         }
     }
 }

@@ -13,4 +13,4 @@ var TextInputLayout.string: String
 
 var TextInputLayout.stringOrNull: String?
     get() = editText?.text?.toString()
-    set(value) { editText?.setText(value)}
+    set(value) { editText?.setText(value) }

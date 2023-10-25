@@ -11,12 +11,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityCategoryDetailBinding
+import studio.hcmc.reminisce.dto.category.CategoryDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
+import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.category.editable.CategoryEditableDetailActivity
+import studio.hcmc.reminisce.ui.activity.category.editable.CategoryTitleEditDialog
 import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
@@ -33,7 +36,6 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val categoryTitle by lazy { intent.getStringExtra("categoryTitle") }
-    private val fetchedTitle by lazy { intent.getStringExtra("fetchTitle") ?: categoryTitle }
 
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
@@ -50,83 +52,60 @@ class CategoryDetailActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.apply {
-            categoryDetailAppbar.appbarTitle.text = getText(R.string.header_view_holder_title)
-            categoryDetailAppbar.appbarActionButton1.isVisible = false
-            categoryDetailAppbar.appbarBack.setOnClickListener { finish() }
-            categoryDetailAddButton.setOnClickListener {
-                Intent(this@CategoryDetailActivity, WriteActivity::class.java).apply {
-                    putExtra("categoryId", categoryId)
-                    startActivity(this)
-                }
-            }
+        viewBinding.categoryDetailAppbar.apply {
+            appbarTitle.text = getText(R.string.header_view_holder_title)
+            appbarActionButton1.isVisible = false
+            appbarBack.setOnClickListener { finish() }
         }
 
-        // Category Title 변경 시 recyclerView에게 notify
-//        if (intent.getBooleanExtra("titleFetchResult", false)) {
-//            CategoryDetailAdapter(summaryDelegate, categoryHeaderDelegate).notifyItemChanged(0)
-//        }
+        viewBinding.categoryDetailAddButton.setOnClickListener {
+            Intent(this@CategoryDetailActivity, WriteActivity::class.java).apply {
+                putExtra("categoryId", categoryId)
+                startActivity(this)
+            }
+        }
 
         loadContents()
     }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@CategoryDetailActivity)
+        val fetch: suspend () -> List<LocationVO>
         if (categoryTitle == "Default") {
-            val result = runCatching { LocationIO.listByUserId(user.id) }
-                .onSuccess { it ->
-                    locations = it
-                    it.forEach {
-                        tagInfo[it.id] = TagIO.listByLocationId(it.id)
-                        friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                    }
-
-                    for (friends in friendInfo.values) {
-                        for (friend in friends) {
-                            if (friend.nickname == null) {
-                                val opponent = UserIO.getById(friend.opponentId)
-                                users[opponent.id] = opponent
-                            }
-                        }
-                    }
-                }.onFailure { LocalLogger.e(it) }
-
-            if (result.isSuccess) {
-                prepareContents()
-                withContext(Dispatchers.Main) { onContentsReady() }
-            } else {
-                CommonError.onMessageDialog(this@CategoryDetailActivity, "", "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
-            }
+            fetch = { LocationIO.listByUserId(user.id) }
         } else {
-            val result = runCatching { LocationIO.listByCategoryId(categoryId) }
-                .onSuccess { it ->
-                    locations = it
-                    it.forEach {
-                        tagInfo[it.id] = TagIO.listByLocationId(it.id)
-                        friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                    }
+            fetch = { LocationIO.listByCategoryId(categoryId) }
+        }
 
-                    for (friends in friendInfo.values) {
-                        for (friend in friends) {
-                            if (friend.nickname == null) {
-                                val opponent = UserIO.getById(friend.opponentId)
-                                users[opponent.id] = opponent
-                            }
+        val result = runCatching { fetch() }
+            .onSuccess { it ->
+                locations = it
+                it.forEach {
+                    tagInfo[it.id] = TagIO.listByLocationId(it.id)
+                    friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
+                }
+
+                for (friends in friendInfo.values) {
+                    for (friend in friends) {
+                        if (friend.nickname == null) {
+                            val opponent = UserIO.getById(friend.opponentId)
+                            users[opponent.id] = opponent
                         }
                     }
-                }.onFailure { LocalLogger.e(it) }
+                }
+            }.onFailure { LocalLogger.e(it) }
 
-            if (result.isSuccess) {
-                prepareContents()
-                withContext(Dispatchers.Main) { onContentsReady() }
-            } else {
-                CommonError.onMessageDialog(this@CategoryDetailActivity, "", "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
-            }
+        if (result.isSuccess) {
+            prepareContents()
+            withContext(Dispatchers.Main) { onContentsReady() }
+        } else {
+            CommonError.onMessageDialog(this@CategoryDetailActivity, "", "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
+            LocalLogger.e("load Fail")
         }
     }
 
     private fun prepareContents() {
-        contents.add(CategoryDetailAdapter.HeaderContent(categoryTitle ?: fetchedTitle!!))
+        contents.add(CategoryDetailAdapter.HeaderContent(categoryTitle!!))
         for ((date, locations) in locations.groupBy { it.createdAt.toString().substring(0, 7) }.entries) {
             val (year, month) = date.split("-")
             contents.add(CategoryDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
@@ -164,19 +143,30 @@ class CategoryDetailActivity : AppCompatActivity() {
             }
         }
 
-        override fun onTitleEditClick(title: String, position: Int) {
-            Intent(this@CategoryDetailActivity, CategoryTitleEditActivity::class.java).apply {
-                putExtra("originalTitle", title)
-                putExtra("categoryId", categoryId)
-                startActivity(this)
-            }
-
-            val result by lazy { intent.getBooleanExtra("fetchResult", false) }
-            if (result) {
-//                adapter.notifyItemChanged(position)
-//                adapter.notifyDataSetChanged()
-            }
+        override fun onTitleEditClick() {
+            CategoryTitleEditDialog(this@CategoryDetailActivity, dialogDelegate)
         }
+    }
+
+    private val dialogDelegate = object : CategoryTitleEditDialog.Delegate {
+        override fun onSaveClick(editedTitle: String?) {
+            onFetchTitle(editedTitle ?: categoryTitle!!)
+        }
+    }
+
+    private fun onFetchTitle(body: String) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@CategoryDetailActivity)
+        val dto = CategoryDTO.Patch().apply {
+            title = body
+        }
+        runCatching { CategoryIO.patch(user.id, categoryId, dto ) }
+            .onSuccess {
+                withContext(Dispatchers.Main) {
+                    contents[0] = CategoryDetailAdapter.HeaderContent(body)
+                    adapter.notifyItemChanged(0)
+                }
+            }
+            .onFailure { LocalLogger.e(it) }
     }
 
     private val summaryDelegate= object : CategoryDetailSummaryViewHolder.Delegate {
@@ -184,7 +174,6 @@ class CategoryDetailActivity : AppCompatActivity() {
             Intent(this@CategoryDetailActivity, WriteDetailActivity::class.java).apply {
                 putExtra("locationId", location.id)
                 putExtra("title", location.title)
-//                putExtra("class", WriteDetailAdapter.DetailContent(location))
                 startActivity(this)
             }
         }
@@ -192,11 +181,5 @@ class CategoryDetailActivity : AppCompatActivity() {
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
         }
-    }
-
-    private fun prepareSummaryOnClick(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { LocationIO.getById(locationId) }
-            .onSuccess { LocalLogger.v(it.toString()) }
-            .onFailure { LocalLogger.e(it) }
     }
 }

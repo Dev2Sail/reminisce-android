@@ -36,7 +36,6 @@ class AddFriendActivity : AppCompatActivity() {
             appbarActionButton1.isVisible = false
             appbarBack.setOnClickListener { finish() }
         }
-
         viewBinding.addFriendSearch.apply {
             endIconDrawable = getDrawable(R.drawable.round_search_24)
             setEndIconOnClickListener { searchUser() }
@@ -45,7 +44,7 @@ class AddFriendActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch { prepareUser() }
     }
 
-    private suspend fun prepareUser() = CoroutineScope(Dispatchers.IO).launch {
+    private fun prepareUser() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@AddFriendActivity)
         val builder = StringBuilder().apply {
             append("내 이메일 : ")
@@ -98,7 +97,7 @@ class AddFriendActivity : AppCompatActivity() {
         }
         runCatching { FriendIO.post(user.id, opponentInfo) }
             .onSuccess {
-                onAddSuccess()
+                // TODO Intent Friends ACtivity move
                 viewBinding.addFriendSearch.text.clear()
             }
             .onFailure {
@@ -107,10 +106,6 @@ class AddFriendActivity : AppCompatActivity() {
             }
     }
 
-    private fun onAddSuccess() = CoroutineScope(Dispatchers.Main).launch {
-        Toast.makeText(this@AddFriendActivity, "친구로 등록되었어요", Toast.LENGTH_SHORT).show()
-        // TODO 친구 추가 성공 시 intent로 friends activity 이동 후 friends에 notify
-    }
 
     private fun onAddFailure() = CoroutineScope(Dispatchers.Main).launch {
         Toast.makeText(this@AddFriendActivity, "친구 등록에 실패했어요. 다시 시도해 주세요.", Toast.LENGTH_SHORT).show()

@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
-import studio.hcmc.reminisce.databinding.CardCommonHeaderBinding
+import studio.hcmc.reminisce.databinding.CardCommonDetailHeaderBinding
 
 class FriendTagHeaderViewHolder(
-    private val viewBinding: CardCommonHeaderBinding,
+    private val viewBinding: CardCommonDetailHeaderBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
@@ -15,15 +15,15 @@ class FriendTagHeaderViewHolder(
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
-        viewBinding = CardCommonHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+        viewBinding = CardCommonDetailHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         delegate = delegate
     )
 
     fun bind(content: FriendTagAdapter.HeaderContent) {
         viewBinding.apply {
-            commonHeaderTitle.text = content.title
-            commonHeaderAction1.text = viewBinding.root.context.getString(R.string.header_action)
-            commonHeaderAction1.setOnClickListener {
+            cardCommonDetailHeaderTitle.text = content.title
+            cardCommonDetailHeaderAction1.text = viewBinding.root.context.getString(R.string.header_action)
+            cardCommonDetailHeaderAction1.setOnClickListener {
                 delegate.onEditClick(content.title)
             }
         }

@@ -21,7 +21,7 @@ object FriendIO {
             }.body()
     }
 
-    suspend fun put(userId: Int, opponentId: Int, dto: FriendDTO.Put) {
+    suspend fun put(userId: Int, dto: FriendDTO.Put) {
         httpClient
             .put("/friend") {
                 parameter("userId", userId)
@@ -37,7 +37,7 @@ object FriendIO {
 
     suspend fun listByUserId(userId: Int): List<FriendVO> {
         return httpClient
-            .get("/friend/list/all") {parameter("userId", userId) }
+            .get("/friend/list/all") { parameter("userId", userId) }
             .body()
     }
 

@@ -12,7 +12,7 @@ class CategoryDetailHeaderViewHolder (
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick()
-        fun onTitleEditClick(title: String, position: Int)
+        fun onTitleEditClick()
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -27,8 +27,12 @@ class CategoryDetailHeaderViewHolder (
                 "new" -> viewBinding.root.context.getString(R.string.add_category_body)
                 else -> content.title
             }
-            cardCategoryDetailHeaderEditIcon.setOnClickListener { delegate.onTitleEditClick(content.title, bindingAdapterPosition) }
-            cardCategoryDetailHeaderAction1.setOnClickListener { delegate.onItemClick() }
+            cardCategoryDetailHeaderEditIcon.setOnClickListener {
+                delegate.onTitleEditClick()
+            }
+            cardCategoryDetailHeaderAction1.setOnClickListener {
+                delegate.onItemClick()
+            }
         }
     }
 }

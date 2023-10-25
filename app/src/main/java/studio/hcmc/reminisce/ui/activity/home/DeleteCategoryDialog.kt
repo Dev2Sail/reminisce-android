@@ -7,15 +7,16 @@ import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
 class DeleteCategoryDialog(
     context: Context,
-    delegate: Delegate
+    delegate: Delegate,
+    categoryId: Int
 ) {
-    private val viewBinding: DialogDeleteHomeCategoryBinding
+
 
     interface Delegate {
-        fun onDeleteClick()
+        fun onDeleteClick(categoryId: Int)
     }
     init {
-        viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(context))
+        val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(context))
         val dialog = BottomSheetDialog(context, viewBinding)
 
         dialog.show()
@@ -26,18 +27,8 @@ class DeleteCategoryDialog(
            }
            dialogHomeCategoryDeleteRemove.setOnClickListener {
                dialog.dismiss()
-               delegate.onDeleteClick()
+               delegate.onDeleteClick(categoryId)
            }
        }
     }
-//    private fun deleteCategory() = CoroutineScope(Dispatchers.IO).launch {
-//        runCatching { CategoryIO.delete(selectedCategoryId) }
-//            .onSuccess {
-//                // TODO recyclerView notify()
-//
-//            }
-//            .onFailure {
-//                LocalLogger.e(it)
-//            }
-//    }
 }
