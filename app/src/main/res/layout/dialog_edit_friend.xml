@@ -100,7 +100,6 @@
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginEnd="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_large"
-        android:enabled="false"
         android:fontFamily="@font/pretendard_medium"
         android:text="@string/dialog_save"
         android:textSize="@dimen/label_large"

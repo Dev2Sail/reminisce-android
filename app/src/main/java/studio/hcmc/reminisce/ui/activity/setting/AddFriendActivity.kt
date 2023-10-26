@@ -14,7 +14,9 @@ import studio.hcmc.reminisce.databinding.LayoutNotFoundBinding
 import studio.hcmc.reminisce.dto.friend.FriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
+import studio.hcmc.reminisce.io.ktor_client.SpringException
 import studio.hcmc.reminisce.io.ktor_client.UserIO
+import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
@@ -102,12 +104,38 @@ class AddFriendActivity : AppCompatActivity() {
             }
             .onFailure {
                 onAddFailure()
+//                onFriendDuplicated()
                 LocalLogger.e(it)
             }
     }
 
+    // TODO 친구 등록 실패
+    // TODO 사용자 본인 이메일로 친구 신청한 경우
+    // TODO 사용자가 검색한 이메일의 사용자가 탈퇴한 경우
+    // TODO 이미 친구로 등록된 경우
 
     private fun onAddFailure() = CoroutineScope(Dispatchers.Main).launch {
         Toast.makeText(this@AddFriendActivity, "친구 등록에 실패했어요. 다시 시도해 주세요.", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onNotFoundUser(body: SpringException) {
+        // 해당 이메일로 등록된 사용자가 없는 경우 addview
+        if (body.error == "Not Found") {
+
+        }
+    }
+    private fun onFriendDuplicated(body: SpringException) {
+        // 이미 친구로 등록된 사용자일 경우
+        if (body.error == "Duplicate") {
+
+            CommonError.onMessageDialog(this, "친구 등록 실패", "이미 등록된 친구입니다")
+        }
+    }
+
+    private fun onBadRequest(body: SpringException) {
+        // 사용자 본인 이메일로 요청 날린 경우
+        if (body.error == "Bad Request") {
+
+        }
     }
 }

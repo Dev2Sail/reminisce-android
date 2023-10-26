@@ -48,42 +48,33 @@ class FriendsActivity : AppCompatActivity() {
         }
         viewBinding.friendsSearch.setOnClickListener { launchSearchFriend() }
 
-        prepareFriends()
+        onLoadContents()
+
     }
 
-    private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
+    private fun onLoadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendsActivity)
         val result = runCatching { FriendIO.listByUserId(user.id) }
             .onSuccess {it ->
                 friends = it.sortedBy { it.requestedAt }
-//                contents.addAll(it.sortedBy { it.requestedAt })
-                it.sortedBy { it.requestedAt }.forEach {
-                    contents.add(FriendsAdapter.DetailContent(it))
-                }
+
                 for (friend in it) {
                     val opponent = UserIO.getById(friend.opponentId)
                     users[opponent.id] = opponent
                 }
-            }.onFailure {
-                LocalLogger.e(it)
-            }
+            }.onFailure { LocalLogger.e(it) }
 
         if (result.isSuccess) {
-//            for (friend in friends) {
-//                contents.add(FriendsAdapter.DetailContent(friend))
-//            }
-
+            prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
-        } else {
-            LocalLogger.e("prepare Fail")
         }
     }
 
-//    private fun prepareContents() {
-//        for (friend in friends) {
-//            contents.add(friend)
-//        }
-//    }
+    private fun prepareContents() {
+        for (friend in friends) {
+            contents.add(FriendsAdapter.DetailContent(friend.nickname ?: users[friend.opponentId]!!.nickname))
+        }
+    }
 
     private fun onContentsReady() {
         viewBinding.friendsItems.layoutManager = LinearLayoutManager(this)
@@ -97,15 +88,15 @@ class FriendsActivity : AppCompatActivity() {
     }
 
     private val itemDelegate = object : FriendsItemViewHolder.Delegate {
-        override fun onItemClick(opponentId: Int, savedNickname: String?, position: Int) {
-            EditFriendDialog(
-                this@FriendsActivity,
-                opponentId,
-                savedNickname,
-                position,
-                editDialogDelegate
-            )
-        }
+//        override fun onItemClick(opponentId: Int, savedNickname: String?, position: Int) {
+//            EditFriendDialog(
+//                this@FriendsActivity,
+//                opponentId,
+//                savedNickname,
+//                position,
+//                editDialogDelegate
+//            )
+//        }
 
         override fun onItemLongClick(opponentId: Int, position: Int) {
             DeleteFriendDialog(this@FriendsActivity, opponentId, position, deleteDialogDelegate)
@@ -113,6 +104,11 @@ class FriendsActivity : AppCompatActivity() {
 
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
+        }
+
+        override fun onTestClick(nickname: String, position: Int) {
+            val friend = friends[position]
+            EditFriendDialog(this@FriendsActivity, friend.opponentId, nickname, position, editDialogDelegate)
         }
     }
 
@@ -124,7 +120,7 @@ class FriendsActivity : AppCompatActivity() {
         override fun onEditClick(opponentId: Int, body: String?, position: Int) {
             val dto = FriendDTO.Put().apply {
                 this.opponentId = opponentId
-                this.nickname = body ?: getUser(opponentId).nickname
+                this.nickname = body
             }
             onFetchContent(dto, position)
         }
@@ -135,16 +131,10 @@ class FriendsActivity : AppCompatActivity() {
         runCatching { FriendIO.put(user.id, dto) }
             .onSuccess {
                 withContext(Dispatchers.Main) {
-                    /*
-                    contents[0] = CategoryDetailAdapter.HeaderContent(body)
-                    adapter.notifyItemChanged(0)
-                     */
-//                    contents[position] = FriendsAdapter.DetailContent()
-                    contents[position] = FriendsAdapter.DetailContent(friends[position]
-                    adapter.notifyItemChanged(position )
+                    contents[position] = FriendsAdapter.DetailContent(dto.nickname ?: users[dto.opponentId]!!.nickname)
+                    adapter.notifyItemChanged(position)
                 }
-            }
-            .onFailure { LocalLogger.e(it) }
+            }.onFailure { LocalLogger.e(it) }
     }
 
     private val deleteDialogDelegate = object : DeleteFriendDialog.Delegate {
@@ -158,6 +148,7 @@ class FriendsActivity : AppCompatActivity() {
         runCatching { FriendIO.delete(user.id, opponentId) }
             .onSuccess {
                 withContext(Dispatchers.Main) {
+//                    contents[position]
                     adapter.notifyItemRemoved(position)
 
                 }

@@ -11,7 +11,7 @@ import studio.hcmc.reminisce.vo.user.UserVO
 class EditFriendDialog(
     activity: Activity,
     opponentId: Int,
-    savedNickname: String?,
+    savedNickname: String,
     position: Int,
     delegate: Delegate
 ) {
@@ -28,24 +28,39 @@ class EditFriendDialog(
         // friend로 등록된 user의 email
         viewBinding.dialogEditFriendField.helperText = delegate.getUser(opponentId).email
         // friend에 등록된 nickname
-        viewBinding.dialogEditFriendTitle.text = savedNickname ?: delegate.getUser(opponentId).nickname
+        viewBinding.dialogEditFriendTitle.text = savedNickname
 
         viewBinding.apply {
             dialogEditFriendField.editText!!.addTextChangedListener {
-                dialogEditFriendSave.isEnabled = dialogEditFriendField.string.isNotEmpty() && dialogEditFriendField.string.length <= 20
-            }
-            dialogEditFriendSave.setOnClickListener {
-                if (viewBinding.dialogEditFriendField.string.length <= 20) {
-                    delegate.onEditClick(opponentId, viewBinding.dialogEditFriendField.string, position)
-                    dialog.dismiss()
+                if (dialogEditFriendField.string.length > 20) {
+                    dialogEditFriendSave.isEnabled = false
                 }
             }
         }
 
+
+
+//        viewBinding.apply {
+//            dialogEditFriendField.editText!!.addTextChangedListener {
+////                dialogEditFriendSave.isEnabled.apply {
+//////                    dialogEditFriendField.string.isNotEmpty() && dialogEditFriendField.string.length <= 20
+////                    dialogEditFriendField.string.length <= 20
+////                }
+////                dialogEditFriendSave.isEnabled = dialogEditFriendField.string.isNotEmpty() && dialogEditFriendField.string.length <= 20
+//            }
+//        }
         viewBinding.dialogEditFriendSave.setOnClickListener {
-            if (viewBinding.dialogEditFriendField.string.length <= 20) {
-                delegate.onEditClick(opponentId, viewBinding.dialogEditFriendField.string, position)
-                dialog.dismiss()
+            val input = viewBinding.dialogEditFriendField.string
+            when {
+                // friend nickname 삭제
+                input.isEmpty() -> {
+                    delegate.onEditClick(opponentId, null, position)
+                    dialog.dismiss()
+                }
+                input.isNotEmpty() && input.length <= 20 -> {
+                    delegate.onEditClick(opponentId, viewBinding.dialogEditFriendField.string, position)
+                    dialog.dismiss()
+                }
             }
         }
         viewBinding.dialogEditFriendCancel.setOnClickListener { dialog.dismiss() }

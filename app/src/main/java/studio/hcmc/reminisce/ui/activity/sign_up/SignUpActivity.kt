@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.sign_up
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -16,6 +15,7 @@ import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.home.HomeActivity
 import studio.hcmc.reminisce.ui.activity.sign_in.SignInActivity
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
@@ -60,7 +60,7 @@ class SignUpActivity : AppCompatActivity() {
                     .onFailure {
                         UserIO.signUp(signUpDTO)
                         onSignUpMessage()
-                        Log.v("reminisce Logger", "[reminisce > Sign Up > signup] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
+                        LocalLogger.e(it)
                     }
             }
         }
@@ -100,4 +100,8 @@ class SignUpActivity : AppCompatActivity() {
     private fun onSignUpError() = CoroutineScope(Dispatchers.IO).launch {
         SignUpErrorDialog(this@SignUpActivity, signUpErrorDelegate)
     }
+
+//    private fun onEmailDuplicated(user: UserVO) {
+//        viewBinding.signUpEmail.suffixText
+//    }
 }
