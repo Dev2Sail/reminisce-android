@@ -18,10 +18,8 @@ class DeleteFriendDialog(
     init {
         val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        viewBinding.apply {
-            dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.dialog_delete_friend_title)
-            dialogHomeCategoryDeleteBody.text = activity.getText(R.string.dialog_delete_friend_body)
-        }
+        viewBinding.dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.dialog_delete_friend_title)
+        viewBinding.dialogHomeCategoryDeleteBody.text = activity.getText(R.string.dialog_delete_friend_body)
         viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
             delegate.onDeleteClick(opponentId, position)

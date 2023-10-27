@@ -28,7 +28,7 @@
         android:id="@+id/dialog_category_title_field"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginHorizontal="@dimen/margin_2xlarge"
         android:layout_marginTop="@dimen/margin_regular"
         app:counterEnabled="true"
         app:counterMaxLength="15"
@@ -68,13 +68,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_regular"
-        android:layout_marginEnd="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_large"
         android:enabled="false"
         android:fontFamily="@font/pretendard_medium"
         android:text="@string/dialog_save"
         android:textSize="@dimen/label_large"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/dialog_category_title_field"
         app:layout_constraintTop_toBottomOf="@id/dialog_category_title_field" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,7 +23,10 @@ class HomeAdapter(
     sealed interface Content
 
     class HeaderContent(private val o: Any? = null): Content
-    data class CategoryContent(val category: CategoryVO, val count: Int): Content
+    data class CategoryContent(
+        val category: CategoryVO,
+        val count: Int
+    ): Content
     class TagContent(val tags: List<TagVO>? = null): Content
     class FriendContent(val friends: List<FriendVO>? = null): Content
     //    class CityContent(val body: String? = null): Content

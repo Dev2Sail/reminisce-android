@@ -11,11 +11,9 @@ class FriendsItemViewHolder(
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-//        fun onItemClick(opponentId: Int, savedNickname: String?, position: Int)
+        fun onItemClick(opponentId: Int, nickname: String?, position: Int)
         fun onItemLongClick(opponentId: Int, position: Int)
         fun getUser(userId: Int): UserVO
-
-        fun onTestClick(nickname: String, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -24,15 +22,14 @@ class FriendsItemViewHolder(
     )
 
     fun bind(content: FriendsAdapter.DetailContent) {
+        val friend = content.friend
         viewBinding.apply {
-            friendsItemTitle.text = content.nickname
+            friendsItemTitle.text = friend.nickname ?: delegate.getUser(friend.opponentId).nickname
             friendsItemIcon.setOnClickListener {
-                delegate.onTestClick(content.nickname, bindingAdapterPosition)
-//                delegate.onItemClick()
-
+                delegate.onItemClick(friend.opponentId, friend.nickname, bindingAdapterPosition)
             }
             root.setOnLongClickListener {
-//                delegate.onItemLongClick(friend!!.opponentId, bindingAdapterPosition)
+                delegate.onItemLongClick(friend.opponentId, bindingAdapterPosition)
 
                 false
             }

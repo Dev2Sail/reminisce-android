@@ -14,6 +14,18 @@ import studio.hcmc.reminisce.vo.friend.FriendVO
 
 object FriendIO {
     suspend fun post(userId: Int, dto: FriendDTO.Post): FriendVO {
+//        val result: HttpResponse = httpClient.post("/friend") {
+//            parameter("userId", userId)
+//            setBody(Gson().toJsonTree(dto))
+//        }
+
+//        when (result.status) {
+//            HttpStatusCode.Conflict -> { LocalLogger.v("friend post -> conflict -> duplicate") }
+//            HttpStatusCode.BadRequest -> { LocalLogger.v("friend post -> badRequest -> self request")}
+//
+//        }
+
+//        return result
         return httpClient
             .post("/friend") {
                 parameter("userId", userId)
@@ -33,6 +45,12 @@ object FriendIO {
         httpClient
             .delete("/friend/${opponentId}") { parameter("userId", userId) }
             .bodyAsText()
+    }
+
+    suspend fun getByUserIdAndOpponentId(userId: Int, opponentId: Int): FriendVO {
+        return httpClient
+            .get("/friend/${userId}/${opponentId}")
+            .body()
     }
 
     suspend fun listByUserId(userId: Int): List<FriendVO> {

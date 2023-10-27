@@ -13,7 +13,7 @@ class CategoryViewHolder(
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(category: CategoryVO)
-        fun onItemLongClick(categoryId: Int)
+        fun onItemLongClick(categoryId: Int, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -30,16 +30,14 @@ class CategoryViewHolder(
             else -> category.title
         }
 
-        viewBinding.apply {
-            homeCategoryBody.text = count.toString()
-            homeCategoryAction1.setOnClickListener {
-                delegate.onItemClick(category)
-            }
-            root.setOnLongClickListener {
-                delegate.onItemLongClick(category.id)
+        viewBinding.homeCategoryBody.text = count.toString()
+        viewBinding.homeCategoryAction1.setOnClickListener {
+            delegate.onItemClick(category)
+        }
+        viewBinding.root.setOnLongClickListener {
+            delegate.onItemLongClick(category.id, bindingAdapterPosition)
 
-                false
-            }
+            false
         }
     }
 }

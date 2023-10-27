@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.category
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,7 @@ import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
@@ -55,7 +57,11 @@ class CategoryDetailActivity : AppCompatActivity() {
         viewBinding.categoryDetailAppbar.apply {
             appbarTitle.text = getText(R.string.header_view_holder_title)
             appbarActionButton1.isVisible = false
-            appbarBack.setOnClickListener { finish() }
+            appbarBack.setOnClickListener {
+                // intent setActivity 이용해서 fetch flag 달아주고 home activity에서 content 다시 로드할 수 있게
+                Intent().setActivity(this@CategoryDetailActivity, Activity.RESULT_OK)
+                finish()
+            }
         }
 
         viewBinding.categoryDetailAddButton.setOnClickListener {
@@ -162,6 +168,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         runCatching { CategoryIO.patch(user.id, categoryId, dto ) }
             .onSuccess {
                 withContext(Dispatchers.Main) {
+                    intent.putExtra("isModified", true)
                     contents[0] = CategoryDetailAdapter.HeaderContent(body)
                     adapter.notifyItemChanged(0)
                 }

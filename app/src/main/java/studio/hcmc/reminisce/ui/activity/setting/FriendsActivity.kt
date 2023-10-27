@@ -49,7 +49,6 @@ class FriendsActivity : AppCompatActivity() {
         viewBinding.friendsSearch.setOnClickListener { launchSearchFriend() }
 
         onLoadContents()
-
     }
 
     private fun onLoadContents() = CoroutineScope(Dispatchers.IO).launch {
@@ -71,9 +70,10 @@ class FriendsActivity : AppCompatActivity() {
     }
 
     private fun prepareContents() {
-        for (friend in friends) {
-            contents.add(FriendsAdapter.DetailContent(friend.nickname ?: users[friend.opponentId]!!.nickname))
-        }
+        friends.forEach { contents.add(FriendsAdapter.DetailContent(it)) }
+//        for (vo in friends) {
+//            contents.add(FriendsAdapter.DetailContent(vo))
+//        }
     }
 
     private fun onContentsReady() {
@@ -88,16 +88,12 @@ class FriendsActivity : AppCompatActivity() {
     }
 
     private val itemDelegate = object : FriendsItemViewHolder.Delegate {
-//        override fun onItemClick(opponentId: Int, savedNickname: String?, position: Int) {
-//            EditFriendDialog(
-//                this@FriendsActivity,
-//                opponentId,
-//                savedNickname,
-//                position,
-//                editDialogDelegate
-//            )
-//        }
+        // to EditFriendDialog
+        override fun onItemClick(opponentId: Int, nickname: String?, position: Int) {
+            EditFriendDialog(this@FriendsActivity, opponentId, nickname, position, editDialogDelegate)
+        }
 
+        // to DeleteFriendDialog
         override fun onItemLongClick(opponentId: Int, position: Int) {
             DeleteFriendDialog(this@FriendsActivity, opponentId, position, deleteDialogDelegate)
         }
@@ -105,38 +101,40 @@ class FriendsActivity : AppCompatActivity() {
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
         }
-
-        override fun onTestClick(nickname: String, position: Int) {
-            val friend = friends[position]
-            EditFriendDialog(this@FriendsActivity, friend.opponentId, nickname, position, editDialogDelegate)
-        }
     }
 
+    // editDialog
     private val editDialogDelegate = object : EditFriendDialog.Delegate {
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
         }
 
+        // need opponentId, nickname?
         override fun onEditClick(opponentId: Int, body: String?, position: Int) {
             val dto = FriendDTO.Put().apply {
                 this.opponentId = opponentId
                 this.nickname = body
             }
+
             onFetchContent(dto, position)
         }
     }
 
+    // FriendIo.put : userId, FriendDto.Put
     private fun onFetchContent(dto: FriendDTO.Put, position: Int) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendsActivity)
         runCatching { FriendIO.put(user.id, dto) }
             .onSuccess {
+                val fetch = FriendIO.getByUserIdAndOpponentId(user.id, dto.opponentId)
+
                 withContext(Dispatchers.Main) {
-                    contents[position] = FriendsAdapter.DetailContent(dto.nickname ?: users[dto.opponentId]!!.nickname)
+                    contents[position] = FriendsAdapter.DetailContent(fetch)
                     adapter.notifyItemChanged(position)
                 }
             }.onFailure { LocalLogger.e(it) }
     }
 
+    // delete dialog
     private val deleteDialogDelegate = object : DeleteFriendDialog.Delegate {
         override fun onDeleteClick(opponentId: Int, position: Int) {
             onDeleteContent(opponentId, position)
@@ -148,9 +146,8 @@ class FriendsActivity : AppCompatActivity() {
         runCatching { FriendIO.delete(user.id, opponentId) }
             .onSuccess {
                 withContext(Dispatchers.Main) {
-//                    contents[position]
+                    contents.removeAt(position)
                     adapter.notifyItemRemoved(position)
-
                 }
             }.onFailure { LocalLogger.e(it) }
     }

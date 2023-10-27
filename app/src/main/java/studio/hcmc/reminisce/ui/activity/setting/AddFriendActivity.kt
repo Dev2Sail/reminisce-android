@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.setting
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +17,6 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.SpringException
 import studio.hcmc.reminisce.io.ktor_client.UserIO
-import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
@@ -43,7 +43,8 @@ class AddFriendActivity : AppCompatActivity() {
             setEndIconOnClickListener { searchUser() }
         }
 
-        CoroutineScope(Dispatchers.IO).launch { prepareUser() }
+//        CoroutineScope(Dispatchers.IO).launch { prepareUser() }
+        prepareUser()
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.IO).launch {
@@ -88,54 +89,69 @@ class AddFriendActivity : AppCompatActivity() {
 
     private val addFriendDialogDelegate = object : AddFriendDialog.Delegate {
         override fun onAddClick(opponentId: Int) {
-            onAddReady(opponentId)
+            onAddContent(opponentId)
         }
     }
 
-    private fun onAddReady(friendId: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun onAddContent(opponentId: Int) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@AddFriendActivity)
-        val opponentInfo = FriendDTO.Post().apply {
-            opponentId = friendId
+        val dto = FriendDTO.Post().apply {
+            this.opponentId = opponentId
         }
-        runCatching { FriendIO.post(user.id, opponentInfo) }
+
+        val result = runCatching {
+            FriendIO.post(user.id, dto)
+        }
             .onSuccess {
                 // TODO Intent Friends ACtivity move
                 viewBinding.addFriendSearch.text.clear()
             }
             .onFailure {
+
                 onAddFailure()
 //                onFriendDuplicated()
+//                LocalLogger.e(it)
+//                onError(it.cause)
                 LocalLogger.e(it)
+
+
+
+//                onError(HttpResponse)
             }
+        if (result.isSuccess) {
+            Intent(this@AddFriendActivity, FriendsActivity::class.java).apply {
+                startActivity(this)
+                finish()
+            }
+        } else {
+//            LocalLogger.v("${result.exceptionOrNull(SpringException::)}")
+        }
     }
 
-    // TODO 친구 등록 실패
-    // TODO 사용자 본인 이메일로 친구 신청한 경우
-    // TODO 사용자가 검색한 이메일의 사용자가 탈퇴한 경우
-    // TODO 이미 친구로 등록된 경우
+
+    private fun onError(body: SpringException) {
+        // TODO response status로 구분 지어서 오류 멘트 수정
+
+        when (body.error) {
+            "Bad Request" -> {LocalLogger.v("self request")}
+            "Duplicate" -> { LocalLogger.v("friend duplicate")}
+
+        }
+        when (body.status) {
+            400 -> {
+                /* self request */
+                LocalLogger.v("status 400 : bad request")
+            }
+            409 -> {
+                /* duplicate */
+                LocalLogger.v("status 409 : duplicate")
+            }
+        }
+    }
+
 
     private fun onAddFailure() = CoroutineScope(Dispatchers.Main).launch {
         Toast.makeText(this@AddFriendActivity, "친구 등록에 실패했어요. 다시 시도해 주세요.", Toast.LENGTH_SHORT).show()
     }
 
-    private fun onNotFoundUser(body: SpringException) {
-        // 해당 이메일로 등록된 사용자가 없는 경우 addview
-        if (body.error == "Not Found") {
-
-        }
-    }
-    private fun onFriendDuplicated(body: SpringException) {
-        // 이미 친구로 등록된 사용자일 경우
-        if (body.error == "Duplicate") {
-
-            CommonError.onMessageDialog(this, "친구 등록 실패", "이미 등록된 친구입니다")
-        }
-    }
-
-    private fun onBadRequest(body: SpringException) {
-        // 사용자 본인 이메일로 요청 날린 경우
-        if (body.error == "Bad Request") {
-
-        }
-    }
 }

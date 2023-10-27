@@ -7,9 +7,7 @@ package studio.hcmc.reminisce
 // * Writer
 // TODO WriteDetail recyclerView (writeDetailDate + writeDetailLocation + writeDetailMemo + writeDetailOptions)
 
-// * Folder
 
-// TODO 단일 location 화면 제작
 
 // * Folder > Write > WriteOptions
 // TODO Select category 완성 (recyclerView 단일 선택 && currentCategryId가 기본 선택돼있어야 함)
@@ -39,6 +37,15 @@ package studio.hcmc.reminisce
 // 2) tomcat에서 filter에서 catch 후 readByte를 wrapper로 감싸고
 // 3) filter -> interceptor 에서 logger 호출
 // 4) 최종적으로 들어온 요청을 interceptor에서 controller 호출
+
+
+/*
+friendsItemView(friend: FriendVO)
+onItemClick
+
+ */
+
+
 
 
 

@@ -123,7 +123,7 @@
     <string name="dialog_withdraw_body">오늘추억을 탈퇴하시겠어요?\n\n- 기록된 모든 추억은 복구할 수 없어요.\n- 해당 이메일로 재가입이 어려워요.</string>
 
     <string name="dialog_error_common_title">오류 발생</string>
-    <string name="dialog_error_common_body">오류가 발생했어요. 앱을 재실행 해주세요.</string>
+    <string name="dialog_error_common_body">오류가 발생했어요. 오늘추억을 재실행 해주세요.</string>
 
     <string name="card_category_item_body">100</string>
     <string name="card_category_item_title">Category Name</string>

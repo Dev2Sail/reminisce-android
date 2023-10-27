@@ -3,6 +3,7 @@ package studio.hcmc.reminisce.ui.activity.setting
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import studio.hcmc.reminisce.ui.view.SingleTypeAdapterDelegate
+import studio.hcmc.reminisce.vo.friend.FriendVO
 
 class FriendsAdapter(
     private val adapterDelegate: Delegate,
@@ -11,7 +12,7 @@ class FriendsAdapter(
     interface Delegate: SingleTypeAdapterDelegate<Content>
 
     sealed interface Content
-    class DetailContent(val nickname: String): Content
+    class DetailContent(val friend: FriendVO): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FriendsItemViewHolder(parent, itemDelegate)
     override fun getItemCount() = adapterDelegate.getItemCount()
