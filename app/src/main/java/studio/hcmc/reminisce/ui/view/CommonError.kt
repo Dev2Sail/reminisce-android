@@ -22,11 +22,9 @@ object CommonError {
 
     fun onMessageDialog(
         context: Context,
-        title: String,
         message: String
     ) = CoroutineScope(Dispatchers.Main).launch {
         MaterialAlertDialogBuilder(context)
-            .setTitle(title)
             .setMessage(message)
             .setPositiveButton("확인") { _, _ -> }
             .setCancelable(true)

@@ -12,7 +12,7 @@ class CategoryViewHolder(
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(category: CategoryVO)
+        fun onItemClick(category: CategoryVO, position: Int)
         fun onItemLongClick(categoryId: Int, position: Int)
     }
 
@@ -32,7 +32,7 @@ class CategoryViewHolder(
 
         viewBinding.homeCategoryBody.text = count.toString()
         viewBinding.homeCategoryAction1.setOnClickListener {
-            delegate.onItemClick(category)
+            delegate.onItemClick(category, bindingAdapterPosition)
         }
         viewBinding.root.setOnLongClickListener {
             delegate.onItemLongClick(category.id, bindingAdapterPosition)

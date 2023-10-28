@@ -29,6 +29,7 @@ class TagDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityTagDetailBinding
     private lateinit var adapter: TagDetailAdapter
     private lateinit var locations: List<LocationVO>
+    private lateinit var tag: TagVO
 
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
     private val tagBody by lazy { intent.getStringExtra("tagTitle") }
@@ -59,6 +60,7 @@ class TagDetailActivity : AppCompatActivity() {
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@TagDetailActivity)
+        val tag = TagIO.getByUserIdAndTagId(user.id, tagId)
         val result = runCatching { LocationIO.listByTagId(tagId) }
             .onSuccess { it ->
                 locations = it
@@ -84,12 +86,12 @@ class TagDetailActivity : AppCompatActivity() {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
-            CommonError.onMessageDialog(this@TagDetailActivity, "", "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
+            CommonError.onMessageDialog(this@TagDetailActivity, "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
         }
     }
 
     private fun prepareContents() {
-        contents.add(TagDetailAdapter.HeaderContent(tagBody!!))
+        contents.add(TagDetailAdapter.HeaderContent(tag.body))
         for ((date, locations) in locations.groupBy { it.createdAt.toString().substring(0, 7) }.entries) {
             val (year, month) = date.split("-")
             contents.add(TagDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
@@ -119,6 +121,7 @@ class TagDetailActivity : AppCompatActivity() {
     }
 
     private val headerDelegate = object : TagDetailHeaderViewHolder.Delegate {
+        // TODO editableActivity result
         override fun onEditClick(title: String) {
             Intent(this@TagDetailActivity, TagEditableDetailActivity::class.java).apply {
                 putExtra("tagId", tagId)

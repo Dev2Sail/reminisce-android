@@ -26,6 +26,7 @@ import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.setActivity
+import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
@@ -34,10 +35,11 @@ import studio.hcmc.reminisce.vo.user.UserVO
 class CategoryDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCategoryDetailBinding
     private lateinit var adapter: CategoryDetailAdapter
+    private lateinit var category: CategoryVO
     private lateinit var locations: List<LocationVO>
 
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
-    private val categoryTitle by lazy { intent.getStringExtra("categoryTitle") }
+    private val position by lazy { intent.getIntExtra("position", -1) }
 
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
@@ -59,10 +61,14 @@ class CategoryDetailActivity : AppCompatActivity() {
             appbarActionButton1.isVisible = false
             appbarBack.setOnClickListener {
                 // intent setActivity 이용해서 fetch flag 달아주고 home activity에서 content 다시 로드할 수 있게
-                Intent().setActivity(this@CategoryDetailActivity, Activity.RESULT_OK)
+                Intent().putExtra("position", position).setActivity(this@CategoryDetailActivity, Activity.RESULT_OK)
                 finish()
             }
         }
+        /*
+        startActivityResult() -> activity1에서 activity0으로 돌아오며 activity1 응답 받아 처리하는 경우
+        setResult() -> activity1 띄웠을 때 이전 activity로 intent 전달 activity1을 띄운 이전 activity에 응답 코드와 intent 전달
+         */
 
         viewBinding.categoryDetailAddButton.setOnClickListener {
             Intent(this@CategoryDetailActivity, WriteActivity::class.java).apply {
@@ -76,8 +82,9 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@CategoryDetailActivity)
+        category = CategoryIO.getById(categoryId)
         val fetch: suspend () -> List<LocationVO>
-        if (categoryTitle == "Default") {
+        if (category.title == "Default") {
             fetch = { LocationIO.listByUserId(user.id) }
         } else {
             fetch = { LocationIO.listByCategoryId(categoryId) }
@@ -105,13 +112,13 @@ class CategoryDetailActivity : AppCompatActivity() {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
-            CommonError.onMessageDialog(this@CategoryDetailActivity, "", "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
+            CommonError.onMessageDialog(this@CategoryDetailActivity,  "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
             LocalLogger.e("load Fail")
         }
     }
 
     private fun prepareContents() {
-        contents.add(CategoryDetailAdapter.HeaderContent(categoryTitle!!))
+        contents.add(CategoryDetailAdapter.HeaderContent(category.title))
         for ((date, locations) in locations.groupBy { it.createdAt.toString().substring(0, 7) }.entries) {
             val (year, month) = date.split("-")
             contents.add(CategoryDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
@@ -143,7 +150,7 @@ class CategoryDetailActivity : AppCompatActivity() {
     private val headerDelegate = object : CategoryDetailHeaderViewHolder.Delegate {
         override fun onItemClick() {
             Intent(this@CategoryDetailActivity, CategoryEditableDetailActivity::class.java).apply {
-                putExtra("categoryTitle", categoryTitle)
+                putExtra("categoryTitle", category.title)
                 putExtra("categoryId", categoryId)
                 startActivity(this)
             }
@@ -156,7 +163,7 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private val dialogDelegate = object : CategoryTitleEditDialog.Delegate {
         override fun onSaveClick(editedTitle: String?) {
-            onFetchTitle(editedTitle ?: categoryTitle!!)
+            onFetchTitle(editedTitle ?: category.title)
         }
     }
 

@@ -14,6 +14,10 @@ class TagViewHolder(
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(tag: TagVO)
+
+        fun onItemClick2(tagId: Int)
+
+        fun onItemLongClick(tagId: Int, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -33,7 +37,15 @@ class TagViewHolder(
                         text = tag.body
                         isCheckable = false
                         isSelected = true
-                        setOnClickListener { delegate.onItemClick(tag) }
+                        setOnClickListener {
+                            delegate.onItemClick2(tag.id)
+//                            delegate.onItemClick(tag)
+                        }
+                        setOnLongClickListener {
+                            delegate.onItemLongClick(tag.id, bindingAdapterPosition)
+
+                            false
+                        }
                     }
                 )
             }

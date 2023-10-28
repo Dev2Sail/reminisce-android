@@ -14,6 +14,12 @@ object TagIO {
             .bodyAsText()
     }
 
+    suspend fun getByUserIdAndTagId(userId: Int, tagId: Int): TagVO {
+        return httpClient
+            .get("/tag/${tagId}") { parameter("userId", userId) }
+            .body()
+    }
+
     suspend fun listByUserId(userId: Int): List<TagVO> {
         return httpClient
             .get("/tag/list/all") { parameter("userId", userId) }

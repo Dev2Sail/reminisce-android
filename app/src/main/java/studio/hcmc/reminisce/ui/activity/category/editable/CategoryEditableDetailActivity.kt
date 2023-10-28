@@ -85,7 +85,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
-            CommonError.onMessageDialog(this@CategoryEditableDetailActivity, "", "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
+            CommonError.onMessageDialog(this@CategoryEditableDetailActivity, "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
         }
     }
 

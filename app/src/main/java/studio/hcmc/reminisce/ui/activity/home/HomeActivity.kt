@@ -2,6 +2,8 @@ package studio.hcmc.reminisce.ui.activity.home
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
@@ -34,19 +36,16 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var adapter: HomeAdapter
 
-//    private lateinit var categories: List<CategoryVO>
     private lateinit var friends: List<FriendVO>
     private lateinit var friendTags: List<LocationFriendVO>
     private lateinit var tags: List<TagVO>
-//    private val cityTags = ArrayList<String>()
 
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val categories = ArrayList<CategoryVO>()
     private val categoryInfo = HashMap<Int /* categoryId */, Int /* countById */>()
     private val contents = ArrayList<HomeAdapter.Content>()
 
-    private val modifyFlag by lazy { intent.getBooleanExtra("isModified", false) }
-
+    private val categoryTitleEditLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onCategoryEditResult)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityHomeBinding.inflate(layoutInflater)
@@ -67,10 +66,7 @@ class HomeActivity : AppCompatActivity() {
             val user = UserExtension.getUser(this@HomeActivity)
             listOf(
 //                launch { categories = CategoryIO.listByUserId(user.id) },
-                launch {
-//                    categories = CategoryIO.listByUserId(user.id)
-                       categories.addAll(CategoryIO.listByUserId(user.id).sortedBy { it.sortOrder })
-                       },
+                launch { categories.addAll(CategoryIO.listByUserId(user.id).sortedBy { it.sortOrder }) },
                 launch { tags = TagIO.listByUserId(user.id) },
                 launch { friends = FriendIO.listByUserId(user.id) },
                 launch { friendTags = LocationFriendIO.listByUserId(user.id) }
@@ -163,6 +159,7 @@ class HomeActivity : AppCompatActivity() {
                 val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, it.id).get("count").asInt
                 categories.add(it)
                 categoryInfo[it.id] = count
+                // TODO itemInserted
                 // add 잘 되는데 한눈에 보기 (category[1]번째에 추가됨
                 withContext(Dispatchers.Main) {
                     contents.add(HomeAdapter.CategoryContent(it, count))
@@ -176,16 +173,16 @@ class HomeActivity : AppCompatActivity() {
             }.onFailure {
                 LocalLogger.e(it)
                 withContext(Dispatchers.Main) {
-                    CommonError.onMessageDialog(this@HomeActivity, "폴더 생성 실패", "폴더를 추가하는 데 실패했어요. \n다시 시도해 주세요.")
+                    CommonError.onMessageDialog(this@HomeActivity, "폴더를 추가하는 데 실패했어요. \n다시 시도해 주세요.")
                 }
             }
     }
 
     private val categoryDelegate = object : CategoryViewHolder.Delegate {
-        override fun onItemClick(category: CategoryVO) {
+        override fun onItemClick(category: CategoryVO, position: Int) {
             Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
                 putExtra("categoryId", category.id)
-                putExtra("categoryTitle", category.title)
+                putExtra("position", position)
                 startActivity(this)
             }
         }
@@ -199,7 +196,9 @@ class HomeActivity : AppCompatActivity() {
     // Delete Category Dialog delegate
     private val deleteDialogDelegate = object : DeleteCategoryDialog.Delegate {
         override fun onDeleteClick(categoryId: Int, position: Int) {
-            onDeleteContent(categoryId, position)
+            LocalLogger.v("position: $position, contents size: ${contents.size}")
+
+//            onDeleteContent(categoryId, position)
         }
     }
 
@@ -207,23 +206,34 @@ class HomeActivity : AppCompatActivity() {
         runCatching { CategoryIO.delete(categoryId) }
             .onSuccess {
                 withContext(Dispatchers.Main) {
+                        contents.removeAt(position)
                     categories.removeAt(position)
-                    contents.removeAt(position)
                     adapter.notifyItemRemoved(position)
                 }
             }.onFailure { LocalLogger.e(it) }
     }
 
+    // TODO onItemLongClick() -> delete
+    // TODO tag result (after delete)
     private val tagDelegate = object : TagViewHolder.Delegate {
         override fun onItemClick(tag: TagVO) {
+            // TODO tagId만 보내서 거기서 요청
             Intent(this@HomeActivity, TagDetailActivity::class.java).apply {
                 putExtra("tagId", tag.id)
-                putExtra("tagTitle", tag.body)
                 startActivity(this)
             }
         }
+
+        override fun onItemClick2(tagId: Int) {
+            // TODO only tag Id intent
+        }
+
+        override fun onItemLongClick(tagId: Int, position: Int) {
+            // TODO delete tag
+        }
     }
 
+    // TODO onItemLongClick() -> delete
     private val friendTagDelegate = object : FriendTagViewHolder.Delegate {
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
@@ -238,15 +248,26 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-//    private val cityDelegate = object : CityTagViewHolder.Delegate {
-//        override val cityTags: List<String>
-//            get() = this@HomeActivity.cityTags
-//
-//        override fun onTagClick(cityTag: String) {
-//            Intent(this@HomeActivity, CategoryDetailActivity::class.java).apply {
-//                putExtra("cityId", cityTag)
-//                startActivity(this)
-//            }
-//        }
-//    }
+    private fun onCategoryEditResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isEdited", false) == true) {
+            val title = activityResult.data?.getStringExtra("editedTitle")
+            val categoryId = activityResult.data?.getIntExtra("categoryId", -1)
+            val position = activityResult.data?.getIntExtra("position", -1)
+            onFetchCategory(categoryId!!, position!!)
+
+
+        }
+    }
+
+    private fun onFetchCategory(categoryId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@HomeActivity)
+        runCatching { CategoryIO.getById(categoryId) }
+            .onSuccess {
+                val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, categoryId).get("count").asInt
+                withContext(Dispatchers.Main) {
+                    contents[position] = HomeAdapter.CategoryContent(it, count)
+                    adapter.notifyItemChanged(position)
+                }
+            }.onFailure { LocalLogger.e(it) }
+    }
 }
