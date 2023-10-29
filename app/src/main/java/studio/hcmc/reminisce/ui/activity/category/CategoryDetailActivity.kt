@@ -54,6 +54,7 @@ class CategoryDetailActivity : AppCompatActivity() {
 
         initView()
     }
+    // TODO title 변경 후 homeActivity로 이동하며 resultCode와 data 넘길 것
 
     private fun initView() {
         viewBinding.categoryDetailAppbar.apply {

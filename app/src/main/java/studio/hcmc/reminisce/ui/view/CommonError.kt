@@ -25,6 +25,7 @@ object CommonError {
         message: String
     ) = CoroutineScope(Dispatchers.Main).launch {
         MaterialAlertDialogBuilder(context)
+            .setTitle("")
             .setMessage(message)
             .setPositiveButton("확인") { _, _ -> }
             .setCancelable(true)

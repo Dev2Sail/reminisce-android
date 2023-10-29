@@ -32,12 +32,10 @@ class TagDetailActivity : AppCompatActivity() {
     private lateinit var tag: TagVO
 
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
-    private val tagBody by lazy { intent.getStringExtra("tagTitle") }
 
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
-
     private val contents = ArrayList<TagDetailAdapter.Content>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,14 +52,22 @@ class TagDetailActivity : AppCompatActivity() {
             appbarActionButton1.isVisible = false
             appbarBack.setOnClickListener { finish() }
         }
+        prepareTag()
 
-        loadContents()
+    }
+
+    private fun prepareTag() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@TagDetailActivity)
+        val result = runCatching { TagIO.getByUserIdAndTagId(user.id, tagId) }
+            .onSuccess {
+                tag = it
+                loadContents()
+            }.onFailure { LocalLogger.e(it)}
     }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@TagDetailActivity)
-        val tag = TagIO.getByUserIdAndTagId(user.id, tagId)
-        val result = runCatching { LocationIO.listByTagId(tagId) }
+        val result = runCatching { LocationIO.listByTagId(tag.id) }
             .onSuccess { it ->
                 locations = it
                 it.forEach {
@@ -77,11 +83,7 @@ class TagDetailActivity : AppCompatActivity() {
                         }
                     }
                 }
-
-//                prepareContents()
-//                withContext(Dispatchers.Main) { onContentsReady() }
             }.onFailure { LocalLogger.e(it) }
-
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
@@ -124,8 +126,8 @@ class TagDetailActivity : AppCompatActivity() {
         // TODO editableActivity result
         override fun onEditClick(title: String) {
             Intent(this@TagDetailActivity, TagEditableDetailActivity::class.java).apply {
-                putExtra("tagId", tagId)
-                putExtra("tagTitle", tagBody)
+                putExtra("tagId", tag.id)
+
                 startActivity(this)
             }
         }

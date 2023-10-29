@@ -105,6 +105,9 @@
     <string name="dialog_delete_friend_title">친구 삭제</string>
     <string name="dialog_delete_friend_body">친구를 삭제하시겠어요? \n태그된 모든 추억에서도 함께 지워져요.</string>
 
+    <string name="dialog_delete_tag_title">태그 삭제</string>
+    <string name="dialog_delete_tag_body">태그를 삭제하시겠어요? \n태그된 모든 추억에서도 함께 지워져요.</string>
+
     <string name="dialog_stop_writing_title">그만 작성하기</string>
     <string name="dialog_stop_writing_body">지금 작성하던 내용은 저장되지 않아요.</string>
     <string name="dialog_stop_writing_ok">네</string>

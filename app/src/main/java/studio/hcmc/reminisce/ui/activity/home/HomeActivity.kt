@@ -36,6 +36,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var adapter: HomeAdapter
 
+
     private lateinit var friends: List<FriendVO>
     private lateinit var friendTags: List<LocationFriendVO>
     private lateinit var tags: List<TagVO>
@@ -157,18 +158,24 @@ class HomeActivity : AppCompatActivity() {
         runCatching { CategoryIO.post(dto) }
             .onSuccess {
                 val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, it.id).get("count").asInt
+                LocalLogger.v("it = ${it.id}, count = $count")
                 categories.add(it)
                 categoryInfo[it.id] = count
-                // TODO itemInserted
+                // TODO itemInserted notify
                 // add 잘 되는데 한눈에 보기 (category[1]번째에 추가됨
+                contents.add(HomeAdapter.CategoryContent(it, count))
                 withContext(Dispatchers.Main) {
-                    contents.add(HomeAdapter.CategoryContent(it, count))
+//                    adapter.notifyItemInserted(1)
+                    adapter.notifyItemChanged(contents.size - 2)
+
+
 //                    adapter.notifyItemInserted(1) // 한눈에 보기가 하나 더 생겨버림
 //                    adapter.notifyItemChanged(1) // 맨 아래 생김
-                    adapter.notifyItemRangeChanged(1, 1) // 맨 아래 생김
+//                    adapter.notifyItemRangeChanged(1, 1) // 맨 아래 생김
 //                    adapter.notifyItemInserted(1)
 //                    adapter.notifyItemRangeInserted(1, )
 //                    adapter.notifyItemRangeChanged(1,1)
+//                    adapter.notifyItemRangeInserted(contents.size, categories.size)
                 }
             }.onFailure {
                 LocalLogger.e(it)
@@ -187,28 +194,24 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        // to Delete Category Dialog
         override fun onItemLongClick(categoryId: Int, position: Int) {
             DeleteCategoryDialog(this@HomeActivity, categoryId, position, deleteDialogDelegate)
         }
     }
 
-    // Delete Category Dialog delegate
     private val deleteDialogDelegate = object : DeleteCategoryDialog.Delegate {
         override fun onDeleteClick(categoryId: Int, position: Int) {
-            LocalLogger.v("position: $position, contents size: ${contents.size}")
-
-//            onDeleteContent(categoryId, position)
+            onDeleteContent(categoryId, position)
         }
     }
 
     private fun onDeleteContent(categoryId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch{
         runCatching { CategoryIO.delete(categoryId) }
             .onSuccess {
+                categories.removeAt(position)
+                contents.removeAt(position)
                 withContext(Dispatchers.Main) {
-                        contents.removeAt(position)
-                    categories.removeAt(position)
-                    adapter.notifyItemRemoved(position)
+                    adapter.notifyItemRemoved(position + 1)
                 }
             }.onFailure { LocalLogger.e(it) }
     }
@@ -216,21 +219,32 @@ class HomeActivity : AppCompatActivity() {
     // TODO onItemLongClick() -> delete
     // TODO tag result (after delete)
     private val tagDelegate = object : TagViewHolder.Delegate {
-        override fun onItemClick(tag: TagVO) {
-            // TODO tagId만 보내서 거기서 요청
+        override fun onItemClick(tagId: Int) {
             Intent(this@HomeActivity, TagDetailActivity::class.java).apply {
-                putExtra("tagId", tag.id)
+                putExtra("tagId", tagId)
                 startActivity(this)
             }
         }
 
-        override fun onItemClick2(tagId: Int) {
-            // TODO only tag Id intent
-        }
-
         override fun onItemLongClick(tagId: Int, position: Int) {
-            // TODO delete tag
+            DeleteTagDialog(this@HomeActivity, tagId, position, deleteTagDelegate)
         }
+    }
+
+    // tagDelegate.onItemLongClick() -> deleteTagDelegate -> onDeleteTag
+    private val deleteTagDelegate = object : DeleteTagDialog.Delegate {
+        override fun onDeleteClick(tagId: Int, position: Int) {
+            onDeleteTag(tagId, position)
+        }
+    }
+
+    private fun onDeleteTag(tagId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { TagIO.delete(tagId) }
+            .onSuccess {
+                withContext(Dispatchers.Main) {
+
+                }
+            }.onFailure { LocalLogger.e(it) }
     }
 
     // TODO onItemLongClick() -> delete
@@ -254,8 +268,6 @@ class HomeActivity : AppCompatActivity() {
             val categoryId = activityResult.data?.getIntExtra("categoryId", -1)
             val position = activityResult.data?.getIntExtra("position", -1)
             onFetchCategory(categoryId!!, position!!)
-
-
         }
     }
 

@@ -35,7 +35,7 @@ class CategoryViewHolder(
             delegate.onItemClick(category, bindingAdapterPosition)
         }
         viewBinding.root.setOnLongClickListener {
-            delegate.onItemLongClick(category.id, bindingAdapterPosition)
+            delegate.onItemLongClick(category.id, bindingAdapterPosition - 1)
 
             false
         }
