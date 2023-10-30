@@ -6,7 +6,6 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.databinding.CardHomeTagFriendBinding
 import studio.hcmc.reminisce.databinding.ChipTagBinding
-import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
 class FriendTagViewHolder(
@@ -14,9 +13,9 @@ class FriendTagViewHolder(
     private val delegate: Delegate
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
-
         fun getUser(userId: Int): UserVO
-        fun onItemClick(friend: FriendVO)
+        fun onItemClick(opponentId: Int, nickname: String)
+        fun onItemLongClick(opponentId: Int, friendIdx: Int, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -27,16 +26,24 @@ class FriendTagViewHolder(
     fun bind(content: HomeAdapter.FriendContent) {
         val friends = content.friends
         if (!friends.isNullOrEmpty()) {
-            viewBinding.homePersonTagChipGroup.removeAllViews()
-            for (friend in friends) {
-                viewBinding.homePersonTagChipGroup.addView(LayoutInflater.from(viewBinding.root.context)
-                    .let { ChipTagBinding.inflate(it, viewBinding.homePersonTagChipGroup, false) }
+            viewBinding.homePersonTagChips.removeAllViews()
+            for (friend in friends.withIndex()) {
+                val vo = friend.value
+                viewBinding.homePersonTagChips.addView(LayoutInflater.from(viewBinding.root.context)
+                    .let { ChipTagBinding.inflate(it, viewBinding.homePersonTagChips, false) }
                     .root
                     .apply {
-                        text = friend.nickname ?: delegate.getUser(friend.opponentId).nickname
+                        text = vo.nickname ?: delegate.getUser(vo.opponentId).nickname
                         isCheckable = false
                         isSelected = true
-                        setOnClickListener { delegate.onItemClick(friend) }
+                        setOnClickListener {
+                            delegate.onItemClick(vo.opponentId, vo.nickname ?: delegate.getUser(vo.opponentId).nickname)
+                        }
+                        setOnLongClickListener {
+                            delegate.onItemLongClick(friend.value.opponentId, friend.index, bindingAdapterPosition)
+
+                            false
+                        }
                     }
                 )
             }
@@ -45,4 +52,3 @@ class FriendTagViewHolder(
         }
     }
 }
-// userId 30, friend (31(내가너무바빠), 32(null), 33(null), 42(아유졸려)

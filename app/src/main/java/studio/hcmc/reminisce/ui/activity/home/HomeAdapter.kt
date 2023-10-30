@@ -29,6 +29,7 @@ class HomeAdapter(
     ): Content
     class TagContent(val tags: List<TagVO>? = null): Content
     class FriendContent(val friends: List<FriendVO>? = null): Content
+
     //    class CityContent(val body: String? = null): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {

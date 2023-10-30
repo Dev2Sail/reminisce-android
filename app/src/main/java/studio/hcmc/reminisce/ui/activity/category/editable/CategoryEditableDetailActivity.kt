@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.category.editable
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -15,9 +16,9 @@ import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
-import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
@@ -29,12 +30,11 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     private lateinit var locations: List<LocationVO>
 
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
-    private val categoryTitle by lazy { intent.getStringExtra("categoryTitle") }
+    private val title by lazy { intent.getStringExtra("categoryTitle") }
 
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
-
     private val contents = ArrayList<CategoryEditableDetailAdapter.Content>()
     private val selectedIds = HashSet<Int>()
 
@@ -48,13 +48,11 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
 
     private fun initView() {
         viewBinding.categoryEditableDetailAppbar.apply {
-            appbarTitle.text = categoryTitle
+            appbarTitle.text = title
             appbarBack.setOnClickListener { finish() }
             appbarActionButton1.text = getString(R.string.dialog_remove)
             appbarActionButton1.setOnClickListener {
-                for (id in selectedIds) {
-                    fetchContents(id)
-                }
+                fetchContents(selectedIds)
             }
         }
 
@@ -101,10 +99,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.categoryEditableDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = CategoryEditableDetailAdapter(
-            adapterDelegate,
-            summaryDelegate
-        )
+        adapter = CategoryEditableDetailAdapter(adapterDelegate, summaryDelegate)
         viewBinding.categoryEditableDetailItems.adapter = adapter
     }
 
@@ -129,16 +124,14 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchContents(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { LocationIO.delete(locationId) }
-            .onSuccess {
-                LocalLogger.v("success")
-                Intent(this@CategoryEditableDetailActivity, CategoryDetailActivity::class.java).apply {
-                    startActivity(this)
-                    finish()
-                }
-            }
-            .onFailure { LocalLogger.e(it) }
+    private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching {
+            locationIds.forEach { LocationIO.delete(it) }
+//            for (locationId in locationIds) { LocationIO.delete(locationId) }
+        }.onSuccess {
+            Intent().putExtra("isModified", true).setActivity(this@CategoryEditableDetailActivity, Activity.RESULT_OK)
+            finish()
+        }.onFailure { LocalLogger.e(it) }
     }
 }
 

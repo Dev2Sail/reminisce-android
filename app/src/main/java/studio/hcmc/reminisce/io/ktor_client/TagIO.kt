@@ -10,7 +10,7 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 object TagIO {
     suspend fun delete(tagId: Int) {
         httpClient
-            .delete("/user/tag/${tagId}")
+            .delete("/tag/${tagId}")
             .bodyAsText()
     }
 

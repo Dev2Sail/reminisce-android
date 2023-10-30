@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.tag.editable
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -15,9 +16,9 @@ import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
-import studio.hcmc.reminisce.ui.activity.tag.TagDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
@@ -29,7 +30,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
     private lateinit var locations: List<LocationVO>
 
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
-    private val tagBody by lazy { intent.getStringExtra("tagTitle") }
+    private val body by lazy { intent.getStringExtra("tagBody") }
 
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
@@ -48,14 +49,10 @@ class TagEditableDetailActivity : AppCompatActivity() {
 
     private fun initView() {
         viewBinding.tagEditableDetailAppbar.apply {
-            appbarTitle.text = tagBody
+            appbarTitle.text = body
             appbarBack.setOnClickListener { finish() }
             appbarActionButton1.text = getString(R.string.dialog_remove)
-            appbarActionButton1.setOnClickListener {
-                for (id in selectedIds) {
-                    fetchContents(id)
-                }
-            }
+            appbarActionButton1.setOnClickListener { fetchContents(selectedIds) }
         }
 
         loadContents()
@@ -79,9 +76,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
                         }
                     }
                 }
-            }.onFailure {
-                LocalLogger.e(it)
-            }
+            }.onFailure { LocalLogger.e(it) }
 
         if (result.isSuccess) {
             prepareContents()
@@ -103,10 +98,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.tagEditableDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = TagEditableAdapter(
-            adapterDelegate = adapterDelegate,
-            summaryDelegate = summaryDelegate
-        )
+        adapter = TagEditableAdapter(adapterDelegate, summaryDelegate)
         viewBinding.tagEditableDetailItems.adapter = adapter
     }
 
@@ -131,15 +123,11 @@ class TagEditableDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchContents(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { LocationIO.delete(locationId) }
+    private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { locationIds.forEach { LocationIO.delete(it) } }
             .onSuccess {
-                LocalLogger.v("success")
-                Intent(this@TagEditableDetailActivity, TagDetailActivity::class.java).apply {
-                    startActivity(this)
-                    finish()
-                }
-            }
-            .onFailure { LocalLogger.e(it) }
+                Intent().putExtra("isModified", true).setActivity(this@TagEditableDetailActivity, Activity.RESULT_OK)
+                finish()
+            }.onFailure { LocalLogger.e(it) }
     }
 }

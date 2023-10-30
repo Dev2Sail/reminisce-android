@@ -5,14 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardCategoryItemBinding
-import studio.hcmc.reminisce.vo.category.CategoryVO
 
 class CategoryViewHolder(
     private val viewBinding: CardCategoryItemBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(category: CategoryVO, position: Int)
+        fun onItemClick(categoryId: Int, position: Int)
         fun onItemLongClick(categoryId: Int, position: Int)
     }
 
@@ -32,7 +31,7 @@ class CategoryViewHolder(
 
         viewBinding.homeCategoryBody.text = count.toString()
         viewBinding.homeCategoryAction1.setOnClickListener {
-            delegate.onItemClick(category, bindingAdapterPosition)
+            delegate.onItemClick(category.id, bindingAdapterPosition)
         }
         viewBinding.root.setOnLongClickListener {
             delegate.onItemLongClick(category.id, bindingAdapterPosition - 1)

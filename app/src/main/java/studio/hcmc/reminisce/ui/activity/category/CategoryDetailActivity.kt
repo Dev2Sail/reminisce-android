@@ -3,6 +3,8 @@ package studio.hcmc.reminisce.ui.activity.category
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,13 +40,15 @@ class CategoryDetailActivity : AppCompatActivity() {
     private lateinit var category: CategoryVO
     private lateinit var locations: List<LocationVO>
 
+    private val categoryEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
+//    private val writeByCategoryIdLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onAddResult)
+
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val position by lazy { intent.getIntExtra("position", -1) }
 
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
-
     private val contents = ArrayList<CategoryDetailAdapter.Content>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,24 +58,16 @@ class CategoryDetailActivity : AppCompatActivity() {
 
         initView()
     }
-    // TODO title 변경 후 homeActivity로 이동하며 resultCode와 data 넘길 것
 
     private fun initView() {
         viewBinding.categoryDetailAppbar.apply {
             appbarTitle.text = getText(R.string.header_view_holder_title)
             appbarActionButton1.isVisible = false
-            appbarBack.setOnClickListener {
-                // intent setActivity 이용해서 fetch flag 달아주고 home activity에서 content 다시 로드할 수 있게
-                Intent().putExtra("position", position).setActivity(this@CategoryDetailActivity, Activity.RESULT_OK)
-                finish()
-            }
+            appbarBack.setOnClickListener { finish() }
         }
-        /*
-        startActivityResult() -> activity1에서 activity0으로 돌아오며 activity1 응답 받아 처리하는 경우
-        setResult() -> activity1 띄웠을 때 이전 activity로 intent 전달 activity1을 띄운 이전 activity에 응답 코드와 intent 전달
-         */
 
         viewBinding.categoryDetailAddButton.setOnClickListener {
+            // TODO writeActivity 성공 시 result
             Intent(this@CategoryDetailActivity, WriteActivity::class.java).apply {
                 putExtra("categoryId", categoryId)
                 startActivity(this)
@@ -150,11 +146,11 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private val headerDelegate = object : CategoryDetailHeaderViewHolder.Delegate {
         override fun onItemClick() {
-            Intent(this@CategoryDetailActivity, CategoryEditableDetailActivity::class.java).apply {
-                putExtra("categoryTitle", category.title)
-                putExtra("categoryId", categoryId)
-                startActivity(this)
-            }
+            val intent = Intent(this@CategoryDetailActivity, CategoryEditableDetailActivity::class.java)
+                .putExtra("categoryId", categoryId)
+                .putExtra("categoryTitle", category.title)
+            categoryEditableLauncher.launch(intent)
+
         }
 
         override fun onTitleEditClick() {
@@ -163,8 +159,8 @@ class CategoryDetailActivity : AppCompatActivity() {
     }
 
     private val dialogDelegate = object : CategoryTitleEditDialog.Delegate {
-        override fun onSaveClick(editedTitle: String?) {
-            onFetchTitle(editedTitle ?: category.title)
+        override fun onSaveClick(editedTitle: String) {
+            onFetchTitle(editedTitle)
         }
     }
 
@@ -173,15 +169,24 @@ class CategoryDetailActivity : AppCompatActivity() {
         val dto = CategoryDTO.Patch().apply {
             title = body
         }
-        runCatching { CategoryIO.patch(user.id, categoryId, dto ) }
+        val result = runCatching { CategoryIO.patch(user.id, categoryId, dto) }
             .onSuccess {
                 withContext(Dispatchers.Main) {
-                    intent.putExtra("isModified", true)
                     contents[0] = CategoryDetailAdapter.HeaderContent(body)
                     adapter.notifyItemChanged(0)
                 }
             }
             .onFailure { LocalLogger.e(it) }
+        if (result.isSuccess) {
+            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener {
+                Intent()
+                    .putExtra("isEdited", true)
+                    .putExtra("categoryId", categoryId)
+                    .putExtra("position", position)
+                    .setActivity(this@CategoryDetailActivity, Activity.RESULT_OK)
+                finish()
+            }
+        }
     }
 
     private val summaryDelegate= object : CategoryDetailSummaryViewHolder.Delegate {
@@ -195,6 +200,28 @@ class CategoryDetailActivity : AppCompatActivity() {
 
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
+        }
+    }
+
+    private fun onModifiedResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
+            contents.removeAll {it is CategoryDetailAdapter.Content}
+            loadContents()
+            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener {
+                Intent()
+                    .putExtra("isModified", true)
+                    .putExtra("categoryId", categoryId)
+                    .putExtra("position", position)
+                    .setActivity(this, Activity.RESULT_OK)
+                finish()
+            }
+        }
+    }
+
+    private fun onAddResult(activityResult: ActivityResult) {
+        // 메모 저장 성공했을 때
+        if (activityResult.resultCode == Activity.RESULT_OK) {
+
         }
     }
 }

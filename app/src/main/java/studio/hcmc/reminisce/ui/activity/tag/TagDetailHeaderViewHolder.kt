@@ -10,7 +10,7 @@ class TagDetailHeaderViewHolder(
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onEditClick(title: String)
+        fun onEditClick(body: String)
     }
     constructor(parent: ViewGroup, delegate: Delegate) : this(
         viewBinding = CardCommonDetailHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),

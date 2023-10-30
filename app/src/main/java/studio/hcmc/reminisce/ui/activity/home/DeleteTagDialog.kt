@@ -9,11 +9,12 @@ import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 class DeleteTagDialog(
     context: Context,
     tagId: Int,
+    tagIdx: Int,
     position: Int,
     delegate: Delegate
 ) {
     interface Delegate {
-        fun onDeleteClick(tagId: Int, position: Int)
+        fun onDeleteClick(tagId: Int, tagIdx: Int, position: Int)
     }
 
     init {
@@ -24,7 +25,7 @@ class DeleteTagDialog(
         viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
             dialog.dismiss()
-            delegate.onDeleteClick(tagId, position)
+            delegate.onDeleteClick(tagId, position, tagIdx)
         }
         dialog.show()
     }

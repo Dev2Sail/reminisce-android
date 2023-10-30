@@ -2,6 +2,8 @@ package studio.hcmc.reminisce.ui.activity.tag
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +33,7 @@ class TagDetailActivity : AppCompatActivity() {
     private lateinit var locations: List<LocationVO>
     private lateinit var tag: TagVO
 
+    private val tagEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
 
     private val users = HashMap<Int /* UserId */, UserVO>()
@@ -58,7 +61,7 @@ class TagDetailActivity : AppCompatActivity() {
 
     private fun prepareTag() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@TagDetailActivity)
-        val result = runCatching { TagIO.getByUserIdAndTagId(user.id, tagId) }
+        runCatching { TagIO.getByUserIdAndTagId(user.id, tagId) }
             .onSuccess {
                 tag = it
                 loadContents()
@@ -123,13 +126,11 @@ class TagDetailActivity : AppCompatActivity() {
     }
 
     private val headerDelegate = object : TagDetailHeaderViewHolder.Delegate {
-        // TODO editableActivity result
-        override fun onEditClick(title: String) {
-            Intent(this@TagDetailActivity, TagEditableDetailActivity::class.java).apply {
-                putExtra("tagId", tag.id)
-
-                startActivity(this)
-            }
+        override fun onEditClick(body: String) {
+            val intent = Intent(this@TagDetailActivity, TagEditableDetailActivity::class.java)
+                .putExtra("tagId", tag.id)
+                .putExtra("tagBody", tag.body)
+            tagEditableLauncher.launch(intent)
         }
     }
 
@@ -144,6 +145,13 @@ class TagDetailActivity : AppCompatActivity() {
 
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
+        }
+    }
+
+    private fun onModifiedResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
+            contents.removeAll { it is TagDetailAdapter.Content }
+            loadContents()
         }
     }
 }

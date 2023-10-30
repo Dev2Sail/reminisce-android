@@ -26,6 +26,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityFriendTagDetailBinding
     private lateinit var adapter: FriendTagAdapter
     private lateinit var locations: List<LocationVO>
+    private lateinit var friend: FriendVO
 
     private val opponentId by lazy { intent.getIntExtra("opponentId", -1) }
     private val nickname by lazy { intent.getStringExtra("nickname") }
@@ -63,6 +64,10 @@ class FriendTagDetailActivity : AppCompatActivity() {
                     tagInfo[it.id] = TagIO.listByLocationId(it.id)
                     friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
                 }
+
+//                friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId } }
+                LocalLogger.v("${friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId }.keys }}")
+                LocalLogger.v("${friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId } }}")
 
                 for (friends in friendInfo.values) {
                     for (friend in friends) {
@@ -133,5 +138,4 @@ class FriendTagDetailActivity : AppCompatActivity() {
             .onSuccess { LocalLogger.v(it.toString()) }
             .onFailure { LocalLogger.e(it) }
     }
-
 }
