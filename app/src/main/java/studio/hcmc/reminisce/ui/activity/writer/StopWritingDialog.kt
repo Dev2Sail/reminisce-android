@@ -14,15 +14,11 @@ class StopWritingDialog(activity: Activity) {
         viewBinding.dialogHomeCategoryDeleteBody.text = activity.getText(R.string.dialog_stop_writing_body)
         viewBinding.dialogHomeCategoryDeleteCancel.text = activity.getText(R.string.dialog_stop_writing_cancel)
         viewBinding.dialogHomeCategoryDeleteRemove.text = activity.getText(R.string.dialog_stop_writing_ok)
-
-        dialog.show()
-
-        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener {
-            dialog.dismiss()
-        }
+        viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
             dialog.dismiss()
             activity.finish()
         }
+        dialog.show()
     }
 }

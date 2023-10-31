@@ -81,7 +81,7 @@ class WriteDetailActivity : AppCompatActivity() {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
-            CommonError.onMessageDialog(this@WriteDetailActivity, "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
+            CommonError.onMessageDialog(this@WriteDetailActivity, getString(R.string.dialog_error_common_list_body))
             LocalLogger.e(result.exceptionOrNull()!!)
             LocalLogger.e("Write Detail loadContents Error")
         }

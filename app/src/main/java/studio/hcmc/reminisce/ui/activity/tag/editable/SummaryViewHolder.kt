@@ -70,10 +70,7 @@ class SummaryViewHolder(
             viewBinding.cardCheckableSummaryFriends.root.isGone = true
         }
 
-        viewBinding.cardCheckableSummaryCheckbox.setOnClickListener {
-            delegate.onItemClick(location.id)
-        }
-
+        viewBinding.cardCheckableSummaryCheckbox.setOnClickListener { delegate.onItemClick(location.id) }
         viewBinding.cardCheckableSummaryContainer.setOnClickListener {
             viewBinding.cardCheckableSummaryCheckbox.isChecked = delegate.onItemClick(location.id)
         }

@@ -1,6 +1,9 @@
 package studio.hcmc.reminisce.ui.activity.friend_tag
 
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +18,8 @@ import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
+import studio.hcmc.reminisce.ui.activity.friend_tag.editable.FriendTagEditableDetailActivity
+import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.friend.FriendVO
@@ -28,6 +33,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
     private lateinit var locations: List<LocationVO>
     private lateinit var friend: FriendVO
 
+    private val friendTagEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
     private val opponentId by lazy { intent.getIntExtra("opponentId", -1) }
     private val nickname by lazy { intent.getStringExtra("nickname") }
 
@@ -52,12 +58,21 @@ class FriendTagDetailActivity : AppCompatActivity() {
             appbarBack.setOnClickListener { finish() }
         }
 
-        loadContents()
+        prepareFriend()
+    }
+
+    private fun prepareFriend() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@FriendTagDetailActivity)
+        runCatching { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
+            .onSuccess {
+                friend = it
+                loadContents()
+            }.onFailure { LocalLogger.e(it) }
     }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendTagDetailActivity)
-        val result = runCatching { LocationIO.listByUserIdAndOpponentId(user.id, opponentId) }
+        val result = runCatching { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId) }
             .onSuccess { it ->
                 locations = it
                 it.forEach {
@@ -66,13 +81,12 @@ class FriendTagDetailActivity : AppCompatActivity() {
                 }
 
 //                friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId } }
-                LocalLogger.v("${friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId }.keys }}")
-                LocalLogger.v("${friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId } }}")
+//                LocalLogger.v("${friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId } }}")
 
                 for (friends in friendInfo.values) {
-                    for (friend in friends) {
-                        if (friend.nickname == null) {
-                            val opponent = UserIO.getById(friend.opponentId)
+                    for (friendVO in friends) {
+                        if (friendVO.nickname == null) {
+                            val opponent = UserIO.getById(friendVO.opponentId)
                             users[opponent.id] = opponent
                         }
                     }
@@ -83,7 +97,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
-            CommonError.onMessageDialog(this@FriendTagDetailActivity, "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
+            CommonError.onMessageDialog(this@FriendTagDetailActivity, getString(R.string.dialog_error_common_list_body))
         }
     }
 
@@ -118,14 +132,22 @@ class FriendTagDetailActivity : AppCompatActivity() {
     }
 
     private val headerDelegate = object : FriendTagHeaderViewHolder.Delegate {
-        override fun onEditClick(title: String) {
-            // TODO Intent
+        override fun onEditClick() {
+            val intent = Intent(this@FriendTagDetailActivity, FriendTagEditableDetailActivity::class.java)
+                .putExtra("opponentId", friend.opponentId)
+                .putExtra("nickname", friend.nickname ?: users[friend.opponentId]!!.nickname)
+            friendTagEditableLauncher.launch(intent)
         }
     }
 
     private val summaryDelegate = object : FriendTagSummaryViewHolder.Delegate {
-        override fun onItemClick(locationId: Int) {
-            prepareSummaryOnClick(locationId)
+        override fun onItemClick(locationId: Int, title: String) {
+            // TODO intent result
+            Intent(this@FriendTagDetailActivity, WriteDetailActivity::class.java).apply {
+                putExtra("locationId", locationId)
+                putExtra("title", title)
+                startActivity(this)
+            }
         }
 
         override fun getUser(userId: Int): UserVO {
@@ -133,9 +155,10 @@ class FriendTagDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun prepareSummaryOnClick(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { LocationIO.getById(locationId) }
-            .onSuccess { LocalLogger.v(it.toString()) }
-            .onFailure { LocalLogger.e(it) }
+    private fun onModifiedResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
+            contents.removeAll { it is FriendTagAdapter.Content }
+            loadContents()
+        }
     }
 }

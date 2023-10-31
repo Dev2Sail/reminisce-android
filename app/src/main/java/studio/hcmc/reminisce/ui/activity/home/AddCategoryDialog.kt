@@ -18,7 +18,6 @@ class AddCategoryDialog(
     init {
         val viewBinding = DialogAddCategoryBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-
         viewBinding.apply {
             dialogAddCategoryField.editText!!.addTextChangedListener {
                 if (dialogAddCategoryField.string.length <= 15) {

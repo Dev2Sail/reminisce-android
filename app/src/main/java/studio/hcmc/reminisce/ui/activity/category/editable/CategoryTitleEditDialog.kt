@@ -24,7 +24,6 @@ class CategoryTitleEditDialog(
         inputField.editText!!.addTextChangedListener {
             viewBinding.dialogEditCategorySave.isEnabled = inputField.text.isNotEmpty() && inputField.string.length <= 15
         }
-
         viewBinding.dialogEditCategorySave.setOnClickListener {
             if (viewBinding.dialogCategoryTitleField.isNotEmpty() && viewBinding.dialogCategoryTitleField.string.length <= 15) {
                 delegate.onSaveClick(viewBinding.dialogCategoryTitleField.string)

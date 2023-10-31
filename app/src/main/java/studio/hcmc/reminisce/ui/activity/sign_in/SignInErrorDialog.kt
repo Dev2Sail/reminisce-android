@@ -11,11 +11,7 @@ class SignInErrorDialog(
     init {
         val viewBinding = DialogSignInErrorBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-
+        viewBinding.dialogSignInErrorOk.setOnClickListener { dialog.dismiss() }
         dialog.show()
-
-        viewBinding.dialogSignInErrorOk.setOnClickListener {
-            dialog.dismiss()
-        }
     }
 }

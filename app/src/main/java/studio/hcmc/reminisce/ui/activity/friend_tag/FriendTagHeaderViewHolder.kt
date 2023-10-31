@@ -11,7 +11,7 @@ class FriendTagHeaderViewHolder(
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onEditClick(title: String)
+        fun onEditClick()
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -24,7 +24,7 @@ class FriendTagHeaderViewHolder(
             cardCommonDetailHeaderTitle.text = content.title
             cardCommonDetailHeaderAction1.text = viewBinding.root.context.getString(R.string.header_action)
             cardCommonDetailHeaderAction1.setOnClickListener {
-                delegate.onEditClick(content.title)
+                delegate.onEditClick()
             }
         }
     }

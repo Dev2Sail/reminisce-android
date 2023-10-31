@@ -6,6 +6,7 @@ import androidx.core.widget.addTextChangedListener
 import studio.hcmc.reminisce.databinding.DialogEditFriendBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 import studio.hcmc.reminisce.util.string
+import studio.hcmc.reminisce.util.stringOrNull
 import studio.hcmc.reminisce.vo.user.UserVO
 
 class EditFriendDialog(
@@ -41,19 +42,26 @@ class EditFriendDialog(
             }
         }
         viewBinding.dialogEditFriendSave.setOnClickListener {
-            val input = viewBinding.dialogEditFriendField.string
-            when {
-                // friend nickname is null
-                input.isEmpty() -> {
-                    delegate.onEditClick(opponentId, null, position)
-                    dialog.dismiss()
-                }
-                // friend nickname is not null
-                input.isNotEmpty() && input.length <= 20 -> {
-                    delegate.onEditClick(opponentId, viewBinding.dialogEditFriendField.string, position)
-                    dialog.dismiss()
-                }
-            }
+            // TODO stringOrNull 수정
+            val input = viewBinding.dialogEditFriendField.stringOrNull
+//            when {
+//                input.isNullOrEmpty() -> {
+//
+//                }
+//                input.isNotEmpty() &&
+//            }
+//            when {
+//                // friend nickname is null
+//                input.isEmpty() -> {
+//                    delegate.onEditClick(opponentId, null, position)
+//                    dialog.dismiss()
+//                }
+//                // friend nickname is not null
+//                input.isNotEmpty() && input.length <= 20 -> {
+//                    delegate.onEditClick(opponentId, viewBinding.dialogEditFriendField.string, position)
+//                    dialog.dismiss()
+//                }
+//            }
         }
         viewBinding.dialogEditFriendCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()

@@ -14,18 +14,16 @@ class WithdrawDialog(
         fun onDoneClick()
     }
     init {
-        val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity)).apply {
-            dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.dialog_withdraw_title)
-            dialogHomeCategoryDeleteBody.text = activity.getText(R.string.dialog_withdraw_body)
-            dialogHomeCategoryDeleteRemove.text = activity.getText(R.string.dialog_withdraw)
-        }
+        val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-
-        dialog.show()
+        viewBinding.dialogHomeCategoryDeleteTitle.text = activity.getText(R.string.dialog_withdraw_title)
+        viewBinding.dialogHomeCategoryDeleteBody.text = activity.getText(R.string.dialog_withdraw_body)
+        viewBinding.dialogHomeCategoryDeleteRemove.text = activity.getText(R.string.dialog_withdraw)
         viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
             dialog.dismiss()
             delegate.onDoneClick()
         }
+        dialog.show()
     }
 }

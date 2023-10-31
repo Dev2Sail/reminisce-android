@@ -16,15 +16,12 @@ class SignUpMessageDialog(
     init {
         val viewBinding = DialogSignInErrorBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-
         viewBinding.dialogSignInErrorTitle.text = activity.getText(R.string.dialog_sign_up_message_title)
         viewBinding.dialogSignInErrorBody.text = activity.getText(R.string.dialog_sign_up_message_body)
-
-        dialog.show()
-
         viewBinding.dialogSignInErrorOk.setOnClickListener {
             dialog.dismiss()
             delegate.onDoneClick()
         }
+        dialog.show()
     }
 }

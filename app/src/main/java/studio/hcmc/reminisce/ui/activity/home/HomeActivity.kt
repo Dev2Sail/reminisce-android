@@ -12,6 +12,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityHomeBinding
 import studio.hcmc.reminisce.dto.category.CategoryDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
@@ -169,7 +170,7 @@ class HomeActivity : AppCompatActivity() {
             }.onFailure {
                 LocalLogger.e(it)
                 withContext(Dispatchers.Main) {
-                    CommonError.onMessageDialog(this@HomeActivity, "폴더를 추가하는 데 실패했어요. \n다시 시도해 주세요.")
+                    CommonError.onMessageDialog(this@HomeActivity, getString(R.string.dialog_error_add_folder))
                 }
             }
     }

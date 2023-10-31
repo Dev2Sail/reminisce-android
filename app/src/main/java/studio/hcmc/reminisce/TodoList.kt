@@ -7,8 +7,6 @@ package studio.hcmc.reminisce
 // * Writer
 // TODO WriteDetail recyclerView (writeDetailDate + writeDetailLocation + writeDetailMemo + writeDetailOptions)
 
-
-
 // * Folder > Write > WriteOptions
 // TODO Select category 완성 (recyclerView 단일 선택 && currentCategryId가 기본 선택돼있어야 함)
 
@@ -24,11 +22,6 @@ package studio.hcmc.reminisce
 // * Common
 // TODO RecyclerView Notify()
 // TODO activity 이동 시 activityResult 써서 완전히 종료 (appbarBack)
-
-// TODO logger 통일 :
-
-// TODO error handling
-
 // TODO network error 판별
 
 
@@ -56,16 +49,6 @@ onItemClick
 // card_summary -> 모든 summary 통일
 // card_checkable_summary -> 모든 activity 편집 화면에서 사용
 // layout_summary_item -> 모든 summary 내 아이템
-
-
-// add location -> locationId
-// tag가 여러 개일 경우
-// tag가 저장될 때 location_tag에도 한 트랜잭션에서 동시에 저장
-
-
-// location_friend -> friend list ->
-// location_tag
-
 
 /*
 

@@ -41,6 +41,8 @@ class WriteSelectVisitedAtDialog(
         }
 
         viewBinding.dialogSelectSave.setOnClickListener {
+//            val (year, month, day) = viewBinding.dialogSelectVisitedAtField.string.split("-")
+//            activity.getString(R.string.visited_at_format, )
             delegate.onSaveClick(viewBinding.dialogSelectVisitedAtField.string)
             dialog.dismiss()
         }

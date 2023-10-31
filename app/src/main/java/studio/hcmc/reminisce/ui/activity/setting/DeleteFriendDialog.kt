@@ -25,7 +25,6 @@ class DeleteFriendDialog(
             delegate.onDeleteClick(opponentId, position)
             dialog.dismiss()
         }
-
         dialog.show()
     }
 }

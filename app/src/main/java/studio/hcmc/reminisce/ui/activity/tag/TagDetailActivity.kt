@@ -56,7 +56,6 @@ class TagDetailActivity : AppCompatActivity() {
             appbarBack.setOnClickListener { finish() }
         }
         prepareTag()
-
     }
 
     private fun prepareTag() = CoroutineScope(Dispatchers.IO).launch {
@@ -91,7 +90,7 @@ class TagDetailActivity : AppCompatActivity() {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
-            CommonError.onMessageDialog(this@TagDetailActivity, "목록을 불러오는데 실패했어요. \n 다시 실행해 주세요.")
+            CommonError.onMessageDialog(this@TagDetailActivity, getString(R.string.dialog_error_common_list_body))
         }
     }
 
@@ -126,7 +125,7 @@ class TagDetailActivity : AppCompatActivity() {
     }
 
     private val headerDelegate = object : TagDetailHeaderViewHolder.Delegate {
-        override fun onEditClick(body: String) {
+        override fun onEditClick() {
             val intent = Intent(this@TagDetailActivity, TagEditableDetailActivity::class.java)
                 .putExtra("tagId", tag.id)
                 .putExtra("tagBody", tag.body)

@@ -14,7 +14,7 @@ class FriendTagSummaryViewHolder(
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(locationId: Int)
+        fun onItemClick(locationId: Int, title: String)
 
         fun getUser(userId: Int): UserVO
     }
@@ -75,7 +75,7 @@ class FriendTagSummaryViewHolder(
         }
 
         viewBinding.root.setOnClickListener {
-            delegate.onItemClick(location.id)
+            delegate.onItemClick(location.id, location.title)
         }
     }
 }

@@ -21,13 +21,11 @@ class AddFriendDialog(
         builder.append(nickname)
         builder.append("님을 친구로 등록할까요?")
         viewBinding.dialogAddFriendBody.text = builder.toString()
-
-        dialog.show()
-
         viewBinding.dialogAddFriendAdd.setOnClickListener {
             dialog.dismiss()
             delegate.onAddClick(opponentId)
         }
         viewBinding.dialogAddFriendCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 }

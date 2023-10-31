@@ -31,47 +31,43 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.signUpAppbar.apply {
-            appbarTitle.text = getText(R.string.greeting_sign_up)
-            appbarBack.setOnClickListener { finish() }
-            appbarActionButton1.setOnClickListener {
-                val intent = Intent(this@SignUpActivity, SignInActivity::class.java)
-                startActivity(intent)
-            }
+        viewBinding.signUpAppbar.appbarTitle.text = getText(R.string.greeting_sign_up)
+        viewBinding.signUpAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.signUpAppbar.appbarActionButton1.setOnClickListener {
+            val intent = Intent(this@SignUpActivity, SignInActivity::class.java)
+            startActivity(intent)
         }
-
-        viewBinding.apply {
-            signUpEmail.editText!!.addTextChangedListener { setNextEnabledState() }
-            signUpPassword.editText!!.addTextChangedListener { setNextEnabledState() }
-            signUpNickname.editText!!.addTextChangedListener { setNextEnabledState() }
-        }
-
-
+        viewBinding.signUpEmail.editText!!.addTextChangedListener { setNextEnabledState() }
+        viewBinding.signUpPassword.editText!!.addTextChangedListener { setNextEnabledState() }
+        viewBinding.signUpNickname.editText!!.addTextChangedListener { setNextEnabledState() }
         viewBinding.signUpNext.setOnClickListener {
-            val signUpDTO = UserDTO.Post().apply {
+            val dto = UserDTO.Post().apply {
                 email = viewBinding.signUpEmail.string
                 password = viewBinding.signUpPassword.string.sha512
                 nickname = viewBinding.signUpNickname.string
             }
-
-            CoroutineScope(Dispatchers.IO).launch {
-                runCatching { UserIO.getByEmail(signUpDTO.email) }
-                    .onSuccess { onSignUpError() }
-                    .onFailure {
-                        UserIO.signUp(signUpDTO)
-                        onSignUpMessage()
-                        LocalLogger.e(it)
-                    }
-            }
+            signUp(dto)
         }
     }
 
+    private fun signUp(dto: UserDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { UserIO.getByEmail(dto.email) }
+            .onSuccess {
+                onSignUpError()
+                LocalLogger.e(it.email)
+            }
+            .onFailure {
+                UserIO.signUp(dto)
+                onSignUpMessage()
+                LocalLogger.v(it)
+            }
+    }
 
     private fun setNextEnabledState() {
-        val inputtedEmail = viewBinding.signUpEmail.editText!!.text.toString()
+        val inputtedEmail = viewBinding.signUpEmail.string
         val checkedState = Patterns.EMAIL_ADDRESS.matcher(inputtedEmail).matches()
-        val inputtedPassword = viewBinding.signUpPassword.editText!!.text.toString()
-        val inputtedNickname = viewBinding.signUpNickname.editText!!.text.toString()
+        val inputtedPassword = viewBinding.signUpPassword.string
+        val inputtedNickname = viewBinding.signUpNickname.string
         viewBinding.signUpNext.isEnabled = checkedState &&
                 (inputtedPassword.isNotEmpty() && inputtedPassword.length >= 5) &&
                 (inputtedNickname.isNotEmpty() && inputtedNickname.length <= 20)
@@ -81,6 +77,7 @@ class SignUpActivity : AppCompatActivity() {
         override fun onDoneClick() {
             Intent(this@SignUpActivity, HomeActivity::class.java).apply {
                 startActivity(this)
+                finish()
             }
         }
     }
@@ -100,8 +97,4 @@ class SignUpActivity : AppCompatActivity() {
     private fun onSignUpError() = CoroutineScope(Dispatchers.IO).launch {
         SignUpErrorDialog(this@SignUpActivity, signUpErrorDelegate)
     }
-
-//    private fun onEmailDuplicated(user: UserVO) {
-//        viewBinding.signUpEmail.suffixText
-//    }
 }

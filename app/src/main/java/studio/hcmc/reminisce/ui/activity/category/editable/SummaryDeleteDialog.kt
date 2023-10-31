@@ -26,7 +26,6 @@ class SummaryDeleteDialog(
             dialogHomeCategoryDeleteBody.text = context.getText(R.string.dialog_summary_delete_body)
         }
 
-        dialog.show()
 
         viewBinding.apply {
             dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
@@ -35,6 +34,7 @@ class SummaryDeleteDialog(
                 deleteSummary()
             }
         }
+        dialog.show()
     }
 
     private fun deleteSummary() = CoroutineScope(Dispatchers.IO).launch {

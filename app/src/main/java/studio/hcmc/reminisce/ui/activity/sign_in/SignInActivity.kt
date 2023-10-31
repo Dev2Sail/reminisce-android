@@ -17,6 +17,7 @@ import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.home.HomeActivity
 import studio.hcmc.reminisce.ui.activity.launcher.LauncherActivity
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 
 class SignInActivity : AppCompatActivity() {
@@ -31,42 +32,35 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.signInAppbar.apply {
-            appbarTitle.text = getText(R.string.sign_in_login)
-            appbarActionButton1.isVisible = false
-
-            appbarBack.setOnClickListener {
-                Intent(this@SignInActivity, LauncherActivity::class.java).apply {
-                    startActivity(this)
-                }
+        viewBinding.signInAppbar.appbarTitle.text = getText(R.string.sign_in_login)
+        viewBinding.signInAppbar.appbarActionButton1.isVisible = false
+        viewBinding.signInAppbar.appbarBack.setOnClickListener {
+            Intent(this, LauncherActivity::class.java).apply {
+                startActivity(this)
+                finish()
             }
         }
-
-        viewBinding.signInEmail.editText!!.addTextChangedListener {
-            setNextEnabledState()
-        }
-        viewBinding.signInPassword.editText!!.addTextChangedListener {
-            setNextEnabledState()
-        }
+        viewBinding.signInEmail.editText!!.addTextChangedListener { setNextEnabledState() }
+        viewBinding.signInPassword.editText!!.addTextChangedListener { setNextEnabledState() }
         viewBinding.signInNext.setOnClickListener {
             val email = viewBinding.signInEmail.string
             val plainPassword = viewBinding.signInPassword.string
-
-            CoroutineScope(Dispatchers.IO).launch {
-                runCatching { UserIO.login(UserAuthVO(email, plainPassword)) }
-                    .onSuccess {
-                        UserAuthVO(email, plainPassword).save(this@SignInActivity)
-                        Intent(this@SignInActivity, HomeActivity::class.java).apply {
-                            startActivity(this)
-                            finish()
-                        }
-                    }.onFailure {
-                        onSignInError()
-                        Log.v("reminisce Logger", "[reminisce > signIn] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
-                    }
-            }
+            signIn(email, plainPassword)
         }
+    }
 
+    private fun signIn(email: String, password: String) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { UserIO.login(UserAuthVO(email, password)) }
+            .onSuccess {
+                UserAuthVO(email, password).save(this@SignInActivity)
+                Intent(this@SignInActivity, HomeActivity::class.java).apply {
+                    startActivity(this)
+                    finish()
+                }
+            }.onFailure {
+                onSignInError()
+                LocalLogger.e(it)
+            }
     }
 
     private fun setNextEnabledState() {

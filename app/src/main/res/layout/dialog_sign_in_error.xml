@@ -48,6 +48,7 @@
         android:layout_marginBottom="@dimen/margin_large"
         android:fontFamily="@font/pretendard_medium"
         android:text="@string/dialog_ok"
+        android:textColor="@color/md_theme_light_error"
         android:textSize="@dimen/label_large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/dialog_sign_in_error_body"

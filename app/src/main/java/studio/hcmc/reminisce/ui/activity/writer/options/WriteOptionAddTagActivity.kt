@@ -66,6 +66,7 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
             false
         }
     }
+    // TODO AutoCompleteTextView
 
     private fun prepareTags() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@WriteOptionAddTagActivity)
@@ -77,7 +78,7 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
                 }
             }
             .onFailure {
-                CommonError.onMessageDialog(this@WriteOptionAddTagActivity, "태그를 불러오는 데 실패했어요. \n 다시 실행해 주세요.")
+                CommonError.onMessageDialog(this@WriteOptionAddTagActivity, getString(R.string.dialog_error_tag_load))
                 CommonError.debugError(it)
                 Log.v("reminisce Logger", "[reminisce > tag] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
                 CommonError.onDialog(this@WriteOptionAddTagActivity)

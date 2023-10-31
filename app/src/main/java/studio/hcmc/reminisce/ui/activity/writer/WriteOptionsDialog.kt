@@ -18,11 +18,9 @@ class WriteOptionsDialog(
     init {
         val viewBinding = DialogWriteOptionsBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-
-        dialog.show()
-
         viewBinding.writeOptionsNextFriend.setOnClickListener { delegate.addFriendClick() }
         viewBinding.writeOptionsNextTag.setOnClickListener { delegate.addTagClick() }
         viewBinding.writeOptionsNextCategory.setOnClickListener { delegate.selectCategoryClick() }
+        dialog.show()
     }
 }
