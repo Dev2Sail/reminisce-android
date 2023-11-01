@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_regular"
         android:layout_marginTop="@dimen/margin_small"
+        app:boxStrokeColor="@color/md_theme_light_onSurface"
         android:layout_marginEnd="@dimen/margin_regular"
         android:background="@color/md_theme_light_surface"
         app:endIconMode="clear_text"

@@ -29,7 +29,6 @@ import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
-import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
@@ -41,8 +40,8 @@ class HomeActivity : AppCompatActivity() {
     private var defaultCategoryId = 0
     private val categories = ArrayList<CategoryVO>()
     private val categoryInfo = HashMap<Int /* categoryId */, Int /* countById */>()
-    private val friends = ArrayList<FriendVO>()
-    private val friendTags = ArrayList<LocationFriendVO>()
+    private lateinit var friends: MutableList<FriendVO>
+    private val friendTagOpponentIds = HashSet<Int /* LocationFriendVO.opponentId */>()
     private val tags = ArrayList<TagVO>()
     private val contents = ArrayList<HomeAdapter.Content>()
 
@@ -68,9 +67,11 @@ class HomeActivity : AppCompatActivity() {
             listOf(
                 launch { categories.addAll(CategoryIO.listByUserId(user.id).sortedBy { it.sortOrder }) },
                 launch { tags.addAll(TagIO.listByUserId(user.id).sortedByDescending { it.id }) },
-                launch { friends.addAll(FriendIO.listByUserId(user.id).sortedByDescending { it.requestedAt }) },
-                launch { friendTags.addAll(LocationFriendIO.listByUserId(user.id)) }
+                launch { LocationFriendIO.listByUserId(user.id).mapTo(friendTagOpponentIds) { it.opponentId } }
             ).joinAll()
+
+            friends = friendTagOpponentIds.mapTo(ArrayList(friendTagOpponentIds.size)) { FriendIO.getByUserIdAndOpponentId(user.id, it) }
+            friends.sortByDescending { it.requestedAt }
 
             for (friend in friends) {
                 if (friend.nickname == null) {
@@ -104,23 +105,10 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun prepareContents() {
-        val friendContent = ArrayList<FriendVO>()
-
-        for (friend in friends) {
-            for (tag in friendTags) {
-                if (friend.opponentId == tag.opponentId) {
-                    friendContent.add(friend)
-                }
-            }
-        }
-
         contents.add(HomeAdapter.HeaderContent())
-        categories.forEach { contents.add(HomeAdapter.CategoryContent(it, categoryInfo[it.id] ?: 0)) }
-//        for (category in categories) {
-//            contents.add(HomeAdapter.CategoryContent(category, categoryInfo[category.id] ?: 0 ))
-//        }
+        contents.addAll(categories.map { HomeAdapter.CategoryContent(it, categoryInfo[it.id] ?: 0) })
         contents.add(HomeAdapter.TagContent(tags))
-        contents.add(HomeAdapter.FriendContent(friendContent.distinct()))
+        contents.add(HomeAdapter.FriendContent(friends))
     }
 
     private fun onContentsReady() {

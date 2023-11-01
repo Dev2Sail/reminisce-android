@@ -30,9 +30,8 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_2xlarge"
         android:layout_marginTop="@dimen/margin_regular"
-        app:counterEnabled="true"
-        app:counterMaxLength="10"
         app:endIconMode="clear_text"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_select_visited_at_title">

@@ -164,4 +164,6 @@
 
     <string name="most_added_friend">가장 많이 등록된 친구</string>
 
+    <string name="error_visited_at">날짜를 다시 입력해 주세요.</string>
+
 </resources>

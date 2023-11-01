@@ -4,11 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.MapConstants
+import com.naver.maps.map.util.MarkerIcons
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityMapBinding
 import studio.hcmc.reminisce.util.navigationController
@@ -46,6 +49,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         val marker = Marker()
+        marker.position = LatLng(37.40959, 126.6951245)
+        marker.map = naverMap
+        marker.icon = MarkerIcons.BLACK
+
+
+        val bounds = LatLngBounds.Builder()
+            .include(LatLng(37.5640984, 126.9712268))
+            .build()
+
+        naverMap.isIndoorEnabled = true // 실내지도 활성화
 
 //        val mapUISetting = naverMap.uiSettings.apply {
 //        }

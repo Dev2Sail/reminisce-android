@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.map
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import studio.hcmc.reminisce.databinding.ActivitySearchLocationBinding
 
 class SearchLocationActivity : AppCompatActivity() {
@@ -16,17 +15,32 @@ class SearchLocationActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-//        viewBinding.searchLocationField.setEndIconDrawable(R.drawable.round_search_16)
-        viewBinding.searchLocationField.editText!!.addTextChangedListener {
-
-        }
-
+        viewBinding.searchLocationBackIcon.setOnClickListener { finish() }
+//        viewBinding.searchLocationField.editText!!.setOnEditorActionListener { v, actionId, event ->
+//            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+//            }
+//        }
 
 
     }
+
+
+
+
+
 }
 /*
 inputField.editText!!.addTextChangedListener {
             appBar.appbarActionButton1.isEnabled = inputField.text.isNotEmpty() && inputField.text.length >= 5
         }
+ */
+
+/*
+naver는 주소 <-> 좌표
+https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode -> 위도, 경도 좌표 return
+
+reverseGc
+https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc
+
+
  */

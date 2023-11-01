@@ -11,9 +11,6 @@ import studio.hcmc.reminisce.databinding.ActivityWriteBinding
 import studio.hcmc.reminisce.dto.location.LocationDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.ui.activity.map.MapActivity
-import java.sql.Date
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class WriteActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteBinding
@@ -95,18 +92,9 @@ class WriteActivity : AppCompatActivity() {
     }
 
     private val visitedAtDelegate = object : WriteSelectVisitedAtDialog.Delegate {
-        // use java sql date
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
-        var currentDate: String = dateFormat.format(Date(System.currentTimeMillis()))
-
-        override fun onSaveClick(value: String) {
-            if (value.isNotEmpty()) {
-                writeOptions["visitedAt"] = value
-                viewBinding.writeVisitedAt.text = value
-            } else {
-                writeOptions["visitedAt"] = currentDate
-                viewBinding.writeVisitedAt.text = currentDate
-            }
+        override fun onSaveClick(date: String) {
+            viewBinding.writeVisitedAt.text = date
+            writeOptions["visitedAt"] = date
         }
     }
 

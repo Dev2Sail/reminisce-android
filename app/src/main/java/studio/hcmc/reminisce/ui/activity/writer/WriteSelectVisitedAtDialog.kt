@@ -2,65 +2,74 @@ package studio.hcmc.reminisce.ui.activity.writer
 
 import android.app.Activity
 import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import androidx.core.widget.addTextChangedListener
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.DialogSelectVisitedAtBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 import java.sql.Date
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class WriteSelectVisitedAtDialog(
     activity: Activity,
     delegate: Delegate
 ) {
     interface Delegate {
-        fun onSaveClick(value: String)
+        fun onSaveClick(date: String)
     }
-
+    private val viewBinding: DialogSelectVisitedAtBinding
+    private var watcher: TextWatcher? = null
     init {
-        val viewBinding = DialogSelectVisitedAtBinding.inflate(LayoutInflater.from(activity))
+        viewBinding = DialogSelectVisitedAtBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-
-        // simpleFormat 말고 그냥 format으로 변환
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
-        var now = dateFormat.format(Date(System.currentTimeMillis()))
-        viewBinding.dialogSelectVisitedAtField.placeholderText = now
-
-        dialog.show()
-
+        val now = Date(System.currentTimeMillis())
+        viewBinding.dialogSelectVisitedAtField.placeholderText = now.toString()
+        watcher = viewBinding.dialogSelectVisitedAtField.editText!!.addTextChangedListener {
+            dateInputFormatter(it!!)
+            val input = viewBinding.dialogSelectVisitedAtField.string
+            if (input.length == 10) {
+                if (validateDate(input)) {
+                    viewBinding.dialogSelectVisitedAtField.error = null
+                    viewBinding.dialogSelectSave.isEnabled = true
+                } else {
+                    viewBinding.dialogSelectVisitedAtField.error = activity.getString(R.string.error_visited_at)
+                }
+            }
+        }
         viewBinding.dialogSelectCancel.setOnClickListener {
-            delegate.onSaveClick("")
+            delegate.onSaveClick(now.toString())
             dialog.dismiss()
         }
-
-        viewBinding.dialogSelectVisitedAtField.editText!!.addTextChangedListener {
-            viewBinding.dialogSelectSave.isEnabled = validateDate(formatInputDate(viewBinding.dialogSelectVisitedAtField.text))
-        }
-
         viewBinding.dialogSelectSave.setOnClickListener {
-//            val (year, month, day) = viewBinding.dialogSelectVisitedAtField.string.split("-")
-//            activity.getString(R.string.visited_at_format, )
             delegate.onSaveClick(viewBinding.dialogSelectVisitedAtField.string)
             dialog.dismiss()
         }
+        dialog.show()
     }
 
-    private fun formatInputDate(value: Editable): String {
-        if (value.length == 4 || value.length == 7) { value.append("-") }
-
-        return value.toString()
+    private fun dateInputFormatter(value: Editable){
+        viewBinding.dialogSelectVisitedAtField.editText!!.removeTextChangedListener(watcher)
+        val plain = value.toString().replace("-", "")
+        if (plain.length < 5) {
+            viewBinding.dialogSelectVisitedAtField.editText!!.setText(plain)
+        } else if (plain.length < 7) {
+            viewBinding.dialogSelectVisitedAtField.editText!!.setText(plain.substring(0, 4) + "-" + plain.substring(4, plain.length))
+        } else {
+            viewBinding.dialogSelectVisitedAtField.editText!!.setText(plain.substring(0, 4) + "-" + plain.substring(4, 6) + "-" + plain.substring(6, plain.length))
+        }
+        viewBinding.dialogSelectVisitedAtField.editText!!.setSelection(viewBinding.dialogSelectVisitedAtField.text.length)
+        viewBinding.dialogSelectVisitedAtField.editText!!.addTextChangedListener(watcher)
     }
 
     private fun validateDate(value: String): Boolean {
         return try {
-            val format = SimpleDateFormat("yyyy-MM-dd")
-            val date = format.parse(value)
-            val reverse = format.format(date)
-            value == reverse
+            // 얘가 value랑 동일해야 함
+            value == Date.valueOf(value).toString()
         } catch (e: Throwable) {
+            LocalLogger.e(e)
             false
         }
     }

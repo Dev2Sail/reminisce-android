@@ -21,9 +21,6 @@
             android:name=".ui.activity.friend_tag.editable.FriendTagEditableDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.tag.editable.TestCheckActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.activity.tag.editable.TagEditableDetailActivity"
             android:exported="false" />
         <activity
@@ -79,9 +76,6 @@
             android:exported="false" />
         <activity
             android:name=".ui.activity.writer.WriteActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.home.AddCategoryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.category.CategoryDetailActivity"
