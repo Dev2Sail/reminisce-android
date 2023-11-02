@@ -5,12 +5,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.databinding.ActivityWriteBinding
 import studio.hcmc.reminisce.dto.location.LocationDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.ui.activity.map.MapActivity
+import studio.hcmc.reminisce.util.stringOrNull
 
 class WriteActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteBinding
@@ -59,10 +59,6 @@ class WriteActivity : AppCompatActivity() {
                 startActivity(this)
             }
         }
-
-        viewBinding.writeMarkerEmoji.setOnClickListener {
-            WriteSelectEmojiDialog(this@WriteActivity, emojiDelegate)
-        }
     }
 
     private fun postContents() = CoroutineScope(Dispatchers.IO).launch {
@@ -70,12 +66,11 @@ class WriteActivity : AppCompatActivity() {
         val postDTO = LocationDTO.Post().apply {
             categoryId = currentCategoryId
             visitedAt = writeOptions["visitedAt"].toString()
-            markerEmoji = writeOptions["emoji"].toString()
-            body = viewBinding.writeTextContainer.editText!!.toString() // editText!!.toString()이 isEmpty하면 "" 삽입
+            body = viewBinding.writeTextContainer.stringOrNull ?: null// editText!!.toString()이 isEmpty하면 "" 삽입
         }
 
         val result = runCatching {
-            async {  }
+
         }
 
     }
@@ -95,13 +90,6 @@ class WriteActivity : AppCompatActivity() {
         override fun onSaveClick(date: String) {
             viewBinding.writeVisitedAt.text = date
             writeOptions["visitedAt"] = date
-        }
-    }
-
-    private val emojiDelegate = object :WriteSelectEmojiDialog.Delegate {
-        override fun onSaveClick(value: String) {
-            writeOptions["emoji"] = value
-            viewBinding.writeMarkerEmoji.text = value
         }
     }
 }

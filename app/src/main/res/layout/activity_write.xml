@@ -99,31 +99,31 @@
                 app:layout_constraintStart_toEndOf="@id/write_location_icon"
                 app:layout_constraintTop_toBottomOf="@id/write_location_title" />
 
-            <ImageView
-                android:id="@+id/write_marker_emoji_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_2xlarge"
-                android:src="@drawable/outline_add_reaction_16"
-                app:layout_constraintBottom_toBottomOf="@id/write_marker_emoji"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/write_marker_emoji"
-                app:tint="@color/md_theme_light_primary" />
+<!--            <ImageView-->
+<!--                android:id="@+id/write_marker_emoji_icon"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/margin_2xlarge"-->
+<!--                android:src="@drawable/outline_add_reaction_16"-->
+<!--                app:layout_constraintBottom_toBottomOf="@id/write_marker_emoji"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="@id/write_marker_emoji"-->
+<!--                app:tint="@color/md_theme_light_primary" />-->
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/write_marker_emoji"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_small"
-                android:layout_marginTop="@dimen/margin_regular"
-                android:layout_marginEnd="@dimen/margin_large"
-                android:fontFamily="@font/pretendard_regular"
-                android:text="@string/write_emoji"
-                android:textColor="@color/md_theme_light_onSurfaceVariant"
-                android:textSize="@dimen/body_medium"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/write_marker_emoji_icon"
-                app:layout_constraintTop_toBottomOf="@id/write_location" />
+<!--            <com.google.android.material.textview.MaterialTextView-->
+<!--                android:id="@+id/write_marker_emoji"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/margin_small"-->
+<!--                android:layout_marginTop="@dimen/margin_regular"-->
+<!--                android:layout_marginEnd="@dimen/margin_large"-->
+<!--                android:fontFamily="@font/pretendard_regular"-->
+<!--                android:text="@string/write_emoji"-->
+<!--                android:textColor="@color/md_theme_light_onSurfaceVariant"-->
+<!--                android:textSize="@dimen/body_medium"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toEndOf="@id/write_marker_emoji_icon"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/write_location" />-->
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/write_divider1"
@@ -134,7 +134,7 @@
                 android:layout_marginBottom="@dimen/margin_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/write_marker_emoji" />
+                app:layout_constraintTop_toBottomOf="@id/write_location" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/write_text_container"

@@ -40,16 +40,6 @@ class SummaryViewHolder(
             cardCheckableSummaryAddress.layoutSummaryItemBody.text = addressBuilder.toString()
         }
 
-        if (!location.markerEmoji.isNullOrEmpty()) {
-            viewBinding.cardCheckableSummaryMarkerEmoji.root.isVisible = true
-            viewBinding.cardCheckableSummaryMarkerEmoji.apply {
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
-                layoutSummaryItemBody.text = location.markerEmoji
-            }
-        } else {
-            viewBinding.cardCheckableSummaryMarkerEmoji.root.isGone = true
-        }
-
         val tagText = tags.withIndex().joinToString { it.value.body }
         if (tagText.isNotEmpty()) {
             viewBinding.cardCheckableSummaryTags.root.isVisible = true
@@ -81,3 +71,14 @@ class SummaryViewHolder(
         }
     }
 }
+/*
+if (!location.markerEmoji.isNullOrEmpty()) {
+            viewBinding.cardCheckableSummaryMarkerEmoji.root.isVisible = true
+            viewBinding.cardCheckableSummaryMarkerEmoji.apply {
+                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
+                layoutSummaryItemBody.text = location.markerEmoji
+            }
+        } else {
+            viewBinding.cardCheckableSummaryMarkerEmoji.root.isGone = true
+        }
+ */

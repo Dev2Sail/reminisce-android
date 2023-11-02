@@ -23,7 +23,10 @@ class SearchLocationActivity : AppCompatActivity() {
 
 
     }
-
+    /*
+    37.4113717
+    126.6941462,37.4113717
+     */
 
 
 
@@ -39,7 +42,7 @@ inputField.editText!!.addTextChangedListener {
 naver는 주소 <-> 좌표
 https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode -> 위도, 경도 좌표 return
 
-reverseGc
+reverseGc -> ~시 ~구 ~동
 https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc
 
 

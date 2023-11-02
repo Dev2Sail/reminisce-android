@@ -40,15 +40,15 @@ class TagDetailSummaryViewHolder(
             cardSummaryVisitedCount.root.isGone = true
         }
 
-        if (!location.markerEmoji.isNullOrEmpty()) {
-            viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
-            viewBinding.cardSummaryMarkerEmoji.apply {
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
-                layoutSummaryItemBody.text = location.markerEmoji
-            }
-        } else {
-            viewBinding.cardSummaryMarkerEmoji.root.isGone = true
-        }
+//        if (!location.markerEmoji.isNullOrEmpty()) {
+//            viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
+//            viewBinding.cardSummaryMarkerEmoji.apply {
+//                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
+//                layoutSummaryItemBody.text = location.markerEmoji
+//            }
+//        } else {
+//            viewBinding.cardSummaryMarkerEmoji.root.isGone = true
+//        }
 
         val tagText = tags.withIndex().joinToString { it.value.body }
         if (tagText.isNotEmpty()) {
