@@ -4,6 +4,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
+import studio.hcmc.reminisce.BuildConfig
 import studio.hcmc.reminisce.io.kakao.KAResponse
 import studio.hcmc.reminisce.io.kakao.KCTAResponse
 import studio.hcmc.reminisce.io.kakao.KCTRResponse
@@ -13,7 +14,7 @@ object KakaoIO {
     suspend fun listByKeyword(query: String): KKResponse {
         return httpClient
             .get("https://dapi.kakao.com/v2/local/search/keyword.json") {
-                header("Authorization", "KakaoAK dca0c59f8068207b11af82b122e4fd3d")
+                header("Authorization", "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}")
                 parameter("query", query)
             }.body()
     }
@@ -21,7 +22,7 @@ object KakaoIO {
     suspend fun listByAddress(query: String): KAResponse {
         return httpClient
             .get("https://dapi.kakao.com/v2/local/search/address.json") {
-                header("Authorization", "KakaoAK dca0c59f8068207b11af82b122e4fd3d")
+                header("Authorization", "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}")
                 parameter("query", query)
             }.body()
     }
@@ -29,7 +30,7 @@ object KakaoIO {
     suspend fun getRegionCodeByCoord(longitude: String, latitude: String): KCTRResponse {
         return httpClient
             .get("https://dapi.kakao.com/v2/local/geo/coord2regioncode.json") {
-                header("Authorization", "KakaoAK dca0c59f8068207b11af82b122e4fd3d")
+                header("Authorization", "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}")
                 parameter("x", longitude)
                 parameter("y", latitude)
             }.body()

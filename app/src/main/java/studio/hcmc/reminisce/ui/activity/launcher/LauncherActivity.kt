@@ -10,6 +10,7 @@ import com.naver.maps.map.NaverMapSdk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import studio.hcmc.reminisce.BuildConfig
 import studio.hcmc.reminisce.databinding.ActivityLauncherBinding
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.ui.activity.MainActivity
@@ -22,7 +23,7 @@ class LauncherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityLauncherBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        NaverMapSdk.getInstance(applicationContext).client = NaverMapSdk.NaverCloudPlatformClient("ca36w08yej")
+        NaverMapSdk.getInstance(applicationContext).client = NaverMapSdk.NaverCloudPlatformClient(BuildConfig.NAVER_CLIENT_ID)
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({ prepareSignIn() }, 1000)

@@ -3,6 +3,10 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('keys.properties').newDataInputStream())
+
+
 android {
     namespace 'studio.hcmc.reminisce'
     compileSdk 33
@@ -14,7 +18,12 @@ android {
         versionCode 1
         versionName "1.0"
 
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "KAKAO_REST_API_KEY", properties['kakao_rest_api_key']
+        buildConfigField "String", "NAVER_CLIENT_ID", properties['naver_client_id']
+        buildConfigField "String", "NAVER_CLIENT_SECRET", properties['naver_client_secret']
     }
 
     buildTypes {

@@ -36,7 +36,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
-    private val roadAddress = HashMap<String /* placeId */, String /* roadAddressName or addressName */>()
+    private val roadAddress = HashMap<Int /* locationId */, String /* roadAddressName or addressName */>()
     private val contents = ArrayList<CategoryEditableDetailAdapter.Content>()
     private val selectedIds = HashSet<Int>()
 
@@ -89,9 +89,12 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun getAddressByCoords(longitude: String, latitude: String) = CoroutineScope(Dispatchers.IO).launch {
+    private fun getAddressByCoords(locationId: Int, longitude: String, latitude: String) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { KakaoIO.getAddressByCoord(longitude, latitude) }
             .onSuccess {
+                for (document in it.documents) {
+                    roadAddress[locationId] = document.road_address.address_name ?: document.address.address_name
+                }
 
             }.onFailure {  }
     }
