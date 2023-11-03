@@ -13,6 +13,7 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityCategoryEditableDetailBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
+import studio.hcmc.reminisce.io.ktor_client.KakaoIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
@@ -35,6 +36,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
+    private val roadAddress = HashMap<String /* placeId */, String /* roadAddressName or addressName */>()
     private val contents = ArrayList<CategoryEditableDetailAdapter.Content>()
     private val selectedIds = HashSet<Int>()
 
@@ -87,6 +89,13 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun getAddressByCoords(longitude: String, latitude: String) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { KakaoIO.getAddressByCoord(longitude, latitude) }
+            .onSuccess {
+
+            }.onFailure {  }
+    }
+
     private fun prepareContents() {
         for (location in locations.sortedByDescending { it.id }) {
             contents.add(CategoryEditableDetailAdapter.DetailContent(
@@ -122,7 +131,14 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
         }
+
+        override fun getAddress(longitude: Double, latitude: Double): String {
+            TODO("Not yet implemented")
+
+        }
     }
+
+
 
     private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
         runCatching {

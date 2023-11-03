@@ -25,10 +25,7 @@ class LauncherActivity : AppCompatActivity() {
         NaverMapSdk.getInstance(applicationContext).client = NaverMapSdk.NaverCloudPlatformClient("ca36w08yej")
 
         val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-                prepareSignIn()
-            }, 1000
-        )
+        handler.postDelayed({ prepareSignIn() }, 1000)
     }
 
     override fun onPause() {

@@ -26,7 +26,7 @@ class WriteSelectVisitedAtDialog(
         viewBinding = DialogSelectVisitedAtBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
         val now = Date(System.currentTimeMillis())
-        viewBinding.dialogSelectVisitedAtField.placeholderText = now.toString()
+        viewBinding.dialogSelectVisitedAtEditText.hint = now.toString()
         watcher = viewBinding.dialogSelectVisitedAtField.editText!!.addTextChangedListener {
             dateInputFormatter(it!!)
             val input = viewBinding.dialogSelectVisitedAtField.string

@@ -16,6 +16,8 @@ class SummaryViewHolder(
     interface Delegate {
         fun onItemClick(locationId: Int): Boolean
         fun getUser(userId: Int): UserVO
+
+        fun getAddress(longitude: Double, latitude: Double): String
     }
 
     constructor(parent: ViewGroup, delegate: Delegate ): this(
@@ -25,11 +27,8 @@ class SummaryViewHolder(
 
     fun bind(content: CategoryEditableDetailAdapter.DetailContent) {
         val (location, tags, friends) = content
-
-        val addressBuilder = StringBuilder()
+        val address = delegate.getAddress(location.longitude, location.latitude)
         // TODO 좌표 -> 주소로 변환 후 getString에서 정해둔 포맷으로 넣으셈! (date_separator) 참고
-        addressBuilder.append(location.latitude)
-        addressBuilder.append(location.longitude)
 
         val (year, month, day) = location.visitedAt.split("-")
         viewBinding.apply {
@@ -37,7 +36,7 @@ class SummaryViewHolder(
             cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
             cardCheckableSummaryVisitedCount.root.isGone = true
             cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-            cardCheckableSummaryAddress.layoutSummaryItemBody.text = addressBuilder.toString()
+            cardCheckableSummaryAddress.layoutSummaryItemBody.text = address
         }
 
         val tagText = tags.withIndex().joinToString { it.value.body }

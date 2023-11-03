@@ -32,14 +32,17 @@
         android:layout_marginTop="@dimen/margin_regular"
         app:endIconMode="clear_text"
         app:errorEnabled="true"
+        app:hintEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_select_visited_at_title">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/dialog_select_visited_at_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="date"
+            android:hint=""
             android:fontFamily="@font/pretendard_medium"
             android:maxLength="10"
             android:textSize="@dimen/body_large" />

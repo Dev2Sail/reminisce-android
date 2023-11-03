@@ -41,7 +41,7 @@ class CategoryDetailActivity : AppCompatActivity() {
     private lateinit var locations: List<LocationVO>
 
     private val categoryEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
-//    private val writeByCategoryIdLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onAddResult)
+    private val writeByCategoryIdLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onWriteResult)
 
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val position by lazy { intent.getIntExtra("position", -1) }
@@ -60,20 +60,14 @@ class CategoryDetailActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.categoryDetailAppbar.apply {
-            appbarTitle.text = getText(R.string.header_view_holder_title)
-            appbarActionButton1.isVisible = false
-            appbarBack.setOnClickListener { finish() }
-        }
-
+        viewBinding.categoryDetailAppbar.appbarTitle.text = getText(R.string.header_view_holder_title)
+        viewBinding.categoryDetailAppbar.appbarActionButton1.isVisible = false
+        viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.categoryDetailAddButton.setOnClickListener {
-            // TODO writeActivity 성공 시 result
-            Intent(this@CategoryDetailActivity, WriteActivity::class.java).apply {
-                putExtra("categoryId", categoryId)
-                startActivity(this)
-            }
+            val intent = Intent(this, WriteActivity::class.java)
+                .putExtra("categoryId", categoryId)
+            writeByCategoryIdLauncher.launch(intent)
         }
-
         loadContents()
     }
 
@@ -218,10 +212,18 @@ class CategoryDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun onAddResult(activityResult: ActivityResult) {
-        // 메모 저장 성공했을 때
-        if (activityResult.resultCode == Activity.RESULT_OK) {
-
+    private fun onWriteResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
+            contents.removeAll {it is CategoryDetailAdapter.Content}
+            loadContents()
+            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener {
+                Intent()
+                    .putExtra("isModified", true)
+                    .putExtra("categoryId", categoryId)
+                    .putExtra("position", position)
+                    .setActivity(this, Activity.RESULT_OK)
+                finish()
+            }
         }
     }
 }

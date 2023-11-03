@@ -1,11 +1,31 @@
 package studio.hcmc.reminisce.ui.activity.map
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.databinding.ActivitySearchLocationBinding
+import studio.hcmc.reminisce.io.kakao.KKPlaceInfo
+import studio.hcmc.reminisce.io.ktor_client.KakaoIO
+import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.setActivity
+import studio.hcmc.reminisce.util.string
 
 class SearchLocationActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySearchLocationBinding
+    private lateinit var places: List<KKPlaceInfo>
+    private lateinit var adapter: SearchLocationAdapter
+
+    private val contents = ArrayList<SearchLocationAdapter.Content>()
+    private val coords = HashMap<String /* place.id */, String /* longitude, latitude */>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivitySearchLocationBinding.inflate(layoutInflater)
@@ -16,34 +36,68 @@ class SearchLocationActivity : AppCompatActivity() {
 
     private fun initView() {
         viewBinding.searchLocationBackIcon.setOnClickListener { finish() }
-//        viewBinding.searchLocationField.editText!!.setOnEditorActionListener { v, actionId, event ->
-//            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-//            }
-//        }
+        viewBinding.searchLocationField.editText!!.setOnEditorActionListener { _, actionId, event ->
+            val input = viewBinding.searchLocationField.string
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || event.keyCode == KeyEvent.KEYCODE_SEARCH && event.action == KeyEvent.ACTION_DOWN) {
+                fetchSearchResult(input)
 
+                return@setOnEditorActionListener true
+            }
 
-    }
-    /*
-    37.4113717
-    126.6941462,37.4113717
-     */
-
-
-
-
-}
-/*
-inputField.editText!!.addTextChangedListener {
-            appBar.appbarActionButton1.isEnabled = inputField.text.isNotEmpty() && inputField.text.length >= 5
+            false
         }
- */
+    }
 
-/*
-naver는 주소 <-> 좌표
-https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode -> 위도, 경도 좌표 return
+    private fun fetchSearchResult(value: String) = CoroutineScope(Dispatchers.IO).launch {
+        val result = runCatching { KakaoIO.listByKeyword(value) }
+            .onSuccess {
+                places = it.documents
+                for (document in it.documents) {
+                    val builder = StringBuilder()
+                    builder.append(document.x)
+                    builder.append(", ")
+                    builder.append(document.y)
+                    coords[document.id] = builder.toString()
+                }
+            }.onFailure { LocalLogger.e(it) }
+        if (result.isSuccess) {
+            prepareContents()
+            withContext(Dispatchers.Main) { onContentsReady() }
+        }
+    }
 
-reverseGc -> ~시 ~구 ~동
-https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc
+    private fun prepareContents() {
+        for (place in places) {
+            contents.add(SearchLocationAdapter.PlaceContent(
+                place.id,
+                place.place_name,
+                place.category_name.split(">").last().trim(' '),
+                place.road_address_name.ifEmpty { place.address_name }
+            ))
+        }
+        //places.mapTo(contents) { SearchLocationAdapter.PlaceContent(it.place_name, it.category_name.split(">").last(), it.road_address_name) }
+    }
 
+    private fun onContentsReady() {
+        viewBinding.searchLocationItems.layoutManager = LinearLayoutManager(this)
+        adapter = SearchLocationAdapter(adapterDelegate, itemDelegate)
+        viewBinding.searchLocationItems.adapter = adapter
+    }
 
- */
+    private val adapterDelegate = object : SearchLocationAdapter.Delegate {
+        override fun getItemCount() = contents.size
+        override fun getItem(position: Int) = contents[position]
+    }
+
+    private val itemDelegate = object : SearchLocationItemViewHolder.Delegate {
+        override fun onClick(placeId: String, title: String, roadAddress: String) {
+            Intent()
+                .putExtra("place", title)
+                .putExtra("roadAddress", roadAddress)
+                .putExtra("longitude", coords[placeId]!!.split(",")[0].toDouble())
+                .putExtra("latitude", coords[placeId]!!.split(",")[1].toDouble())
+                .setActivity(this@SearchLocationActivity, Activity.RESULT_OK)
+            finish()
+        }
+    }
+}

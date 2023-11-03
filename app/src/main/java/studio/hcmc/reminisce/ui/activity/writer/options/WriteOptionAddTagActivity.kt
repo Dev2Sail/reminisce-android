@@ -108,9 +108,7 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
         }
 
         field.addView(newChip)
-        viewBinding.writeOptionsAddTagAppbar.apply {
-            appbarActionButton1.isEnabled = field.childCount != 0
-        }
+        viewBinding.writeOptionsAddTagAppbar.appbarActionButton1.isEnabled = field.childCount != 0
     }
 
     private fun addSavedChip(id: Int, value: String) {
@@ -127,9 +125,7 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
                 selectedTagIds.remove(id)
             }
 
-            viewBinding.writeOptionsAddTagAppbar.apply {
-                appbarActionButton1.isEnabled = newTags.isNotEmpty() && selectedTagIds.isNotEmpty()
-            }
+            viewBinding.writeOptionsAddTagAppbar.appbarActionButton1.isEnabled = newTags.isNotEmpty() && selectedTagIds.isNotEmpty()
         }
 
         viewBinding.writeOptionsAddTagOld.addView(chip)

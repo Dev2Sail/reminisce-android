@@ -10,17 +10,19 @@ class WriteOptionsDialog(
     delegate: Delegate
 ) {
     interface Delegate {
-        fun addTagClick()
-        fun addFriendClick()
-        fun selectCategoryClick()
+        fun onTagClick()
+        fun onFriendClick()
+        fun onCategoryClick()
     }
 
+    private var viewBinding: DialogWriteOptionsBinding
+
     init {
-        val viewBinding = DialogWriteOptionsBinding.inflate(LayoutInflater.from(activity))
+        viewBinding = DialogWriteOptionsBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        viewBinding.writeOptionsNextFriend.setOnClickListener { delegate.addFriendClick() }
-        viewBinding.writeOptionsNextTag.setOnClickListener { delegate.addTagClick() }
-        viewBinding.writeOptionsNextCategory.setOnClickListener { delegate.selectCategoryClick() }
+        viewBinding.writeOptionsNextFriend.setOnClickListener { delegate.onFriendClick() }
+        viewBinding.writeOptionsNextTag.setOnClickListener { delegate.onTagClick() }
+        viewBinding.writeOptionsNextCategory.setOnClickListener { delegate.onCategoryClick() }
         dialog.show()
     }
 }

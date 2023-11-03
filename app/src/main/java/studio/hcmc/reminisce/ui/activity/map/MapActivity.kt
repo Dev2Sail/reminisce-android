@@ -101,7 +101,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         val defaultMarker = Marker()
-        defaultMarker.position = LatLng(37.40959, 126.6951245)
+//        defaultMarker.position = LatLng(37.40959, 126.6951245)
+        defaultMarker.position = LatLng(37.4095882722825, 126.69511383777056)
         defaultMarker.map = naverMap
         defaultMarker.icon = MarkerIcons.BLACK
         defaultMarker.iconTintColor = getColor(R.color.md_theme_light_primary)
