@@ -19,8 +19,6 @@ class TagDetailHeaderViewHolder(
 
     fun bind(content: TagDetailAdapter.HeaderContent) {
         viewBinding.cardCommonDetailHeaderTitle.text = content.title
-        viewBinding.cardCommonDetailHeaderAction1.setOnClickListener {
-            delegate.onEditClick()
-        }
+        viewBinding.cardCommonDetailHeaderAction1.setOnClickListener { delegate.onEditClick() }
     }
 }

@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.databinding.ActivityWriteBinding
 import studio.hcmc.reminisce.dto.location.LocationDTO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
@@ -46,39 +45,36 @@ class WriteActivity : AppCompatActivity() {
             }
             if (writeOptions["place"] != null && writeOptions["visitedAt"] != null) {
                 writeOptions["body"] = viewBinding.writeTextContainer.string
-                postContents()
+                prepareContents()
             }
         }
-        viewBinding.writeVisitedAt.setOnClickListener { WriteSelectVisitedAtDialog(this@WriteActivity, visitedAtDelegate) }
+        viewBinding.writeVisitedAt.setOnClickListener { WriteSelectVisitedAtDialog(this, visitedAtDelegate) }
+        viewBinding.writeMarkerEmoji.setOnClickListener { WriteSelectEmojiDialog(this, emojiDelegate) }
         viewBinding.writeLocation.setOnClickListener {
             val intent = Intent(this, SearchLocationActivity::class.java)
             searchLocationLauncher.launch(intent)
         }
     }
 
-    private fun postContents() = CoroutineScope(Dispatchers.IO).launch {
+    private fun prepareContents() {
         val dto = LocationDTO.Post().apply {
             this.categoryId = this@WriteActivity.categoryId
-            markerEmoji = null
+            this.markerEmoji = writeOptions["emoji"] as String?
+            this.latitude = writeOptions["latitude"] as Double
+            this.longitude = writeOptions["longitude"] as Double
+            this.roadAddress = writeOptions["roadAddress"] as String
             this.title = writeOptions["place"] as String
-            body = writeOptions["body"] as String
-            latitude = writeOptions["latitude"] as Double
-            longitude = writeOptions["longitude"] as Double
-            visitedAt = writeOptions["visitedAt"] as String
+            this.body = writeOptions["body"] as String
+            this.visitedAt = writeOptions["visitedAt"] as String
         }
+        postContents(dto)
+    }
 
+    private fun postContents(dto: LocationDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.post(dto) }
-            .onSuccess {
-                withContext(Dispatchers.Main) {
-                    val intent = Intent(this@WriteActivity, WriteOptionsActivity::class.java)
-                        .putExtra("locationId", it.id)
-                        .putExtra("categoryId", categoryId)
-                        .putExtra("visitedAt", writeOptions["visitedAt"].toString())
-                        .putExtra("place", writeOptions["place"].toString())
-                    writeOptionsLauncher.launch(intent)
-                    finish()
-                }
-            }.onFailure { LocalLogger.e(it) }
+//            .onSuccess { withContext(Dispatchers.Main) { launchWriteOptions(it.id) } }
+            .onSuccess { launchWriteOptions(it.id) }
+            .onFailure { LocalLogger.e(it) }
     }
 
     private val visitedAtDelegate = object : WriteSelectVisitedAtDialog.Delegate {
@@ -86,6 +82,23 @@ class WriteActivity : AppCompatActivity() {
             viewBinding.writeVisitedAt.text = date
             writeOptions["visitedAt"] = date
         }
+    }
+
+    private val emojiDelegate = object : WriteSelectEmojiDialog.Delegate {
+        override fun onSaveClick(value: String?) {
+            viewBinding.writeMarkerEmoji.text = value
+            writeOptions["emoji"] = value
+        }
+    }
+
+    private fun launchWriteOptions(locationId: Int) {
+        val intent = Intent(this@WriteActivity, WriteOptionsActivity::class.java)
+            .putExtra("locationId", locationId)
+            .putExtra("categoryId", categoryId)
+            .putExtra("visitedAt", writeOptions["visitedAt"].toString())
+            .putExtra("place", writeOptions["place"].toString())
+        writeOptionsLauncher.launch(intent)
+        finish()
     }
 
     private fun onSearchLocationResult(activityResult: ActivityResult) {
@@ -98,6 +111,7 @@ class WriteActivity : AppCompatActivity() {
             viewBinding.writeLocation.text = roadAddress
             viewBinding.writeAppbar.appbarTitle.text = place
             writeOptions["place"] = place!!
+            writeOptions["roadAddress"] = roadAddress
             writeOptions["longitude"] = longitude!!
             writeOptions["latitude"] = latitude!!
         }

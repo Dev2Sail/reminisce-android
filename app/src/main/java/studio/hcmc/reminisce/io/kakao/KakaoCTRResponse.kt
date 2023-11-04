@@ -24,11 +24,11 @@ data class KCTRDocument(
     @SerialName("address_name")
     val addressName: String, // 전체 지역 명칭
     @SerialName("region_1depth_name")
-    val region1depthName: String, // 지역 1Depth, 시도 단위 (바다 x)
+    val region1depthName: String?, // 지역 1Depth, 시도 단위 (바다 x)
     @SerialName("region_2depth_name")
-    val region2depthName: String, // 지역 2Depth, 구 단위 (바다 x)
+    val region2depthName: String?, // 지역 2Depth, 구 단위 (바다 x)
     @SerialName("region_3depth_name")
-    val region3depthName: String, // 지역 3Depth, 동 단위 (바다 x)
+    val region3depthName: String?, // 지역 3Depth, 동 단위 (바다 x)
     val code: String, // Region Code
     @SerialName("x")
     val longitude: Double,

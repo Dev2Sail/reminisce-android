@@ -50,11 +50,9 @@ class TagDetailActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.tagDetailAppbar.apply {
-            appbarTitle.text = getString(R.string.header_view_holder_title)
-            appbarActionButton1.isVisible = false
-            appbarBack.setOnClickListener { finish() }
-        }
+        viewBinding.tagDetailAppbar.appbarTitle.text = getString(R.string.header_view_holder_title)
+        viewBinding.tagDetailAppbar.appbarActionButton1.isVisible = false
+        viewBinding.tagDetailAppbar.appbarBack.setOnClickListener { finish() }
         prepareTag()
     }
 

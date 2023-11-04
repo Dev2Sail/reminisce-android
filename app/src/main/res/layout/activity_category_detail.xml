@@ -28,18 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_regular"
         android:layout_marginBottom="@dimen/margin_regular"
-        android:src="@drawable/round_edit_24"
+        android:src="@drawable/round_favorite_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--        android:id="@+id/category_detail_add_button"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginEnd="@dimen/margin_regular"-->
-<!--        android:layout_marginBottom="@dimen/margin_regular"-->
-<!--        android:backgroundTint="@color/md_theme_light_tertiaryContainer"-->
-<!--        android:src="@drawable/round_edit_24"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>

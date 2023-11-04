@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.databinding.ActivitySearchLocationBinding
 import studio.hcmc.reminisce.io.kakao.KKPlaceInfo
 import studio.hcmc.reminisce.io.ktor_client.KakaoIO
+import studio.hcmc.reminisce.io.ktor_client.MoisIO
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.util.string
@@ -24,13 +25,19 @@ class SearchLocationActivity : AppCompatActivity() {
     private lateinit var adapter: SearchLocationAdapter
 
     private val contents = ArrayList<SearchLocationAdapter.Content>()
-    private val coords = HashMap<String /* place.id */, String /* longitude, latitude */>()
+    private val placeInfo = HashMap<String /* placeId */, Place>()
+    private val roadAddress = HashMap<String /* placeId*/, String>()
+
+    private data class Place(
+        val placeName: String,
+        val longitude: String,
+        val latitude: String
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivitySearchLocationBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 
@@ -53,11 +60,12 @@ class SearchLocationActivity : AppCompatActivity() {
             .onSuccess {
                 places = it.documents
                 for (document in it.documents) {
-                    val builder = StringBuilder()
-                    builder.append(document.longitude)
-                    builder.append(", ")
-                    builder.append(document.latitude)
-                    coords[document.id] = builder.toString()
+                    placeInfo[document.id] = Place(document.placeName, document.longitude, document.latitude)
+                    if (document.roadAddressName.isNullOrEmpty()) {
+                        getRoadAddress(document.id, document.addressName)
+                    } else {
+                        roadAddress[document.id] = document.roadAddressName
+                    }
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
@@ -66,13 +74,23 @@ class SearchLocationActivity : AppCompatActivity() {
         }
     }
 
+    private fun getRoadAddress(placeId: String, address: String) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { MoisIO.transformAddress(address) }
+            .onSuccess {
+                LocalLogger.v("${it.juso.roadAddr}")
+                roadAddress[placeId] = it.juso.roadAddr
+            } // 도로명 주소 통일 }
+            .onFailure { LocalLogger.e(it) }
+    }
+
     private fun prepareContents() {
         for (place in places) {
             contents.add(SearchLocationAdapter.PlaceContent(
                 place.id,
                 place.placeName,
                 place.categoryName.split(">").last().trim(' '),
-                place.roadAddressName.ifEmpty { place.addressName }
+//                place.roadAddressName.ifEmpty { roadAddress[place.id]!! } // ifEmpty moisIO 요청 후 도로명주소 기재
+                roadAddress[place.id]!!
             ))
         }
         //places.mapTo(contents) { SearchLocationAdapter.PlaceContent(it.place_name, it.category_name.split(">").last(), it.road_address_name) }
@@ -90,12 +108,14 @@ class SearchLocationActivity : AppCompatActivity() {
     }
 
     private val itemDelegate = object : SearchLocationItemViewHolder.Delegate {
-        override fun onClick(placeId: String, title: String, roadAddress: String) {
+        override fun onClick(placeId: String, placeName: String, roadAddress: String) {
             Intent()
-                .putExtra("place", title)
+                .putExtra("place", placeName)
                 .putExtra("roadAddress", roadAddress)
-                .putExtra("longitude", coords[placeId]!!.split(",")[0].toDouble())
-                .putExtra("latitude", coords[placeId]!!.split(",")[1].toDouble())
+                .putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
+                .putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
+//                .putExtra("longitude", coords[placeId]!!.split(",")[0].toDouble())
+//                .putExtra("latitude", coords[placeId]!!.split(",")[1].toDouble())
                 .setActivity(this@SearchLocationActivity, Activity.RESULT_OK)
             finish()
         }

@@ -13,15 +13,14 @@ class WriteSelectEmojiDialog(
     delegate: Delegate
 ) {
     interface Delegate {
-        fun onSaveClick(value: String)
+        fun onSaveClick(value: String?)
     }
 
     init {
         val viewBinding = DialogSelectEmojiBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
         viewBinding.dialogSelectEmojiField.editText!!.addTextChangedListener {
-            val input = viewBinding.dialogSelectEmojiField.string
-            viewBinding.dialogSelectSave.isEnabled = input.isEmoji()
+            viewBinding.dialogSelectSave.isEnabled = viewBinding.dialogSelectEmojiField.string.isEmoji()
         }
         viewBinding.dialogSelectCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogSelectSave.setOnClickListener {

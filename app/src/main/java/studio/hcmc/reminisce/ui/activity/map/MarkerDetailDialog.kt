@@ -8,18 +8,20 @@ import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 class MarkerDetailDialog(
     activity: Activity,
     delegate: Delegate,
-    placeName: String
+    placeName: String,
+    address: String
 ) {
     interface Delegate {
-        fun onClick()
+        fun onClick(placeName: String)
     }
 
     init {
         val viewBinding = DialogMarkerDetailBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
         viewBinding.dialogMarkerDetailPlace.text = placeName
-        viewBinding.dialogMarkerDetailNext.setOnClickListener { delegate.onClick() }
-        viewBinding.dialogMarkerDetailNextIcon.setOnClickListener { delegate.onClick() }
+        viewBinding.dialogMarkerDetailAddress.text = address
+        viewBinding.dialogMarkerDetailNext.setOnClickListener { delegate.onClick(placeName) }
+        viewBinding.dialogMarkerDetailNextIcon.setOnClickListener { delegate.onClick(placeName) }
         dialog.show()
     }
 }

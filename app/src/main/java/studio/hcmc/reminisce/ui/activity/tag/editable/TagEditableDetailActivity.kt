@@ -48,13 +48,10 @@ class TagEditableDetailActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.tagEditableDetailAppbar.apply {
-            appbarTitle.text = body
-            appbarBack.setOnClickListener { finish() }
-            appbarActionButton1.text = getString(R.string.dialog_remove)
-            appbarActionButton1.setOnClickListener { fetchContents(selectedIds) }
-        }
-
+        viewBinding.tagEditableDetailAppbar.appbarTitle.text = body
+        viewBinding.tagEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.tagEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
+        viewBinding.tagEditableDetailAppbar.appbarActionButton1.setOnClickListener { fetchContents(selectedIds) }
         loadContents()
     }
 

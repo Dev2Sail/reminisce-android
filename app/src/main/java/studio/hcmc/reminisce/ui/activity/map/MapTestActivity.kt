@@ -4,18 +4,19 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
-import com.naver.maps.map.util.MapConstants
+import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.MarkerIcons
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityMapTestBinding
+import studio.hcmc.reminisce.databinding.LayoutCustomMarkerBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.util.LocalLogger
@@ -23,18 +24,24 @@ import studio.hcmc.reminisce.util.LocalLogger
 class MapTestActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var viewBinding: ActivityMapTestBinding
     private lateinit var naverMap: NaverMap
+
     private var mapView: MapView? = null
+    private val markerInfo = HashMap<String, Place>()
+    private val markers = ArrayList<Marker>(markerInfo.size)
+    private val customMarkerInfo = HashMap<String, PlaceWithEmoji>()
+    private val customMarkers = ArrayList<Marker>(customMarkerInfo.size)
 
-//    private val placeInfo = ArrayList<MarkerInfo>()
+    private data class Place(
+        val address: String,
+        val latitude: Double,
+        val longitude: Double
+    )
 
-    private val coords = ArrayList<SavedCoords>()
-    private val markers = ArrayList<Marker>()
-
-    private val bounds = LatLngBounds.Builder()
-
-    data class SavedCoords(
-        val longitude: Double,
-        val latitude: Double
+    private data class PlaceWithEmoji(
+        val emoji: String,
+        val address: String,
+        val latitude: Double,
+        val longitude: Double
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,57 +49,136 @@ class MapTestActivity : AppCompatActivity(), OnMapReadyCallback {
         viewBinding = ActivityMapTestBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        preparePlace()
-
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setDisplayShowHomeEnabled(true)
         }
+
         mapView = viewBinding.testNavermap
         mapView?.getMapAsync(this) // onMapReady 호출
         mapView?.onCreate(savedInstanceState)
-        prepareMarkers()
-
-    }
-
-    private fun preparePlace() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@MapTestActivity)
-        runCatching { LocationIO.listByUserId(user.id) }
-            .onSuccess {
-                for (location in it) {
-                    coords.add(SavedCoords(location.longitude, location.latitude))
-                }
-            }.onFailure { LocalLogger.e(it) }
-    }
-
-    private fun prepareMarkers() {
-        for (i in 0 until coords.size) {
-            markers[i] = Marker().apply {
-                map = naverMap
-                icon = MarkerIcons.BLACK
-                iconTintColor = getColor(R.color.md_theme_light_primary)
-                isHideCollidedSymbols = true
-                position = LatLng(coords[i].longitude, coords[i].latitude)
-            }
-//            val marker = Marker().apply {
-//                map = naverMap
-//                icon = MarkerIcons.BLACK
-//                iconTintColor = getColor(R.color.md_theme_light_primary)
-//                isHideCollidedSymbols = true
-//                position = LatLng(coords[i].longitude, coords[i].latitude)
-//            }
-        }
     }
 
     override fun onMapReady(map: NaverMap) {
         naverMap = map
-        naverMap.maxZoom = MapConstants.MIN_ZOOM_KOREA
-        uiSetting()
-
+        prepareSetting()
+        preparePlace()
     }
 
-    private fun initView() {
-        // display multiple marker Kakao CTA
+    private fun preparePlace() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@MapTestActivity)
+        val result = runCatching { LocationIO.listByUserId(user.id) }
+            .onSuccess { it -> it.forEach {
+                if (it.markerEmoji.isNullOrEmpty()) {
+                    if (!markerInfo.containsKey(it.title)) {
+                        markerInfo[it.title] = Place(it.roadAddress, it.latitude, it.longitude)
+                    }
+                } else {
+                    if (!customMarkerInfo.containsKey(it.title)) {
+                        customMarkerInfo[it.title] = PlaceWithEmoji(
+                            it.markerEmoji!!,
+                            it.roadAddress,
+                            it.latitude,
+                            it.longitude
+                        )
+                    }
+                }
+
+            }
+                for (location in it) {
+                    if (location.markerEmoji.isNullOrEmpty()) {
+                        if (!markerInfo.containsKey(location.title)) {
+                            markerInfo[location.title] = Place(location.roadAddress, location.latitude, location.longitude)
+                        }
+                    } else {
+                        if (!customMarkerInfo.containsKey(location.title)) {
+                            customMarkerInfo[location.title] = PlaceWithEmoji(
+                                location.markerEmoji!!,
+                                location.roadAddress,
+                                location.latitude,
+                                location.longitude
+                            )
+                        }
+                    }
+
+                }
+            }.onFailure { LocalLogger.e(it) }
+        if (result.isSuccess) { withContext(Dispatchers.Main) { buildMarkers() } }
+    }
+
+    private fun buildMarkers() {
+        for (place in markerInfo) {
+            markers.add(prepareMarker(
+                place.key,
+                place.value.address,
+                place.value.latitude,
+                place.value.longitude
+            ))
+        }
+        for (place in customMarkerInfo) {
+            customMarkers.add(prepareCustomMarker(
+                place.value.emoji,
+                place.key,
+                place.value.address,
+                place.value.latitude,
+                place.value.longitude
+            ))
+        }
+    }
+
+    private fun prepareMarker(place: String, address: String, latitude: Double, longitude: Double): Marker {
+        return Marker().apply {
+            position = LatLng(latitude, longitude)
+            icon = MarkerIcons.BLACK
+            iconTintColor = getColor(R.color.md_theme_light_primary)
+            isHideCollidedSymbols = true
+            setOnClickListener {
+                MarkerDetailDialog(this@MapTestActivity, detailDialogDelegate, place, address)
+
+                false
+            }
+            map = naverMap
+        }
+    }
+
+    private fun prepareCustomMarker(emoji: String, place: String, address: String, latitude: Double, longitude: Double): Marker {
+        val emojiView = LayoutCustomMarkerBinding.inflate(layoutInflater)
+        emojiView.root.text = emoji
+        val customMarker = Marker().apply {
+            position = LatLng(latitude, longitude)
+            icon = OverlayImage.fromView(emojiView.root)
+            isHideCollidedSymbols = true
+            setOnClickListener {
+                MarkerDetailDialog(this@MapTestActivity, detailDialogDelegate, place, address)
+
+                false
+            }
+            map = naverMap
+        }
+
+        return customMarker
+    }
+
+    private val detailDialogDelegate = object : MarkerDetailDialog.Delegate {
+        override fun onClick(placeName: String) {
+            // TODO getByTitle recyclerview
+        }
+    }
+
+    private fun prepareSetting() {
+        naverMap.isIndoorEnabled = true // 실내지도 활성화
+        naverMap.uiSettings.apply {
+            isLocationButtonEnabled = true // 위치 추적 모드 표현
+            isZoomControlEnabled = true
+            isZoomGesturesEnabled = true
+            isTiltGesturesEnabled = false
+            isRotateGesturesEnabled = false
+            isScaleBarEnabled = true
+            isCompassEnabled = false // 나침반 활성화
+        }
+    }
+
+    private fun initOnClick() {
 
 
 //        naverMap.setOnMapClickListener { pointF, latLng ->
@@ -115,40 +201,6 @@ class MapTestActivity : AppCompatActivity(), OnMapReadyCallback {
 //            Toast.makeText(this, "${it.latitude}, ${it.longitude} // ${it.accuracy}", Toast.LENGTH_SHORT).show()
 //        }
     }
-
-    private fun buildBounds() {
-
-        bounds
-            .include(LatLng(37.4462920026041, 126.372737043106))
-            .include(LatLng(37.49592797039814, 126.56541222674704))
-            .include(LatLng(37.47186060562196, 126.66066670198887))
-            .include(LatLng(37.46989474547404, 126.66071402353639))
-            .build()
-    }
-
-    private fun marker() {
-        val defaultMarker = Marker()
-        defaultMarker.map = naverMap
-        defaultMarker.icon = MarkerIcons.BLACK
-        defaultMarker.iconTintColor = getColor(R.color.md_theme_light_primary)
-        defaultMarker.isHideCollidedSymbols = true
-
-
-
-    }
-
-    private fun uiSetting() {
-        naverMap.isIndoorEnabled = true // 실내지도 활성화
-
-        val mapUiSetting = naverMap.uiSettings
-        mapUiSetting.isLocationButtonEnabled = true // 위치 추적 모드 표현
-        mapUiSetting.isZoomControlEnabled = true
-        mapUiSetting.isTiltGesturesEnabled = false
-        mapUiSetting.isRotateGesturesEnabled = false
-        mapUiSetting.isScaleBarEnabled = true
-        mapUiSetting.isCompassEnabled = false // 나침반 활성화
-    }
-
 
     override fun onOptionsItemSelected(item: MenuItem) =
         if (item.itemId == R.id.nav_main_home) {
@@ -193,37 +245,24 @@ class MapTestActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView?.onLowMemory()
     }
 }
-//        val bounds = LatLngBounds.Builder() // 마커 여러 개
-//            // user의 location 조회 후 latitude, longitude insert
-//            .include(LatLng(37.5640984, 126.9712268))
-//            .build()
 
-//        val infoWindow = InfoWindow() // display marker information
-//        infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(this) {
-//            override fun getText(p0: InfoWindow): CharSequence {
-//                return "장소"
-//
-//            }
-//        }
-//
-//        val markerListener = Overlay.OnClickListener {
-//            val marker = it as Marker
-//
-//            if (marker.infoWindow == null) {
-//                infoWindow.open(marker)
-//            } else {
-//                infoWindow.close()
-//            }
-//
-//            true
-//        }
-//defaultMarker.onClickListener = markerListener
-//        marker().onClickListener = markerListener
+private fun buildBounds() {
+
+//        bounds
+//            .include(LatLng(37.4462920026041, 126.372737043106))
+//            .include(LatLng(37.49592797039814, 126.56541222674704))
+//            .include(LatLng(37.47186060562196, 126.66066670198887))
+//            .include(LatLng(37.46989474547404, 126.66071402353639))
+//            .build()
+}
 
 /*
-defaultMarker.setOnClickListener {
-            Toast.makeText(this, "Marker Click", Toast.LENGTH_SHORT).show()
-            // OnMapClick x
-            true
-        }
- */
+   curl -G "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode" \
+   --data-urlencode "query=숙골로 113" \
+   -H "X-NCP-APIGW-API-KEY-ID: ca36w08yej" \
+   -H "X-NCP-APIGW-API-KEY: 4cNOUIR7r6l3F1j82BXvZaNtXOmqVYwDRxNMVHrW" -v
+    */
+// https://github.com/navermaps/android-map-sdk/tree/master/app/src/main/java/com/naver/maps/map/demo/kotlin/overlay
+// https://navermaps.github.io/maps.js.ncp/docs/tutorial-digest.example.html
+// https://api.ncloud-docs.com/docs/ai-naver-mapsgeocoding-geocode
+// https://velog.io/@soyoung-dev/AndroidKotlin-%EB%84%A4%EC%9D%B4%EB%B2%84-%EC%A7%80%EB%8F%84-API-%EB%A7%88%EC%BB%A4-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0%EB%A7%81

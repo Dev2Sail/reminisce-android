@@ -13,7 +13,6 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityCategoryEditableDetailBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
-import studio.hcmc.reminisce.io.ktor_client.KakaoIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
@@ -49,14 +48,14 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.categoryEditableDetailAppbar.apply {
-            appbarTitle.text = title
-            appbarBack.setOnClickListener { finish() }
-            appbarActionButton1.text = getString(R.string.dialog_remove)
-            appbarActionButton1.setOnClickListener {
-                fetchContents(selectedIds)
-            }
+        viewBinding.categoryEditableDetailAppbar.appbarTitle.text = when (title) {
+            "Default" -> getString(R.string.category_view_holder_title)
+            "new" -> getString(R.string.add_category_body)
+            else -> title
         }
+        viewBinding.categoryEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.categoryEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
+        viewBinding.categoryEditableDetailAppbar.appbarActionButton1.setOnClickListener { fetchContents(selectedIds) }
 
         loadContents()
     }
@@ -70,10 +69,10 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
                     tagInfo[location.id] = TagIO.listByLocationId(location.id)
                     friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
                     LocalLogger.v("${location.latitude} // ${location.longitude}")
-                    fetchAddressByCoords(location.id, location.longitude.toString(), location.latitude.toString())
-
+//                    fetchAddressByCoords(location.id, location.longitude.toString(), location.latitude.toString())
                 }
-                                for (friends in friendInfo.values) {
+
+                for (friends in friendInfo.values) {
                     for (friend in friends) {
                         if (friend.nickname == null) {
                             val opponent = UserIO.getById(friend.opponentId)
@@ -84,7 +83,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             }.onFailure { LocalLogger.e(it) }
 
         if (result.isSuccess) {
-            prepareAddress()
+//            prepareAddress()
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
@@ -96,7 +95,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         for (location in locations) {
             val longitudeToString = location.longitude.toString()
             val latitudeToString = location.latitude.toString()
-            fetchAddressByCoords(location.id, longitudeToString, latitudeToString)
+//            fetchAddressByCoords(location.id, longitudeToString, latitudeToString)
         }
     }
     private fun prepareContents() {
@@ -108,28 +107,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             ))
         }
     }
-
-    private fun fetchAddressByCoords(locationId: Int, longitude: String, latitude: String) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { KakaoIO.getAddressByCoord(longitude, latitude) }
-            .onSuccess {
-//                LocalLogger.v("meta: ${it.meta}")
-                for (document in it.documents) {
-//                    LocalLogger.v("responses : ${document.roadAddress.addressName} \n ${document.address.addressName}")
-                    addressList[locationId] = document.roadAddress.addressName.ifEmpty { document.address.addressName }
-                }
-            }.onFailure { LocalLogger.e("Kakao Address By Coords Fail", it)}
-    }
-
-//    private fun fetchRegionCodeByCoords(locationId: Int, longitude: String, latitude: String) = CoroutineScope(Dispatchers.IO).launch {
-//        runCatching { KakaoIO.getRegionCodeByCoord(longitude, latitude) }
-//            .onSuccess {
-//                for (document in it.documents) {
-////                    addressList[locationId] = document.
-//
-//
-//                }
-//            }
-//    }
 
     private fun onContentsReady() {
         viewBinding.categoryEditableDetailItems.layoutManager = LinearLayoutManager(this)
@@ -156,10 +133,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             return users[userId]!!
         }
 
-        override fun getAddress(locationId: Int): String {
-            LocalLogger.v("locationId=$locationId, ${addressList[locationId]}")
-            return addressList[locationId]!!
-        }
     }
 
 
@@ -171,8 +144,9 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
 
     private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
         runCatching {
-            locationIds.forEach { LocationIO.delete(it) }
-//            for (locationId in locationIds) { LocationIO.delete(locationId) }
+            for (locationId in locationIds) {
+                LocationIO.delete(locationId)
+            }
         }.onSuccess {
             Intent().putExtra("isModified", true).setActivity(this@CategoryEditableDetailActivity, Activity.RESULT_OK)
             finish()

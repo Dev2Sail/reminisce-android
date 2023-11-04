@@ -16,10 +16,5 @@ object MoisIO {
                 parameter("keyword", address)
                 parameter("resultType", "json")
             }.body()
-
     }
-
-
-
-
 }

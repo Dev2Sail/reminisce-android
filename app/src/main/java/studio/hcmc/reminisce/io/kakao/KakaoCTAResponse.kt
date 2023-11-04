@@ -39,13 +39,13 @@ data class KCTAAddress(
     @SerialName("main_address_no")
     val mainAddressNo: String, // 지번 주 번지
     @SerialName("sub_address_no")
-    val subAddressNo: String // 지번 부 번지, 없다면 빈 문자열("")
+    val subAddressNo: String? // 지번 부 번지, 없다면 빈 문자열("")
 ): KakaoCTAResponse
 
 @Serializable
 data class KCTARoadAddress(
     @SerialName("address_name")
-    val addressName: String, // 전체 도로명 주소
+    val addressName: String?, // 전체 도로명 주소
     @SerialName("region_1depth_name")
     val region1depthName: String, // 지역 1Depth, 시도 단위
     @SerialName("region_2depth_name")
@@ -57,9 +57,9 @@ data class KCTARoadAddress(
     @SerialName("underground_yn")
     val undergroundYn: String, // 지하 여부 Y or N
     @SerialName("main_building_no")
-    val mainBuildingNo: String, // 건물 본번
+    val mainBuildingNo: String?, // 건물 본번
     @SerialName("sub_building_no")
-    val subBuildingNo: String, // 건물 부번, 없다면 빈 문자열("")
+    val subBuildingNo: String?, // 건물 부번, 없다면 빈 문자열("")
     @SerialName("building_name")
     val buildingName: String, // 건물명
     @SerialName("zone_no")

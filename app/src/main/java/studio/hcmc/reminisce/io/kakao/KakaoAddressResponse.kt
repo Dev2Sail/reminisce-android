@@ -24,7 +24,7 @@ data class KAMeta(
 @Serializable
 data class KADocument(
     @SerialName("address_name")
-    val addressName: String, // 전체 지번 주소 or 전체 도로명 주소 -> 입력따라 결정
+    val addressName: String?, // 전체 지번 주소 or 전체 도로명 주소 -> 입력따라 결정
     @SerialName("address_type")
     val addressType: AddressType,
     @SerialName("x")
@@ -70,7 +70,7 @@ data class KAAddress(
 @Serializable
 data class KARoadAddress(
     @SerialName("address_name")
-    val addressName: String, // 전체 도로명 주소
+    val addressName: String?, // 전체 도로명 주소
     @SerialName("region_1depth_name")
     val region1depthName: String, // 지역명 1
     @SerialName("region_2depth_name")

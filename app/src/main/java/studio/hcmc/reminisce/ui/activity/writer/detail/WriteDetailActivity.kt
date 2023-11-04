@@ -42,7 +42,6 @@ class WriteDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityWriteDetailBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 

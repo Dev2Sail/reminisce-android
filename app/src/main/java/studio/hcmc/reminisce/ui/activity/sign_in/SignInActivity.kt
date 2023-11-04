@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySignInBinding
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
@@ -27,19 +28,13 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 
     private fun initView() {
         viewBinding.signInAppbar.appbarTitle.text = getText(R.string.sign_in_login)
         viewBinding.signInAppbar.appbarActionButton1.isVisible = false
-        viewBinding.signInAppbar.appbarBack.setOnClickListener {
-            Intent(this, LauncherActivity::class.java).apply {
-                startActivity(this)
-                finish()
-            }
-        }
+        viewBinding.signInAppbar.appbarBack.setOnClickListener { launchLauncher() }
         viewBinding.signInEmail.editText!!.addTextChangedListener { setNextEnabledState() }
         viewBinding.signInPassword.editText!!.addTextChangedListener { setNextEnabledState() }
         viewBinding.signInNext.setOnClickListener {
@@ -58,7 +53,7 @@ class SignInActivity : AppCompatActivity() {
                     finish()
                 }
             }.onFailure {
-                onSignInError()
+                withContext(Dispatchers.Main) { SignInErrorDialog(this@SignInActivity) }
                 LocalLogger.e(it)
             }
     }
@@ -70,8 +65,11 @@ class SignInActivity : AppCompatActivity() {
         viewBinding.signInNext.isEnabled = checkedState && (inputtedPassword.isNotEmpty() && inputtedPassword.length >= 5)
     }
 
-    private fun onSignInError() = CoroutineScope(Dispatchers.Main).launch {
-        SignInErrorDialog(this@SignInActivity)
+    private fun launchLauncher() {
+        Intent(this, LauncherActivity::class.java).apply {
+            startActivity(this)
+            finish()
+        }
     }
 
     private fun exceptionHandler(): CoroutineExceptionHandler = CoroutineExceptionHandler {_, exception ->

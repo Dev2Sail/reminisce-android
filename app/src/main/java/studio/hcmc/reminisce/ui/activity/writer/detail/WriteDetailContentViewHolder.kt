@@ -17,36 +17,29 @@ class WriteDetailContentViewHolder(
 
     fun bind(content: WriteDetailAdapter.DetailContent) {
         val location = content.location
-        val addressBuilder = StringBuilder()
-        // TODO 좌표 -> 주소로 변환 후 getString에서 정해둔 포맷으로 넣으셈! (date_separator) 참고
-        addressBuilder.append(location.latitude)
-        addressBuilder.append(location.longitude)
-
         val (year, month, day) = location.visitedAt.split("-")
         viewBinding.apply {
             cardWriteDetailContentVisitedAt.writeDetailItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
-            cardWriteDetailContentLocation.writeDetailItemBody.text = addressBuilder.toString()
+            cardWriteDetailContentLocation.writeDetailItemBody.text = location.roadAddress
             cardWriteDetailContentLocation.writeDetailItemIcon.setImageResource(R.drawable.round_location_on_16)
         }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
-            viewBinding.cardWriteDetailContentMarkerEmoji.apply {
-                root.isVisible = true
-                writeDetailItemIcon.setImageResource(R.drawable.round_add_reaction_16)
-                writeDetailItemBody.text = location.markerEmoji
-            }
+            viewBinding.cardWriteDetailContentMarkerEmoji.root.isVisible = true
+            viewBinding.cardWriteDetailContentMarkerEmoji.writeDetailItemIcon.setImageResource(R.drawable.round_add_reaction_16)
+            viewBinding.cardWriteDetailContentMarkerEmoji.writeDetailItemBody.text = location.markerEmoji
         } else {
             viewBinding.cardWriteDetailContentMarkerEmoji.root.isGone = true
         }
 
         if (location.body.isNotEmpty()) {
-            viewBinding.cardWriteDetailContent.apply {
-                isVisible = true
-                text = location.body
-            }
+            viewBinding.cardWriteDetailContent.isVisible = true
+            viewBinding.cardWriteDetailContent.text = location.body
+            viewBinding.cardWriteDetailContentDivider1.isVisible = true
             viewBinding.cardWriteDetailContentDivider2.isVisible = true
         } else {
             viewBinding.cardWriteDetailContent.isGone = true
+            viewBinding.cardWriteDetailContentDivider1.isGone = true
             viewBinding.cardWriteDetailContentDivider2.isGone = true
         }
     }

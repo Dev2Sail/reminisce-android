@@ -32,10 +32,8 @@ class WriteDetailOptionsViewHolder(
         val tagText = tags?.withIndex()?.joinToString { it.value.body }
         if (!tags.isNullOrEmpty()) {
             viewBinding.cardWriteDetailOptionsTags.root.isVisible = true
-            viewBinding.cardWriteDetailOptionsTags.apply {
-                writeDetailItemIcon.setImageResource(R.drawable.round_tag_16)
-                writeDetailItemBody.text = tagText
-            }
+            viewBinding.cardWriteDetailOptionsTags.writeDetailItemIcon.setImageResource(R.drawable.round_tag_16)
+            viewBinding.cardWriteDetailOptionsTags.writeDetailItemBody.text = tagText
         } else {
             viewBinding.cardWriteDetailOptionsTags.root.isGone = true
         }
@@ -43,10 +41,8 @@ class WriteDetailOptionsViewHolder(
         val friendText = friends?.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
         if (!friends.isNullOrEmpty()) {
             viewBinding.cardWriteDetailOptionsFriends.root.isVisible = true
-            viewBinding.cardWriteDetailOptionsFriends.apply {
-                writeDetailItemIcon.setImageResource(R.drawable.round_group_16)
-                writeDetailItemBody.text = friendText
-            }
+            viewBinding.cardWriteDetailOptionsFriends.writeDetailItemIcon.setImageResource(R.drawable.round_group_16)
+            viewBinding.cardWriteDetailOptionsFriends.writeDetailItemBody.text = friendText
         } else {
             viewBinding.cardWriteDetailOptionsFriends.root.isGone = true
         }

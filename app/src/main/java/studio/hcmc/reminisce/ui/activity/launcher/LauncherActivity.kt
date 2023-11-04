@@ -12,9 +12,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.BuildConfig
 import studio.hcmc.reminisce.databinding.ActivityLauncherBinding
+import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.ui.activity.MainActivity
 import studio.hcmc.reminisce.ui.activity.home.HomeActivity
+import studio.hcmc.reminisce.util.LocalLogger
 
 class LauncherActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityLauncherBinding
@@ -37,6 +39,9 @@ class LauncherActivity : AppCompatActivity() {
     private fun prepareSignIn() = CoroutineScope(Dispatchers.IO).launch {
         val context = this@LauncherActivity
         val info = UserAuthVO(context)
+
+        val userOrNull = UserExtension.getUserOrNull()
+        LocalLogger.v("userOrNull : ${userOrNull?.id}")
         Log.v("info", "===== user Info : $info")
 //        LocalLogger.v("userAuth", "=== ${UserExtension.getUser(this@LauncherActivity).id}")
 //        println("123456".sha512)

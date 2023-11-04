@@ -29,23 +29,24 @@ class CategoryDetailSummaryViewHolder(
 
         if (location != null) {
             viewBinding.root.isVisible = true
-            val addressBuilder = StringBuilder()
-            // TODO 좌표 -> 주소로 변환 후 getString에서 정해둔 포맷으로 넣으셈! (date_separator) 참고
-            addressBuilder.append(location.latitude)
-            addressBuilder.append(location.longitude)
-
             val (year, month, day) = location.visitedAt.split("-")
             viewBinding.apply {
                 cardSummaryTitle.text = location.title
                 cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
                 cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-                cardSummaryAddress.layoutSummaryItemBody.text = addressBuilder.toString()
+                cardSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
                 cardSummaryVisitedCount.root.isGone = true
             }
 
-            viewBinding.root.setOnClickListener {
-                delegate.onItemClick(location)
+            if (!location.markerEmoji.isNullOrEmpty()) {
+                viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
+                viewBinding.cardSummaryMarkerEmoji.layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
+                viewBinding.cardSummaryMarkerEmoji.layoutSummaryItemBody.text = location.markerEmoji
+            } else {
+                viewBinding.cardSummaryMarkerEmoji.root.isGone = true
             }
+
+            viewBinding.root.setOnClickListener { delegate.onItemClick(location) }
         } else {
             viewBinding.root.isGone = true
         }
@@ -53,10 +54,8 @@ class CategoryDetailSummaryViewHolder(
         if (!tags.isNullOrEmpty()) {
             val tagText = tags.withIndex().joinToString { it.value.body }
             viewBinding.cardSummaryTags.root.isVisible = true
-            viewBinding.cardSummaryTags.apply {
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
-                layoutSummaryItemBody.text = tagText
-            }
+            viewBinding.cardSummaryTags.layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
+            viewBinding.cardSummaryTags.layoutSummaryItemBody.text = tagText
         } else {
             viewBinding.cardSummaryTags.root.isGone = true
         }
@@ -64,21 +63,10 @@ class CategoryDetailSummaryViewHolder(
         if (!friends.isNullOrEmpty()) {
             val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
             viewBinding.cardSummaryFriends.root.isVisible = true
-            viewBinding.cardSummaryFriends.apply {
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
-                layoutSummaryItemBody.text = friendText
-            }
+            viewBinding.cardSummaryFriends.layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
+            viewBinding.cardSummaryFriends.layoutSummaryItemBody.text = friendText
         } else {
             viewBinding.cardSummaryFriends.root.isGone = true
         }
     }
 }
-//            if (!location.markerEmoji.isNullOrEmpty()) {
-//                viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
-//                viewBinding.cardSummaryMarkerEmoji.apply {
-//                    layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
-//                    layoutSummaryItemBody.text = location.markerEmoji
-//                }
-//            } else {
-//                viewBinding.cardSummaryMarkerEmoji.root.isGone = true
-//            }

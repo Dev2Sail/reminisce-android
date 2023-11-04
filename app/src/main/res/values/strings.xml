@@ -152,7 +152,7 @@
 
     <string name="write_visited_at">언제</string>
     <string name="write_location">어디에서</string>
-    <string name="write_emoji">어떤 모습으로</string>
+    <string name="write_emoji">지도에 표시될 이모지</string>
     <string name="write_friend">누구와</string>
     <string name="write_hashtag">해시태그</string>
     <string name="write_category">카테고리</string>

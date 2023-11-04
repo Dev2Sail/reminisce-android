@@ -45,6 +45,7 @@
         android:id="@+id/search_location_divider"
         android:layout_width="match_parent"
         android:layout_height="4dp"
+        android:backgroundTint="@color/md_theme_light_onSurfaceVariant"
         android:layout_marginVertical="@dimen/margin_small"
         app:layout_constraintBottom_toTopOf="@id/search_location_items"
         app:layout_constraintEnd_toEndOf="parent"

@@ -28,6 +28,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var locationSource: FusedLocationSource
     private var mapView: MapView? = null
 
+    private val markerInfo = HashMap<String, Place>()
+    private val markers = ArrayList<Marker>(markerInfo.size)
+    private val customMarkerInfo = HashMap<String, PlaceWithEmoji>()
+    private val customMarkers = ArrayList<Marker>(customMarkerInfo.size)
+
+    private data class Place(
+        val address: String,
+        val latitude: Double,
+        val longitude: Double
+    )
+
+    private data class PlaceWithEmoji(
+        val emoji: String,
+        val address: String,
+        val latitude: Double,
+        val longitude: Double
+    )
+
     private val PERMISSIONS = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION
@@ -49,7 +67,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView = viewBinding.navermapMapView
         mapView?.getMapAsync(this)
         mapView?.onCreate(savedInstanceState)
-//        mapView?.getMapAsync(null)
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
     }
 
@@ -63,6 +80,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         initView()
     }
+
+
 
     private fun initView() {
         val menuId = intent.getIntExtra("menuId", -1)

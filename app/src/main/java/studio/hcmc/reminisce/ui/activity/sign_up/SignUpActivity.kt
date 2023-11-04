@@ -16,7 +16,7 @@ import studio.hcmc.reminisce.databinding.ActivitySignUpBinding
 import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.dto.user.UserDTO.Post
 import studio.hcmc.reminisce.io.ktor_client.UserIO
-import studio.hcmc.reminisce.ui.activity.home.HomeActivity
+import studio.hcmc.reminisce.ui.activity.sign_in.SignInActivity
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
@@ -56,7 +56,9 @@ class SignUpActivity : AppCompatActivity() {
     private fun validateUser(dto: UserDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { UserIO.getByEmail(dto.email) }
             .onSuccess {
-                withContext(Dispatchers.Main) { SignUpErrorDialog(this@SignUpActivity, signUpErrorDelegate) }
+                withContext(Dispatchers.Main) {
+                    SignUpErrorDialog(this@SignUpActivity, signUpErrorDelegate)
+                }
                 LocalLogger.e(it.email)
             }.onFailure {
                 signUp(dto)
@@ -67,7 +69,9 @@ class SignUpActivity : AppCompatActivity() {
     private fun signUp(dto: Post) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { UserIO.signUp(dto) }
             .onSuccess {
-                withContext(Dispatchers.Main) { SignUpMessageDialog(this@SignUpActivity, signUpMessageDelegate) }
+                withContext(Dispatchers.Main) {
+                    SignUpMessageDialog(this@SignUpActivity, signUpMessageDelegate)
+                }
             }.onFailure { LocalLogger.e(it) }
     }
 
@@ -83,7 +87,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private val signUpMessageDelegate = object : SignUpMessageDialog.Delegate {
         override fun onDoneClick() {
-            Intent(this@SignUpActivity, HomeActivity::class.java).apply {
+            Intent(this@SignUpActivity, SignInActivity::class.java).apply {
                 startActivity(this)
                 finish()
             }
@@ -97,12 +101,4 @@ class SignUpActivity : AppCompatActivity() {
             viewBinding.signUpNickname.text.clear()
         }
     }
-
-//    private fun onSignUpMessage() = CoroutineScope(Dispatchers.IO).launch {
-//        SignUpMessageDialog(this@SignUpActivity, signUpMessageDelegate)
-//    }
-
-//    private fun onSignUpError() = CoroutineScope(Dispatchers.IO).launch {
-//        SignUpErrorDialog(this@SignUpActivity, signUpErrorDelegate)
-//    }
 }

@@ -26,7 +26,6 @@ data class MoisJuso(
     val jibunAddr: String, // 지번주소
     val admCd: String, // 행정구역코드
     val rnMgtSn: String, // 도로명코드
-    val bdNm: String, // 건물명
     val siNm: String, // 시도명
     val sggNm: String, // 시군구명
     val emdNm: String, // 읍면동명

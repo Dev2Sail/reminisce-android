@@ -23,8 +23,6 @@ class SearchLocationItemViewHolder(
         viewBinding.searchLocationPlace.text = placeName
         viewBinding.searchLocationCategory.text = placeCategory ?: ""
         viewBinding.searchLocationRoadAddress.text = placeRoadAddress
-        viewBinding.root.setOnClickListener {
-            delegate.onClick(placeId, placeName, placeRoadAddress)
-        }
+        viewBinding.root.setOnClickListener { delegate.onClick(placeId, placeName, placeRoadAddress) }
     }
 }
