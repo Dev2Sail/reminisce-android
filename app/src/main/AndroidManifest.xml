@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
+            android:name=".ui.activity.map.MapTestActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.friend_tag.editable.FriendTagEditableDetailActivity"
             android:exported="false" />
         <activity
@@ -106,4 +109,5 @@
             android:name=".ui.activity.MainActivity"
             android:exported="false" />
     </application>
+
 </manifest>

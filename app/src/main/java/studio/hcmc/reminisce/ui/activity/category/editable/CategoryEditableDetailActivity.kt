@@ -36,7 +36,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
-    private val roadAddress = HashMap<Int /* locationId */, String /* roadAddressName or addressName */>()
+    private val addressList = HashMap<Int /* locationId */, String /* roadAddressName or addressName */>()
     private val contents = ArrayList<CategoryEditableDetailAdapter.Content>()
     private val selectedIds = HashSet<Int>()
 
@@ -64,14 +64,16 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@CategoryEditableDetailActivity)
         val result = runCatching { LocationIO.listByCategoryId(categoryId) }
-            .onSuccess { it ->
+            .onSuccess {
                 locations = it
-                it.forEach {
-                    tagInfo[it.id] = TagIO.listByLocationId(it.id)
-                    friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                }
+                for (location in it) {
+                    tagInfo[location.id] = TagIO.listByLocationId(location.id)
+                    friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
+                    LocalLogger.v("${location.latitude} // ${location.longitude}")
+                    fetchAddressByCoords(location.id, location.longitude.toString(), location.latitude.toString())
 
-                for (friends in friendInfo.values) {
+                }
+                                for (friends in friendInfo.values) {
                     for (friend in friends) {
                         if (friend.nickname == null) {
                             val opponent = UserIO.getById(friend.opponentId)
@@ -82,6 +84,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             }.onFailure { LocalLogger.e(it) }
 
         if (result.isSuccess) {
+            prepareAddress()
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
@@ -89,16 +92,13 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun getAddressByCoords(locationId: Int, longitude: String, latitude: String) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { KakaoIO.getAddressByCoord(longitude, latitude) }
-            .onSuccess {
-                for (document in it.documents) {
-                    roadAddress[locationId] = document.road_address.address_name ?: document.address.address_name
-                }
-
-            }.onFailure {  }
+    private fun prepareAddress() {
+        for (location in locations) {
+            val longitudeToString = location.longitude.toString()
+            val latitudeToString = location.latitude.toString()
+            fetchAddressByCoords(location.id, longitudeToString, latitudeToString)
+        }
     }
-
     private fun prepareContents() {
         for (location in locations.sortedByDescending { it.id }) {
             contents.add(CategoryEditableDetailAdapter.DetailContent(
@@ -108,6 +108,28 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             ))
         }
     }
+
+    private fun fetchAddressByCoords(locationId: Int, longitude: String, latitude: String) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { KakaoIO.getAddressByCoord(longitude, latitude) }
+            .onSuccess {
+//                LocalLogger.v("meta: ${it.meta}")
+                for (document in it.documents) {
+//                    LocalLogger.v("responses : ${document.roadAddress.addressName} \n ${document.address.addressName}")
+                    addressList[locationId] = document.roadAddress.addressName.ifEmpty { document.address.addressName }
+                }
+            }.onFailure { LocalLogger.e("Kakao Address By Coords Fail", it)}
+    }
+
+//    private fun fetchRegionCodeByCoords(locationId: Int, longitude: String, latitude: String) = CoroutineScope(Dispatchers.IO).launch {
+//        runCatching { KakaoIO.getRegionCodeByCoord(longitude, latitude) }
+//            .onSuccess {
+//                for (document in it.documents) {
+////                    addressList[locationId] = document.
+//
+//
+//                }
+//            }
+//    }
 
     private fun onContentsReady() {
         viewBinding.categoryEditableDetailItems.layoutManager = LinearLayoutManager(this)
@@ -127,7 +149,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
 
                 return false
             }
-
             return true
         }
 
@@ -135,12 +156,17 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             return users[userId]!!
         }
 
-        override fun getAddress(longitude: Double, latitude: Double): String {
-            TODO("Not yet implemented")
-
+        override fun getAddress(locationId: Int): String {
+            LocalLogger.v("locationId=$locationId, ${addressList[locationId]}")
+            return addressList[locationId]!!
         }
     }
 
+
+    /*
+    curl -v -X GET "https://dapi.kakao.com/v2/local/geo/coord2address.json?x=126.372737043106&y=37.4462920026041&input_coord=WGS84" \
+  -H "Authorization: KakaoAK 9ad915174ce9b472811ee15af1c41d84"
+     */
 
 
     private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {

@@ -16,8 +16,7 @@ class SummaryViewHolder(
     interface Delegate {
         fun onItemClick(locationId: Int): Boolean
         fun getUser(userId: Int): UserVO
-
-        fun getAddress(longitude: Double, latitude: Double): String
+        fun getAddress(locationId: Int): String
     }
 
     constructor(parent: ViewGroup, delegate: Delegate ): this(
@@ -27,44 +26,28 @@ class SummaryViewHolder(
 
     fun bind(content: CategoryEditableDetailAdapter.DetailContent) {
         val (location, tags, friends) = content
-        val address = delegate.getAddress(location.longitude, location.latitude)
-        // TODO 좌표 -> 주소로 변환 후 getString에서 정해둔 포맷으로 넣으셈! (date_separator) 참고
-
         val (year, month, day) = location.visitedAt.split("-")
-        viewBinding.apply {
-            cardCheckableSummaryTitle.text = location.title
-            cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
-            cardCheckableSummaryVisitedCount.root.isGone = true
-            cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-            cardCheckableSummaryAddress.layoutSummaryItemBody.text = address
-        }
+        viewBinding.cardCheckableSummaryTitle.text = location.title
+        viewBinding.cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
+        viewBinding.cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+        viewBinding.cardCheckableSummaryAddress.layoutSummaryItemBody.text = delegate.getAddress(location.id)
+        viewBinding.cardCheckableSummaryVisitedCount.root.isGone = true
 
         val tagText = tags.withIndex().joinToString { it.value.body }
         if (tagText.isNotEmpty()) {
             viewBinding.cardCheckableSummaryTags.root.isVisible = true
-            viewBinding.cardCheckableSummaryTags.apply {
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
-                layoutSummaryItemBody.text = tagText
-            }
-        } else {
-            viewBinding.cardCheckableSummaryTags.root.isGone = true
-        }
+            viewBinding.cardCheckableSummaryTags.layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
+            viewBinding.cardCheckableSummaryTags.layoutSummaryItemBody.text = tagText
+        } else { viewBinding.cardCheckableSummaryTags.root.isGone = true }
 
         val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
         if (friendText.isNotEmpty()) {
             viewBinding.cardCheckableSummaryFriends.root.isVisible = true
-            viewBinding.cardCheckableSummaryFriends.apply {
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
-                layoutSummaryItemBody.text = friendText
-            }
-        } else {
-            viewBinding.cardCheckableSummaryFriends.root.isGone = true
-        }
+            viewBinding.cardCheckableSummaryFriends.layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
+            viewBinding.cardCheckableSummaryFriends.layoutSummaryItemBody.text = friendText
+        } else { viewBinding.cardCheckableSummaryFriends.root.isGone = true }
 
-        viewBinding.cardCheckableSummaryCheckbox.setOnClickListener {
-            delegate.onItemClick(location.id)
-        }
-
+        viewBinding.cardCheckableSummaryCheckbox.setOnClickListener { delegate.onItemClick(location.id) }
         viewBinding.cardCheckableSummaryContainer.setOnClickListener {
             viewBinding.cardCheckableSummaryCheckbox.isChecked = delegate.onItemClick(location.id)
         }

@@ -23,6 +23,7 @@ import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.activity.friend_tag.FriendTagDetailActivity
+import studio.hcmc.reminisce.ui.activity.map.MapTestActivity
 import studio.hcmc.reminisce.ui.activity.tag.TagDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
@@ -59,6 +60,13 @@ class HomeActivity : AppCompatActivity() {
         navigationController(viewBinding.homeNavView, menuId)
 
         CoroutineScope(Dispatchers.IO).launch { fetchContents() }
+
+        viewBinding.homeTest.setOnClickListener {
+            Intent(this, MapTestActivity::class.java).apply {
+                startActivity(this)
+                finish()
+            }
+        }
     }
 
     private suspend fun fetchContents() = coroutineScope {

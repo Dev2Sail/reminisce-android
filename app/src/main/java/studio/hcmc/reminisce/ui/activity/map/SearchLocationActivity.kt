@@ -54,9 +54,9 @@ class SearchLocationActivity : AppCompatActivity() {
                 places = it.documents
                 for (document in it.documents) {
                     val builder = StringBuilder()
-                    builder.append(document.x)
+                    builder.append(document.longitude)
                     builder.append(", ")
-                    builder.append(document.y)
+                    builder.append(document.latitude)
                     coords[document.id] = builder.toString()
                 }
             }.onFailure { LocalLogger.e(it) }
@@ -70,9 +70,9 @@ class SearchLocationActivity : AppCompatActivity() {
         for (place in places) {
             contents.add(SearchLocationAdapter.PlaceContent(
                 place.id,
-                place.place_name,
-                place.category_name.split(">").last().trim(' '),
-                place.road_address_name.ifEmpty { place.address_name }
+                place.placeName,
+                place.categoryName.split(">").last().trim(' '),
+                place.roadAddressName.ifEmpty { place.addressName }
             ))
         }
         //places.mapTo(contents) { SearchLocationAdapter.PlaceContent(it.place_name, it.category_name.split(">").last(), it.road_address_name) }

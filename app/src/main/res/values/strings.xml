@@ -166,4 +166,6 @@
 
     <string name="error_visited_at">날짜를 다시 입력해 주세요.</string>
 
+    <string name="dialog_marker_detail_next">저장된 추억</string>
+
 </resources>

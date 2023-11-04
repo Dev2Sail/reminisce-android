@@ -39,7 +39,7 @@ object KakaoIO {
     suspend fun getAddressByCoord(longitude: String, latitude: String): KCTAResponse {
         return httpClient
             .get("https://dapi.kakao.com/v2/local/geo/coord2address.json") {
-                header("Authorization", "KakaoAK dca0c59f8068207b11af82b122e4fd3d")
+                header("Authorization", "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}")
                 parameter("x", longitude)
                 parameter("y", latitude)
             }.body()

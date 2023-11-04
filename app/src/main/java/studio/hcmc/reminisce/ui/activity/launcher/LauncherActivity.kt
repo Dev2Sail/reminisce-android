@@ -51,12 +51,14 @@ class LauncherActivity : AppCompatActivity() {
     private fun launchHome() {
         Intent(this, HomeActivity::class.java).apply {
             startActivity(this)
+            finish()
         }
     }
 
     private fun launchMain() {
         Intent(this, MainActivity::class.java).apply {
             startActivity(this)
+            finish()
         }
     }
 }

@@ -24,6 +24,8 @@ android {
         buildConfigField "String", "KAKAO_REST_API_KEY", properties['kakao_rest_api_key']
         buildConfigField "String", "NAVER_CLIENT_ID", properties['naver_client_id']
         buildConfigField "String", "NAVER_CLIENT_SECRET", properties['naver_client_secret']
+        buildConfigField "String", "MOIS_JUSO_API_KEY", properties['mois_juso_api_key']
+
     }
 
     buildTypes {

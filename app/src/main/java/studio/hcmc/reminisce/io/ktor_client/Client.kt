@@ -22,11 +22,16 @@ private val ErrorHandler = createClientPlugin("ErrorHandler", {}) {
 val httpClient = HttpClient(CIO) {
     defaultRequest {
         url.host = "10.37.129.2"
+//        url.host = "220.79.39.183"
         url.port = 8080
+
         header("Content-type", "application/json")
     }
     expectSuccess = true
 
+    engine {
+        
+    }
 
     install(ContentNegotiation) {
         gson()

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/dialog_marker_detail_handle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_marker_detail_place"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_medium"
+        android:paddingStart="0dp"
+        android:paddingEnd="@dimen/margin_large"
+        android:text="@string/card_summary_title"
+        android:textSize="@dimen/headline_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_marker_detail_handle" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_marker_detail_next"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="@string/dialog_marker_detail_next"
+        android:textSize="@dimen/title_medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/dialog_marker_detail_next_icon"
+        app:layout_constraintTop_toBottomOf="@id/dialog_marker_detail_place" />
+
+    <ImageView
+        android:id="@+id/dialog_marker_detail_next_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_2xlarge"
+        android:src="@drawable/round_arrow_outward_24"
+        app:layout_constraintBottom_toBottomOf="@id/dialog_marker_detail_next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/dialog_marker_detail_next"
+        app:tint="@color/md_theme_light_primary" />
+</androidx.constraintlayout.widget.ConstraintLayout>
