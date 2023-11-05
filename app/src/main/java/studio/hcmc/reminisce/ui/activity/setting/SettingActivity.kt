@@ -31,7 +31,7 @@ class SettingActivity : AppCompatActivity() {
         val menuId = intent.getIntExtra("menuId", -1)
         navigationController(viewBinding.settingNavView, menuId)
 
-        viewBinding.settingHeader.commonHeaderTitle.text = getString(R.string.setting_activity_header)
+        viewBinding.settingHeader.commonHeaderTitle.text = getString(R.string.nav_main_setting)
         viewBinding.settingHeader.commonHeaderAction1.isVisible = false
         viewBinding.settingAccountIcon.setOnClickListener { launchAccountSetting() }
         viewBinding.settingFriendIcon.setOnClickListener { launchFriendSetting() }

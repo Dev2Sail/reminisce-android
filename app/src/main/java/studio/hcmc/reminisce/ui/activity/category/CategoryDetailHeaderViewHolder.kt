@@ -2,6 +2,8 @@ package studio.hcmc.reminisce.ui.activity.category
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardCategoryDetailHeaderBinding
@@ -21,18 +23,17 @@ class CategoryDetailHeaderViewHolder (
     )
 
     fun bind(content: CategoryDetailAdapter.HeaderContent) {
-        viewBinding.apply {
-            cardCategoryDetailHeaderTitle.text = when(content.title) {
-                "Default" -> viewBinding.root.context.getString(R.string.category_view_holder_title)
+        if (content.title == "Default") {
+            viewBinding.cardCategoryDetailHeaderTitle.text = viewBinding.root.context.getString(R.string.category_view_holder_title)
+            viewBinding.cardCategoryDetailHeaderEditIcon.isGone = true
+        } else {
+            viewBinding.cardCategoryDetailHeaderTitle.text = when(content.title) {
                 "new" -> viewBinding.root.context.getString(R.string.add_category_body)
                 else -> content.title
             }
-            cardCategoryDetailHeaderEditIcon.setOnClickListener {
-                delegate.onTitleEditClick()
-            }
-            cardCategoryDetailHeaderAction1.setOnClickListener {
-                delegate.onItemClick()
-            }
+            viewBinding.cardCategoryDetailHeaderEditIcon.isVisible = true
+            viewBinding.cardCategoryDetailHeaderEditIcon.setOnClickListener { delegate.onTitleEditClick() }
         }
+        viewBinding.cardCategoryDetailHeaderAction1.setOnClickListener { delegate.onItemClick() }
     }
 }

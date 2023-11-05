@@ -20,8 +20,8 @@ class HeaderViewHolder(
     )
 
     fun bind() {
-        viewBinding.commonHeaderTitle.text = viewBinding.root.context.getText(R.string.header_view_holder_title)
-        viewBinding.commonHeaderAction1.text = viewBinding.root.context.getText(R.string.header_view_holder_action)
+        viewBinding.commonHeaderTitle.text = viewBinding.root.context.getString(R.string.header_view_holder_title)
+        viewBinding.commonHeaderAction1.text = viewBinding.root.context.getString(R.string.header_view_holder_action)
         viewBinding.commonHeaderAction1.setOnClickListener {
             delegate.onClick()
         }

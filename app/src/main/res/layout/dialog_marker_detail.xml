@@ -21,7 +21,7 @@
         android:paddingStart="0dp"
         android:paddingEnd="@dimen/margin_large"
         android:text="@string/card_summary_title"
-        android:textSize="@dimen/headline_small"
+        android:textSize="@dimen/title_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_marker_detail_handle" />

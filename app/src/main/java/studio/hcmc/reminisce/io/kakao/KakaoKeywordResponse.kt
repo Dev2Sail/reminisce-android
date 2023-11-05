@@ -12,6 +12,7 @@ data class KKResponse(
 ): KakaoKeywordResponse
 
 @Serializable
+@SerialName("Meta")
 data class KKMeta(
     @SerialName("total_count")
     val totalCount: Int, // 검색어에 검색된 문서 수
@@ -24,6 +25,7 @@ data class KKMeta(
 ): KakaoKeywordResponse
 
 @Serializable
+@SerialName("SameName")
 data class KKSameName(
     val region: List<String>, // 질의어에서 인식된 지역 리스트
     val keyword: String, // 질의어에서 지역 정보 제외한 키워드
@@ -32,8 +34,10 @@ data class KKSameName(
 ): KakaoKeywordResponse
 
 @Serializable
+@SerialName("Document")
 data class KKPlaceInfo(
     val id: String, // 장소 ID
+    // TODO 고쳐라!
     @SerialName("place_name")
     val placeName: String, // 장소, 업체명
     @SerialName("category_name")

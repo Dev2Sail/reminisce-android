@@ -82,26 +82,7 @@ class MapTestActivity : AppCompatActivity(), OnMapReadyCallback {
                             it.longitude
                         )
                     }
-                }
-
-            }
-                for (location in it) {
-                    if (location.markerEmoji.isNullOrEmpty()) {
-                        if (!markerInfo.containsKey(location.title)) {
-                            markerInfo[location.title] = Place(location.roadAddress, location.latitude, location.longitude)
-                        }
-                    } else {
-                        if (!customMarkerInfo.containsKey(location.title)) {
-                            customMarkerInfo[location.title] = PlaceWithEmoji(
-                                location.markerEmoji!!,
-                                location.roadAddress,
-                                location.latitude,
-                                location.longitude
-                            )
-                        }
-                    }
-
-                }
+                } }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) { withContext(Dispatchers.Main) { buildMarkers() } }
     }

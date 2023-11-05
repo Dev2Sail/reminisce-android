@@ -29,7 +29,7 @@ class SearchLocationActivity : AppCompatActivity() {
     private val roadAddress = HashMap<String /* placeId*/, String>()
 
     private data class Place(
-        val placeName: String,
+        val placeName: String?,
         val longitude: String,
         val latitude: String
     )
@@ -60,8 +60,10 @@ class SearchLocationActivity : AppCompatActivity() {
             .onSuccess {
                 places = it.documents
                 for (document in it.documents) {
+                    LocalLogger.v("${document.id}: ${document.placeName}, (${document.longitude}, ${document.latitude})")
                     placeInfo[document.id] = Place(document.placeName, document.longitude, document.latitude)
                     if (document.roadAddressName.isNullOrEmpty()) {
+                        LocalLogger.v("${document.id}: ${document.addressName}, ${document.roadAddressName}")
                         getRoadAddress(document.id, document.addressName)
                     } else {
                         roadAddress[document.id] = document.roadAddressName

@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.report
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isGone
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +31,7 @@ class ReportActivity : AppCompatActivity() {
     private fun initView() {
         val menuId = intent.getIntExtra("menuId", -1)
         navigationController(viewBinding.reportNavView, menuId)
+        viewBinding.reportHeader.commonHeaderAction1.isGone = true
 
     }
 
@@ -49,4 +51,12 @@ class ReportActivity : AppCompatActivity() {
             }
             .onFailure { LocalLogger.e(it) }
     }
+
+    // TODO 1년 적 오늘 추억
+
+    // TODO 가장 많이 함께한 친구
+
+    // TODO 해수욕장 방문 횟수
+    // TODO 휴게소 방문 횟수
+    // TODO layout card 통일
 }
