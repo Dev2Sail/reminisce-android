@@ -15,6 +15,7 @@ import studio.hcmc.reminisce.databinding.ActivitySearchLocationBinding
 import studio.hcmc.reminisce.io.kakao.KKPlaceInfo
 import studio.hcmc.reminisce.io.ktor_client.KakaoIO
 import studio.hcmc.reminisce.io.ktor_client.MoisIO
+import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.util.string
@@ -29,7 +30,7 @@ class SearchLocationActivity : AppCompatActivity() {
     private val roadAddress = HashMap<String /* placeId*/, String>()
 
     private data class Place(
-        val placeName: String?,
+        val placeName: String,
         val longitude: String,
         val latitude: String
     )
@@ -60,14 +61,8 @@ class SearchLocationActivity : AppCompatActivity() {
             .onSuccess {
                 places = it.documents
                 for (document in it.documents) {
-                    LocalLogger.v("${document.id}: ${document.placeName}, (${document.longitude}, ${document.latitude})")
-                    placeInfo[document.id] = Place(document.placeName, document.longitude, document.latitude)
-                    if (document.roadAddressName.isNullOrEmpty()) {
-                        LocalLogger.v("${document.id}: ${document.addressName}, ${document.roadAddressName}")
-                        getRoadAddress(document.id, document.addressName)
-                    } else {
-                        roadAddress[document.id] = document.roadAddressName
-                    }
+                    placeInfo[document.id] = Place(document.place_name, document.x, document.y)
+                    roadAddress[document.id] = document.road_address_name.ifEmpty { getRoadAddress(document.address_name) }
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
@@ -76,22 +71,21 @@ class SearchLocationActivity : AppCompatActivity() {
         }
     }
 
-    private fun getRoadAddress(placeId: String, address: String) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { MoisIO.transformAddress(address) }
+    private suspend fun getRoadAddress(address: String): String = withContext(Dispatchers.IO) {
+        runCatching { MoisIO.getRoadAddress(address) }
             .onSuccess {
-                LocalLogger.v("${it.juso.roadAddr}")
-                roadAddress[placeId] = it.juso.roadAddr
-            } // 도로명 주소 통일 }
-            .onFailure { LocalLogger.e(it) }
-    }
+                for (jusoInfo in it.results.juso) {
+                    return@withContext jusoInfo.roadAddr
+                }
+            }.onFailure { LocalLogger.e(it) }
+    }.toString()
 
     private fun prepareContents() {
         for (place in places) {
             contents.add(SearchLocationAdapter.PlaceContent(
                 place.id,
-                place.placeName,
-                place.categoryName.split(">").last().trim(' '),
-//                place.roadAddressName.ifEmpty { roadAddress[place.id]!! } // ifEmpty moisIO 요청 후 도로명주소 기재
+                place.place_name,
+                place.category_name.split(">").last().trim(' '),
                 roadAddress[place.id]!!
             ))
         }
@@ -110,16 +104,25 @@ class SearchLocationActivity : AppCompatActivity() {
     }
 
     private val itemDelegate = object : SearchLocationItemViewHolder.Delegate {
-        override fun onClick(placeId: String, placeName: String, roadAddress: String) {
-            Intent()
-                .putExtra("place", placeName)
-                .putExtra("roadAddress", roadAddress)
-                .putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
-                .putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
-//                .putExtra("longitude", coords[placeId]!!.split(",")[0].toDouble())
-//                .putExtra("latitude", coords[placeId]!!.split(",")[1].toDouble())
-                .setActivity(this@SearchLocationActivity, Activity.RESULT_OK)
-            finish()
+        override fun onClick(placeId: String) {
+            Intent().apply {
+                putExtra("place", placeInfo[placeId]!!.placeName)
+                putExtra("roadAddress", roadAddress[placeId])
+                putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
+                putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
+                setActivity(this@SearchLocationActivity, Activity.RESULT_OK)
+            }
+            launchWrite(placeId)
+        }
+    }
+
+    private fun launchWrite(placeId: String) {
+        Intent(this, WriteActivity::class.java).apply {
+            putExtra("place", placeInfo[placeId]!!.placeName)
+            putExtra("roadAddress", roadAddress[placeId])
+            putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
+            putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
+            startActivity(this)
         }
     }
 }

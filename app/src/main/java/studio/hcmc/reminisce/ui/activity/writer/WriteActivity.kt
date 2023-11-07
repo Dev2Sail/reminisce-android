@@ -12,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import studio.hcmc.reminisce.databinding.ActivityWriteBinding
 import studio.hcmc.reminisce.dto.location.LocationDTO
+import studio.hcmc.reminisce.ext.user.UserExtension
+import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.ui.activity.map.SearchLocationActivity
 import studio.hcmc.reminisce.util.LocalLogger
@@ -21,6 +23,8 @@ import studio.hcmc.reminisce.util.string
 class WriteActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteBinding
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
+
+    private var defaultCategoryId = -1
     private val writeOptions = HashMap<String, Any?>()
 
     private val searchLocationLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onSearchLocationResult)
@@ -37,12 +41,8 @@ class WriteActivity : AppCompatActivity() {
         viewBinding.writeAppbar.appbarTitle.text = ""
         viewBinding.writeAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.writeAppbar.appbarActionButton1.setOnClickListener {
-            if (writeOptions["visitedAt"] == null) {
-                Toast.makeText(this, "방문 날짜를 선택해 주세요.", Toast.LENGTH_SHORT).show()
-            }
-            if (writeOptions["place"] == null) {
-                Toast.makeText(this, "방문 장소를 선택해 주세요.", Toast.LENGTH_SHORT).show()
-            }
+            writeOptions["visitedAt"] ?: Toast.makeText(this, "방문 날짜를 선택해 주세요.", Toast.LENGTH_SHORT).show()
+            writeOptions["place"] ?: Toast.makeText(this, "방문 장소를 선택해 주세요.", Toast.LENGTH_SHORT).show()
             if (writeOptions["place"] != null && writeOptions["visitedAt"] != null) {
                 writeOptions["body"] = viewBinding.writeTextContainer.string
                 prepareContents()
@@ -54,11 +54,34 @@ class WriteActivity : AppCompatActivity() {
             val intent = Intent(this, SearchLocationActivity::class.java)
             searchLocationLauncher.launch(intent)
         }
+        fromSearchLocation()
+    }
+
+    private fun fromSearchLocation() {
+        if (categoryId == -1) {
+            getDefaultCategoryId()
+            val place = intent.getStringExtra("place")
+            val roadAddress = intent.getStringExtra("roadAddress")
+            val longitude = intent.getDoubleExtra("longitude", -1.0)
+            val latitude = intent.getDoubleExtra("latitude", -1.0)
+            viewBinding.writeAppbar.appbarTitle.text = place
+            viewBinding.writeLocation.text = place
+            writeOptions["place"] = place
+            writeOptions["roadAddress"] = roadAddress
+            writeOptions["longitude"] = longitude
+            writeOptions["latitude"] = latitude
+        }
+    }
+
+    private fun getDefaultCategoryId() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@WriteActivity)
+        runCatching { CategoryIO.getDefaultCategoryIdByUserId(user.id) }
+            .onSuccess { defaultCategoryId = it.id }
+            .onFailure { LocalLogger.e(it) }
     }
 
     private fun prepareContents() {
         val dto = LocationDTO.Post().apply {
-            this.categoryId = this@WriteActivity.categoryId
             this.markerEmoji = writeOptions["emoji"] as String?
             this.latitude = writeOptions["latitude"] as Double
             this.longitude = writeOptions["longitude"] as Double
@@ -66,6 +89,11 @@ class WriteActivity : AppCompatActivity() {
             this.title = writeOptions["place"] as String
             this.body = writeOptions["body"] as String
             this.visitedAt = writeOptions["visitedAt"] as String
+        }
+        if (categoryId == -1) {
+            dto.categoryId = defaultCategoryId
+        } else {
+            dto.categoryId = this.categoryId
         }
         postContents(dto)
     }

@@ -165,6 +165,7 @@
     <string name="most_added_friend">가장 많이 등록된 친구</string>
 
     <string name="error_visited_at">날짜를 다시 입력해 주세요.</string>
+    <string name="error_get_nickname">닉네임을 불러올 수 없어요.</string>
 
     <string name="dialog_marker_detail_next">저장된 추억</string>
 

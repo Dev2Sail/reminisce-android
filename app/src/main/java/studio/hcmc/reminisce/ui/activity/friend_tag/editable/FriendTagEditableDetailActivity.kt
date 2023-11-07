@@ -50,8 +50,7 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
         viewBinding.friendTagEditableDetailAppbar.appbarTitle.text = nickname
         viewBinding.friendTagEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.friendTagEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
-        viewBinding.friendTagEditableDetailAppbar.appbarActionButton1.setOnClickListener {  }
-
+        viewBinding.friendTagEditableDetailAppbar.appbarActionButton1.setOnClickListener { fetchContents(selectedIds) }
         loadContents()
     }
 
@@ -77,7 +76,6 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
-
         } else {
             CommonError.onMessageDialog(this@FriendTagEditableDetailActivity, getString(R.string.dialog_error_common_list_body))
         }
@@ -85,11 +83,7 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
 
     private fun prepareContents() {
         for (location in locations.sortedByDescending { it.id }) {
-            contents.add(FriendTagEditableAdapter.DetailContent(
-                location,
-                tagInfo[location.id].orEmpty(),
-                friendInfo[location.id].orEmpty()
-            ))
+            contents.add(FriendTagEditableAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
         }
     }
 
@@ -127,6 +121,4 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
                 finish()
             }.onFailure { LocalLogger.e(it) }
     }
-
-
 }

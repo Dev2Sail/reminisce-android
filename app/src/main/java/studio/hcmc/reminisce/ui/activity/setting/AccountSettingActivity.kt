@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.setting
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import studio.hcmc.reminisce.ui.activity.launcher.LauncherActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
+import studio.hcmc.reminisce.util.setActivity
 
 class AccountSettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingAccountBinding
@@ -29,22 +31,15 @@ class AccountSettingActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        viewBinding.settingAccountAppbar.apply {
-            appbarTitle.text = getText(R.string.setting_account)
-            appbarActionButton1.isVisible = false
-            appbarBack.setOnClickListener { finish() }
-        }
-
-        viewBinding.settingAccountNicknameIcon.setOnClickListener { launchNicknameSetting() }
-        viewBinding.settingAccountPasswordIcon.setOnClickListener { launchPasswordSetting() }
-        viewBinding.settingAccountWithdraw.setOnClickListener {
-            WithdrawDialog(this, withdrawDelegate)
-        }
-
+        prepareUser()
         val menuId = intent.getIntExtra("menuId", -1)
         navigationController(viewBinding.settingAccountNavView, menuId)
-
-        prepareUser()
+        viewBinding.settingAccountAppbar.appbarTitle.text = getText(R.string.setting_account)
+        viewBinding.settingAccountAppbar.appbarActionButton1.isVisible = false
+        viewBinding.settingAccountAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.settingAccountNicknameIcon.setOnClickListener { launchNicknameSetting() }
+        viewBinding.settingAccountPasswordIcon.setOnClickListener { launchPasswordSetting() }
+        viewBinding.settingAccountWithdraw.setOnClickListener { WithdrawDialog(this, withdrawDelegate) }
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.Main).launch {
@@ -53,7 +48,7 @@ class AccountSettingActivity : AppCompatActivity() {
         runCatching { UserIO.getByEmail(user.email) }
             .onSuccess { viewBinding.settingAccountNicknameBody.text = it.nickname }
             .onFailure {
-                viewBinding.settingAccountNicknameBody.text = "닉네임을 불러올 수 없습니다."
+                viewBinding.settingAccountNicknameBody.text = getString(R.string.error_get_nickname)
                 LocalLogger.e(it)
             }
     }
@@ -65,10 +60,7 @@ class AccountSettingActivity : AppCompatActivity() {
                 runCatching { UserIO.delete(user.id) }
                     .onSuccess {
                         UserAuthVO(user.email, user.password).delete(this@AccountSettingActivity)
-                        // TODO Activity Result 회수
-                        Intent(this@AccountSettingActivity, LauncherActivity::class.java).apply {
-                            startActivity(this)
-                        }
+                        launchLauncher()
                     }
                     .onFailure {
                         CommonError.onDialog(this@AccountSettingActivity)
@@ -76,6 +68,12 @@ class AccountSettingActivity : AppCompatActivity() {
                     }
             }
         }
+    }
+
+    private fun launchLauncher() {
+        //TODO launcher에서 activityResult
+        val intent = Intent(this, LauncherActivity::class.java).setActivity(this, Activity.RESULT_OK)
+
     }
 
     private fun launchNicknameSetting() {

@@ -135,13 +135,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
 
     }
 
-
-    /*
-    curl -v -X GET "https://dapi.kakao.com/v2/local/geo/coord2address.json?x=126.372737043106&y=37.4462920026041&input_coord=WGS84" \
-  -H "Authorization: KakaoAK 9ad915174ce9b472811ee15af1c41d84"
-     */
-
-
     private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
         runCatching {
             for (locationId in locationIds) {

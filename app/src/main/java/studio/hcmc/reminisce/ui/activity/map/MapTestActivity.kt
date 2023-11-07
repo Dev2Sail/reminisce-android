@@ -237,12 +237,7 @@ private fun buildBounds() {
 //            .build()
 }
 
-/*
-   curl -G "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode" \
-   --data-urlencode "query=숙골로 113" \
-   -H "X-NCP-APIGW-API-KEY-ID: ca36w08yej" \
-   -H "X-NCP-APIGW-API-KEY: 4cNOUIR7r6l3F1j82BXvZaNtXOmqVYwDRxNMVHrW" -v
-    */
+
 // https://github.com/navermaps/android-map-sdk/tree/master/app/src/main/java/com/naver/maps/map/demo/kotlin/overlay
 // https://navermaps.github.io/maps.js.ncp/docs/tutorial-digest.example.html
 // https://api.ncloud-docs.com/docs/ai-naver-mapsgeocoding-geocode

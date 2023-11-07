@@ -42,15 +42,15 @@ class FriendTagSummaryViewHolder(
             cardSummaryVisitedCount.root.isGone = true
         }
 
-//        if (!location.markerEmoji.isNullOrEmpty()) {
-//            viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
-//            viewBinding.cardSummaryMarkerEmoji.apply {
-//                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
-//                layoutSummaryItemBody.text = location.markerEmoji
-//            }
-//        } else {
-//            viewBinding.cardSummaryMarkerEmoji.root.isGone = true
-//        }
+        if (!location.markerEmoji.isNullOrEmpty()) {
+            viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
+            viewBinding.cardSummaryMarkerEmoji.apply {
+                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
+                layoutSummaryItemBody.text = location.markerEmoji
+            }
+        } else {
+            viewBinding.cardSummaryMarkerEmoji.root.isGone = true
+        }
 
         val tagText = tags.withIndex().joinToString { it.value.body }
         if (tagText.isNotEmpty()) {
@@ -74,8 +74,6 @@ class FriendTagSummaryViewHolder(
             viewBinding.cardSummaryFriends.root.isGone = true
         }
 
-        viewBinding.root.setOnClickListener {
-            delegate.onItemClick(location.id, location.title)
-        }
+        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title) }
     }
 }

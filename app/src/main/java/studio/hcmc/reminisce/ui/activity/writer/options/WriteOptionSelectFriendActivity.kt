@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.writer.options
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +14,7 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.writer.WriteActivity
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
@@ -65,9 +65,7 @@ class WriteOptionSelectFriendActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) { onContentsReady() }
             }
-            .onFailure {
-                Log.v("reminisce Logger", "[reminisce > writeOptions > Prepare friend] : msg - ${it.message} \n::  localMsg - ${it.localizedMessage} \n:: cause - ${it.cause} \n:: stackTree - ${it.stackTrace}")
-            }
+            .onFailure { LocalLogger.e(it) }
     }
 
     private val friendItemDelegate = object : WriteOptionSelectFriendItemViewHolder.Delegate {

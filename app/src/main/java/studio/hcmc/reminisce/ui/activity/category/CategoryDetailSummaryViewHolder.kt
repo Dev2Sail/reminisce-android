@@ -45,28 +45,21 @@ class CategoryDetailSummaryViewHolder(
             } else {
                 viewBinding.cardSummaryMarkerEmoji.root.isGone = true
             }
-
             viewBinding.root.setOnClickListener { delegate.onItemClick(location) }
-        } else {
-            viewBinding.root.isGone = true
-        }
+        } else { viewBinding.root.isGone = true }
 
         if (!tags.isNullOrEmpty()) {
             val tagText = tags.withIndex().joinToString { it.value.body }
             viewBinding.cardSummaryTags.root.isVisible = true
             viewBinding.cardSummaryTags.layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
             viewBinding.cardSummaryTags.layoutSummaryItemBody.text = tagText
-        } else {
-            viewBinding.cardSummaryTags.root.isGone = true
-        }
+        } else { viewBinding.cardSummaryTags.root.isGone = true }
 
         if (!friends.isNullOrEmpty()) {
             val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
             viewBinding.cardSummaryFriends.root.isVisible = true
             viewBinding.cardSummaryFriends.layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
             viewBinding.cardSummaryFriends.layoutSummaryItemBody.text = friendText
-        } else {
-            viewBinding.cardSummaryFriends.root.isGone = true
-        }
+        } else { viewBinding.cardSummaryFriends.root.isGone = true }
     }
 }

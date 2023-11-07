@@ -47,17 +47,13 @@ class FriendTagDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityFriendTagDetailBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 
     private fun initView() {
-        viewBinding.friendTagDetailAppbar.apply {
-            appbarTitle.text = getString(R.string.header_view_holder_title)
-            appbarActionButton1.isVisible = false
-            appbarBack.setOnClickListener { finish() }
-        }
-
+        viewBinding.friendTagDetailAppbar.appbarTitle.text = getString(R.string.header_view_holder_title)
+        viewBinding.friendTagDetailAppbar.appbarActionButton1.isVisible = false
+        viewBinding.friendTagDetailAppbar.appbarBack.setOnClickListener { finish() }
         prepareFriend()
     }
 
@@ -118,11 +114,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.friendTagDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = FriendTagAdapter(
-            adapterDelegate,
-            headerDelegate,
-            summaryDelegate
-        )
+        adapter = FriendTagAdapter(adapterDelegate, headerDelegate, summaryDelegate)
         viewBinding.friendTagDetailItems.adapter = adapter
     }
 

@@ -104,7 +104,6 @@ class CategoryDetailActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
             CommonError.onMessageDialog(this@CategoryDetailActivity,  getString(R.string.dialog_error_common_list_body))
-            LocalLogger.e("load Fail")
         }
     }
 
@@ -125,11 +124,7 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.categoryDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = CategoryDetailAdapter(
-            adapterDelegate,
-            headerDelegate,
-            summaryDelegate
-        )
+        adapter = CategoryDetailAdapter(adapterDelegate, headerDelegate, summaryDelegate)
         viewBinding.categoryDetailItems.adapter = adapter
     }
 
@@ -144,7 +139,6 @@ class CategoryDetailActivity : AppCompatActivity() {
                 .putExtra("categoryId", categoryId)
                 .putExtra("categoryTitle", category.title)
             categoryEditableLauncher.launch(intent)
-
         }
 
         override fun onTitleEditClick() {
@@ -169,8 +163,7 @@ class CategoryDetailActivity : AppCompatActivity() {
                     contents[0] = CategoryDetailAdapter.HeaderContent(body)
                     adapter.notifyItemChanged(0)
                 }
-            }
-            .onFailure { LocalLogger.e(it) }
+            }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
             viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener {
                 Intent()

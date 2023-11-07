@@ -49,6 +49,12 @@ object CategoryIO {
             .body()
     }
 
+    suspend fun getDefaultCategoryIdByUserId(userId: Int): CategoryVO {
+        return httpClient
+            .get("/category") { parameter("userId", userId) }
+            .body()
+    }
+
     suspend fun listByUserId(userId: Int): List<CategoryVO> {
         return httpClient
             .get("/category/list/all") { parameter("userId", userId) }

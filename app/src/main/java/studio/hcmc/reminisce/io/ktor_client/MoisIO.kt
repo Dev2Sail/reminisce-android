@@ -7,7 +7,7 @@ import studio.hcmc.reminisce.BuildConfig
 import studio.hcmc.reminisce.io.mois.MoisResponse
 
 object MoisIO {
-    suspend fun transformAddress(address: String): MoisResponse {
+    suspend fun getRoadAddress(address: String): MoisResponse {
         return httpClient
             .get("https://business.juso.go.kr/addrlink/addrLinkApi.do") {
                 parameter("confmKey", BuildConfig.MOIS_JUSO_API_KEY)

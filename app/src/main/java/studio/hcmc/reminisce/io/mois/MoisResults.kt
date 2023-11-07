@@ -3,10 +3,16 @@ package studio.hcmc.reminisce.io.mois
 import kotlinx.serialization.Serializable
 sealed interface MoisJusoResponse
 
+
 @Serializable
 data class MoisResponse(
+    val results: MoisResults
+): MoisJusoResponse
+
+@Serializable
+data class MoisResults(
     val common: MoisCommon,
-    val juso: MoisJuso
+    val juso: List<MoisJuso>
 ): MoisJusoResponse
 
 @Serializable

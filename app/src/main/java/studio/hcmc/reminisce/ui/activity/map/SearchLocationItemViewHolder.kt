@@ -10,7 +10,7 @@ class SearchLocationItemViewHolder(
     private val delegate: Delegate
 ):ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onClick(placeId: String, placeName: String, roadAddress: String)
+        fun onClick(placeId: String)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -23,6 +23,6 @@ class SearchLocationItemViewHolder(
         viewBinding.searchLocationPlace.text = placeName
         viewBinding.searchLocationCategory.text = placeCategory ?: ""
         viewBinding.searchLocationRoadAddress.text = placeRoadAddress
-        viewBinding.root.setOnClickListener { delegate.onClick(placeId, placeName, placeRoadAddress) }
+        viewBinding.root.setOnClickListener { delegate.onClick(placeId) }
     }
 }
