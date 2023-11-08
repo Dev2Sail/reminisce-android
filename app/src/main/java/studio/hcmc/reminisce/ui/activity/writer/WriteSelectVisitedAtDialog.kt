@@ -35,7 +35,7 @@ class WriteSelectVisitedAtDialog(
                     viewBinding.dialogSelectVisitedAtField.error = null
                     viewBinding.dialogSelectSave.isEnabled = true
                 } else {
-                    viewBinding.dialogSelectVisitedAtField.error = activity.getString(R.string.error_visited_at)
+                    viewBinding.dialogSelectVisitedAtField.error = activity.getString(R.string.error_visited_at_miss)
                 }
             }
         }

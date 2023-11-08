@@ -33,21 +33,16 @@ class FriendsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityFriendsBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 
     private fun initView() {
         val menuId = intent.getIntExtra("menuId", -1)
         navigationController(viewBinding.friendsNavView, menuId)
-
-        viewBinding.friendsAppbar.apply {
-            appbarTitle.text = getText(R.string.setting_friend)
-            appbarActionButton1.isVisible = false
-            appbarBack.setOnClickListener { finish() }
-        }
+        viewBinding.friendsAppbar.appbarTitle.text = getText(R.string.setting_friend)
+        viewBinding.friendsAppbar.appbarActionButton1.isVisible = false
+        viewBinding.friendsAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.friendsSearch.setOnClickListener { launchSearchFriend() }
-
         onLoadContents()
     }
 
@@ -56,7 +51,6 @@ class FriendsActivity : AppCompatActivity() {
         val result = runCatching { FriendIO.listByUserId(user.id) }
             .onSuccess {it ->
                 friends = it.sortedBy { it.requestedAt }
-
                 for (friend in it) {
                     val opponent = UserIO.getById(friend.opponentId)
                     users[opponent.id] = opponent
@@ -126,7 +120,6 @@ class FriendsActivity : AppCompatActivity() {
         runCatching { FriendIO.put(user.id, dto) }
             .onSuccess {
                 val fetch = FriendIO.getByUserIdAndOpponentId(user.id, dto.opponentId)
-
                 withContext(Dispatchers.Main) {
                     contents[position] = FriendsAdapter.DetailContent(fetch)
                     adapter.notifyItemChanged(position)

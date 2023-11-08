@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.writer.options.WriteOptionSelectFriendActivity">
+    tools:context=".ui.activity.writer.options.WriteOptionFriendActivity">
 
     <include
         android:id="@+id/write_select_friend_appbar"

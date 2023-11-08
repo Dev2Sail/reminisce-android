@@ -25,6 +25,7 @@ class SearchLocationActivity : AppCompatActivity() {
     private lateinit var places: List<KKPlaceInfo>
     private lateinit var adapter: SearchLocationAdapter
 
+//    private var categoryId = -1
     private val contents = ArrayList<SearchLocationAdapter.Content>()
     private val placeInfo = HashMap<String /* placeId */, Place>()
     private val roadAddress = HashMap<String /* placeId*/, String>()
@@ -43,6 +44,7 @@ class SearchLocationActivity : AppCompatActivity() {
     }
 
     private fun initView() {
+//        LocalLogger.v("Search Location Activity -- CategoryId:${categoryId}")
         viewBinding.searchLocationBackIcon.setOnClickListener { finish() }
         viewBinding.searchLocationField.editText!!.setOnEditorActionListener { _, actionId, event ->
             val input = viewBinding.searchLocationField.string
@@ -54,6 +56,7 @@ class SearchLocationActivity : AppCompatActivity() {
 
             false
         }
+//        getDefaultCategoryId()
     }
 
     private fun fetchSearchResult(value: String) = CoroutineScope(Dispatchers.IO).launch {
@@ -116,8 +119,10 @@ class SearchLocationActivity : AppCompatActivity() {
         }
     }
 
+    // 잘못된 게 아닌가
     private fun launchWrite(placeId: String) {
         Intent(this, WriteActivity::class.java).apply {
+//            putExtra("categoryId", categoryId)
             putExtra("place", placeInfo[placeId]!!.placeName)
             putExtra("roadAddress", roadAddress[placeId])
             putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
@@ -125,4 +130,10 @@ class SearchLocationActivity : AppCompatActivity() {
             startActivity(this)
         }
     }
+//    private fun getDefaultCategoryId() = CoroutineScope(Dispatchers.IO).launch {
+//        val user = UserExtension.getUser(this@SearchLocationActivity)
+//        runCatching { CategoryIO.getDefaultCategoryIdByUserId(user.id) }
+//            .onSuccess { categoryId = it.id }
+//            .onFailure { LocalLogger.e(it) }
+//    }
 }

@@ -14,19 +14,21 @@ import studio.hcmc.reminisce.vo.location.LocationTagVO
 object LocationTagIO {
     suspend fun post(locationId: Int, dto: TagDTO.Post): LocationTagVO {
         return httpClient
-            .post("/location/${locationId}/tag") { setBody(Gson().toJsonTree(dto)) }
-            .body()
+            .post("/location/options/tag") {
+                parameter("locationId", locationId)
+                setBody(Gson().toJsonTree(dto))
+            }.body()
     }
 
     suspend fun delete(locationId: Int, tagId: Int) {
         httpClient
-            .delete("/location/${locationId}/tag/${tagId}")
+            .delete("/location/options/tag/${tagId}") { parameter("locationId", locationId) }
             .bodyAsText()
     }
 
     suspend fun listByUserId(userId: Int): List<LocationTagVO> {
         return httpClient
-            .get("location/tag/list/all") { parameter("userId", userId) }
+            .get("location/options/tag/list/all") { parameter("userId", userId) }
             .body()
     }
 }

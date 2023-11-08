@@ -45,19 +45,19 @@
             android:name=".ui.activity.map.MapActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.writer.options.WriteOptionSelectCategoryActivity"
+            android:name=".ui.activity.writer.options.WriteOptionCategoryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.writer.WriteOptionsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.writer.options.WriteOptionSelectFriendActivity"
+            android:name=".ui.activity.writer.options.WriteOptionFriendActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.report.ReportActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.writer.options.WriteOptionAddTagActivity"
+            android:name=".ui.activity.writer.options.WriteOptionTagActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.setting.AddFriendActivity"

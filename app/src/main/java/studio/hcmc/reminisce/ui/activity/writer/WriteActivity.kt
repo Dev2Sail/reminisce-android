@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityWriteBinding
 import studio.hcmc.reminisce.dto.location.LocationDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
@@ -23,10 +24,9 @@ import studio.hcmc.reminisce.util.string
 class WriteActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteBinding
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
-
-    private var defaultCategoryId = -1
     private val writeOptions = HashMap<String, Any?>()
 
+    private var defaultCategoryId = -1
     private val searchLocationLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onSearchLocationResult)
     private val writeOptionsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onOptionsResult)
 
@@ -40,36 +40,37 @@ class WriteActivity : AppCompatActivity() {
     private fun initView() {
         viewBinding.writeAppbar.appbarTitle.text = ""
         viewBinding.writeAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.writeAppbar.appbarActionButton1.setOnClickListener {
-            writeOptions["visitedAt"] ?: Toast.makeText(this, "방문 날짜를 선택해 주세요.", Toast.LENGTH_SHORT).show()
-            writeOptions["place"] ?: Toast.makeText(this, "방문 장소를 선택해 주세요.", Toast.LENGTH_SHORT).show()
-            if (writeOptions["place"] != null && writeOptions["visitedAt"] != null) {
-                writeOptions["body"] = viewBinding.writeTextContainer.string
-                prepareContents()
-            }
-        }
+        viewBinding.writeAppbar.appbarActionButton1.setOnClickListener { onValidatePost() }
         viewBinding.writeVisitedAt.setOnClickListener { WriteSelectVisitedAtDialog(this, visitedAtDelegate) }
         viewBinding.writeMarkerEmoji.setOnClickListener { WriteSelectEmojiDialog(this, emojiDelegate) }
         viewBinding.writeLocation.setOnClickListener {
-            val intent = Intent(this, SearchLocationActivity::class.java)
-            searchLocationLauncher.launch(intent)
+            searchLocationLauncher.launch(Intent(this, SearchLocationActivity::class.java))
         }
         fromSearchLocation()
+    }
+
+    private fun onValidatePost() {
+        writeOptions["visitedAt"] ?: Toast.makeText(this, getString(R.string.error_visited_at_miss), Toast.LENGTH_SHORT).show()
+        writeOptions["place"] ?: Toast.makeText(this, getString(R.string.error_location_miss), Toast.LENGTH_SHORT).show()
+        if (writeOptions["place"] != null && writeOptions["visitedAt"] != null) {
+            writeOptions["body"] = viewBinding.writeTextContainer.string
+            prepareContents()
+        }
     }
 
     private fun fromSearchLocation() {
         if (categoryId == -1) {
             getDefaultCategoryId()
             val place = intent.getStringExtra("place")
-            val roadAddress = intent.getStringExtra("roadAddress")
-            val longitude = intent.getDoubleExtra("longitude", -1.0)
-            val latitude = intent.getDoubleExtra("latitude", -1.0)
+//            val roadAddress = intent.getStringExtra("roadAddress")
+//            val longitude = intent.getDoubleExtra("longitude", -1.0)
+//            val latitude = intent.getDoubleExtra("latitude", -1.0)
             viewBinding.writeAppbar.appbarTitle.text = place
             viewBinding.writeLocation.text = place
             writeOptions["place"] = place
-            writeOptions["roadAddress"] = roadAddress
-            writeOptions["longitude"] = longitude
-            writeOptions["latitude"] = latitude
+            writeOptions["roadAddress"] = intent.getStringExtra("roadAddress")
+            writeOptions["longitude"] = intent.getDoubleExtra("longitude", -1.0)
+            writeOptions["latitude"] = intent.getDoubleExtra("latitude", -1.0)
         }
     }
 
@@ -82,6 +83,7 @@ class WriteActivity : AppCompatActivity() {
 
     private fun prepareContents() {
         val dto = LocationDTO.Post().apply {
+//            this.categoryId = this@WriteActivity.categoryId
             this.markerEmoji = writeOptions["emoji"] as String?
             this.latitude = writeOptions["latitude"] as Double
             this.longitude = writeOptions["longitude"] as Double
@@ -90,17 +92,12 @@ class WriteActivity : AppCompatActivity() {
             this.body = writeOptions["body"] as String
             this.visitedAt = writeOptions["visitedAt"] as String
         }
-        if (categoryId == -1) {
-            dto.categoryId = defaultCategoryId
-        } else {
-            dto.categoryId = this.categoryId
-        }
+        dto.categoryId = if (categoryId == -1) defaultCategoryId else this.categoryId
         postContents(dto)
     }
 
     private fun postContents(dto: LocationDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.post(dto) }
-//            .onSuccess { withContext(Dispatchers.Main) { launchWriteOptions(it.id) } }
             .onSuccess { launchWriteOptions(it.id) }
             .onFailure { LocalLogger.e(it) }
     }
@@ -120,9 +117,12 @@ class WriteActivity : AppCompatActivity() {
     }
 
     private fun launchWriteOptions(locationId: Int) {
+        val finalCategoryId = if (categoryId == -1) defaultCategoryId else categoryId
+
         val intent = Intent(this@WriteActivity, WriteOptionsActivity::class.java)
             .putExtra("locationId", locationId)
-            .putExtra("categoryId", categoryId)
+//            .putExtra("categoryId", categoryId)
+            .putExtra("categoryId", finalCategoryId)
             .putExtra("visitedAt", writeOptions["visitedAt"].toString())
             .putExtra("place", writeOptions["place"].toString())
         writeOptionsLauncher.launch(intent)

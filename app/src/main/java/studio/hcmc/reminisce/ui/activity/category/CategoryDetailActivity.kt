@@ -165,19 +165,22 @@ class CategoryDetailActivity : AppCompatActivity() {
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
-            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener {
-                Intent()
-                    .putExtra("isEdited", true)
-                    .putExtra("categoryId", categoryId)
-                    .putExtra("position", position)
-                    .setActivity(this@CategoryDetailActivity, Activity.RESULT_OK)
-                finish()
-            }
+            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { launchEditedHome() }
         }
+    }
+
+    private fun launchEditedHome() {
+        Intent()
+            .putExtra("isEdited", true)
+            .putExtra("categoryId", categoryId)
+            .putExtra("position", position)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 
     private val summaryDelegate= object : CategoryDetailSummaryViewHolder.Delegate {
         override fun onItemClick(location: LocationVO) {
+            // edit 후 result 받아야 함
             Intent(this@CategoryDetailActivity, WriteDetailActivity::class.java).apply {
                 putExtra("locationId", location.id)
                 putExtra("title", location.title)
@@ -194,14 +197,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             contents.removeAll {it is CategoryDetailAdapter.Content}
             loadContents()
-            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener {
-                Intent()
-                    .putExtra("isModified", true)
-                    .putExtra("categoryId", categoryId)
-                    .putExtra("position", position)
-                    .setActivity(this, Activity.RESULT_OK)
-                finish()
-            }
+            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { launchModifiedHome() }
         }
     }
 
@@ -209,14 +205,22 @@ class CategoryDetailActivity : AppCompatActivity() {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
             contents.removeAll {it is CategoryDetailAdapter.Content}
             loadContents()
-            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener {
-                Intent()
-                    .putExtra("isModified", true)
-                    .putExtra("categoryId", categoryId)
-                    .putExtra("position", position)
-                    .setActivity(this, Activity.RESULT_OK)
-                finish()
-            }
+            viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { launchModifiedHome() }
         }
     }
+
+    private fun launchModifiedHome() {
+        Intent()
+            .putExtra("isModified", true)
+            .putExtra("categoryId", categoryId)
+            .putExtra("position", position)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
+    }
 }
+/*
+home에서 patch하는 경우
+1) 카테고리 디테일에서 이름 변경
+2) 카테고리 디테일에서 summary 삭제
+3) 카테고리 디테일에서 summary 추가
+ */

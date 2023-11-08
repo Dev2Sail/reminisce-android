@@ -7,7 +7,8 @@ import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
 class WriteOptionsDialog(
     activity: Activity,
-    delegate: Delegate
+    delegate: Delegate,
+    categoryName: String
 ) {
     interface Delegate {
         fun onTagClick()
@@ -23,6 +24,7 @@ class WriteOptionsDialog(
         viewBinding.writeOptionsNextFriend.setOnClickListener { delegate.onFriendClick() }
         viewBinding.writeOptionsNextTag.setOnClickListener { delegate.onTagClick() }
         viewBinding.writeOptionsNextCategory.setOnClickListener { delegate.onCategoryClick() }
+        viewBinding.writeOptionsCategoryName.text = categoryName
         dialog.show()
     }
 }

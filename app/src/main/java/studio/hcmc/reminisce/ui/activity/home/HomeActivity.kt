@@ -36,12 +36,12 @@ import studio.hcmc.reminisce.vo.user.UserVO
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var adapter: HomeAdapter
+    private lateinit var friends: MutableList<FriendVO>
 
     private val users = HashMap<Int /* UserId */, UserVO>()
-    private var defaultCategoryId = 0
+    private var defaultCategoryId = -1
     private val categories = ArrayList<CategoryVO>()
     private val categoryInfo = HashMap<Int /* categoryId */, Int /* countById */>()
-    private lateinit var friends: MutableList<FriendVO>
     private val friendTagOpponentIds = HashSet<Int /* LocationFriendVO.opponentId */>()
     private val tags = ArrayList<TagVO>()
     private val contents = ArrayList<HomeAdapter.Content>()
@@ -51,22 +51,23 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 
-    private fun initView() {
-        val menuId = intent.getIntExtra("menuId", -1)
-        navigationController(viewBinding.homeNavView, menuId)
-
-        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
-
+    private fun test() {
         viewBinding.homeTest.setOnClickListener {
             Intent(this, MapTestActivity::class.java).apply {
                 startActivity(this)
                 finish()
             }
         }
+    }
+
+    private fun initView() {
+        val menuId = intent.getIntExtra("menuId", -1)
+        navigationController(viewBinding.homeNavView, menuId)
+        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
+        test()
     }
 
     private suspend fun fetchContents() = coroutineScope {
@@ -103,7 +104,6 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }.onFailure { LocalLogger.e(it) }
-
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
@@ -165,10 +165,12 @@ class HomeActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) { adapter.notifyItemInserted(categories.size) }
             }.onFailure {
                 LocalLogger.e(it)
-                withContext(Dispatchers.Main) {
-                    CommonError.onMessageDialog(this@HomeActivity, getString(R.string.dialog_error_add_folder))
-                }
+                withContext(Dispatchers.Main) { onCallError() }
             }
+    }
+
+    private fun onCallError() {
+        CommonError.onMessageDialog(this@HomeActivity, getString(R.string.dialog_error_add_folder))
     }
 
     private val categoryDelegate = object : CategoryViewHolder.Delegate {

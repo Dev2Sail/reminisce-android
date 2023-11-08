@@ -35,7 +35,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
-    private val addressList = HashMap<Int /* locationId */, String /* roadAddressName or addressName */>()
     private val contents = ArrayList<CategoryEditableDetailAdapter.Content>()
     private val selectedIds = HashSet<Int>()
 
@@ -43,7 +42,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCategoryEditableDetailBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 
@@ -55,8 +53,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         }
         viewBinding.categoryEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.categoryEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
-        viewBinding.categoryEditableDetailAppbar.appbarActionButton1.setOnClickListener { fetchContents(selectedIds) }
-
+        viewBinding.categoryEditableDetailAppbar.appbarActionButton1.setOnClickListener { preparePatch(selectedIds) }
         loadContents()
     }
 
@@ -68,8 +65,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
                 for (location in it) {
                     tagInfo[location.id] = TagIO.listByLocationId(location.id)
                     friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
-                    LocalLogger.v("${location.latitude} // ${location.longitude}")
-//                    fetchAddressByCoords(location.id, location.longitude.toString(), location.latitude.toString())
                 }
 
                 for (friends in friendInfo.values) {
@@ -83,21 +78,11 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
             }.onFailure { LocalLogger.e(it) }
 
         if (result.isSuccess) {
-//            prepareAddress()
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
-        } else {
-            CommonError.onMessageDialog(this@CategoryEditableDetailActivity, getString(R.string.dialog_error_common_list_body))
-        }
+        } else { onCallError() }
     }
 
-    private fun prepareAddress() {
-        for (location in locations) {
-            val longitudeToString = location.longitude.toString()
-            val latitudeToString = location.latitude.toString()
-//            fetchAddressByCoords(location.id, longitudeToString, latitudeToString)
-        }
-    }
     private fun prepareContents() {
         for (location in locations.sortedByDescending { it.id }) {
             contents.add(CategoryEditableDetailAdapter.DetailContent(
@@ -112,6 +97,10 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         viewBinding.categoryEditableDetailItems.layoutManager = LinearLayoutManager(this)
         adapter = CategoryEditableDetailAdapter(adapterDelegate, summaryDelegate)
         viewBinding.categoryEditableDetailItems.adapter = adapter
+    }
+
+    private fun onCallError() {
+        CommonError.onMessageDialog(this@CategoryEditableDetailActivity, getString(R.string.dialog_error_common_list_body))
     }
 
     private val adapterDelegate = object : CategoryEditableDetailAdapter.Delegate {
@@ -132,18 +121,23 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         override fun getUser(userId: Int): UserVO {
             return users[userId]!!
         }
-
     }
 
-    private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching {
-            for (locationId in locationIds) {
-                LocationIO.delete(locationId)
-            }
-        }.onSuccess {
-            Intent().putExtra("isModified", true).setActivity(this@CategoryEditableDetailActivity, Activity.RESULT_OK)
-            finish()
-        }.onFailure { LocalLogger.e(it) }
+    private fun preparePatch(ids: HashSet<Int>) {
+        for (id in ids) { fetchContents(id) }
+    }
+
+    private fun fetchContents(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { LocationIO.delete(locationId) }
+            .onSuccess { launchCategoryEditableDetail() }
+            .onFailure { LocalLogger.e(it) }
+    }
+
+    private fun launchCategoryEditableDetail() {
+        val intent = Intent()
+        intent.putExtra("isModified", true)
+        intent.setActivity(this@CategoryEditableDetailActivity, Activity.RESULT_OK)
+        finish()
     }
 }
 

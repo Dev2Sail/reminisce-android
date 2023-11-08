@@ -19,7 +19,7 @@ import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class WriteOptionAddTagActivity : AppCompatActivity() {
+class WriteOptionTagActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteOptionsAddTagBinding
     private lateinit var tags: List<TagVO>
     // 저장할 태그 body
@@ -69,7 +69,7 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
     // TODO AutoCompleteTextView
 
     private fun prepareTags() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@WriteOptionAddTagActivity)
+        val user = UserExtension.getUser(this@WriteOptionTagActivity)
         runCatching { TagIO.listByUserId(user.id) }
             .onSuccess {
                 tags = it
@@ -78,10 +78,10 @@ class WriteOptionAddTagActivity : AppCompatActivity() {
                 }
             }
             .onFailure {
-                CommonError.onMessageDialog(this@WriteOptionAddTagActivity, getString(R.string.dialog_error_tag_load))
+                CommonError.onMessageDialog(this@WriteOptionTagActivity, getString(R.string.dialog_error_tag_load))
                 CommonError.debugError(it)
                 Log.v("reminisce Logger", "[reminisce > tag] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
-                CommonError.onDialog(this@WriteOptionAddTagActivity)
+                CommonError.onDialog(this@WriteOptionTagActivity)
             }
     }
 
