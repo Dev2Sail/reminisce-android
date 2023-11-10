@@ -82,6 +82,7 @@ class WriteOptionsActivity : AppCompatActivity() {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
             val dialogViewBinding = DialogWriteOptionsBinding.inflate(layoutInflater)
             dialogViewBinding.writeOptionsTagIcon.setImageResource(R.drawable.round_favorite_24)
+            dialogViewBinding.writeOptionsTagIcon.setColorFilter(R.color.md_theme_light_primary)
         }
     }
 
@@ -89,6 +90,7 @@ class WriteOptionsActivity : AppCompatActivity() {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
             val dialogViewBinding = DialogWriteOptionsBinding.inflate(layoutInflater)
             dialogViewBinding.writeOptionsTagIcon.setImageResource(R.drawable.round_favorite_24)
+            dialogViewBinding.writeOptionsTagIcon.setColorFilter(R.color.md_theme_light_primary)
         }
     }
 

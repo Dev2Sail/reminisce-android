@@ -1,7 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.writer.options
 
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +14,7 @@ import studio.hcmc.reminisce.databinding.ActivityWriteOptionsAddTagBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.ui.view.CommonError
+import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 import studio.hcmc.reminisce.vo.tag.TagVO
@@ -78,10 +78,9 @@ class WriteOptionTagActivity : AppCompatActivity() {
                 }
             }
             .onFailure {
+                LocalLogger.e(it)
                 CommonError.onMessageDialog(this@WriteOptionTagActivity, getString(R.string.dialog_error_tag_load))
-                CommonError.debugError(it)
-                Log.v("reminisce Logger", "[reminisce > tag] : msg - ${it.message} ::  localMsg - ${it.localizedMessage} :: cause - ${it.cause}")
-                CommonError.onDialog(this@WriteOptionTagActivity)
+//                CommonError.debugError(it)
             }
     }
 

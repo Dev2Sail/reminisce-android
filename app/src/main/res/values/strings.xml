@@ -50,6 +50,7 @@
 
 
     <string name="visited_at_format">%d%d%d%d-%d%d-%d%d</string>
+    <string name="visit_count_format">%s %s %d번째 추억</string>
     <string name="write_options_success_date_message">%s년 %s월 %s일에 다녀온</string>
     <string name="write_options_success_location_message">"%s" 추억이 저장되었어요!</string>
     <string name="write_options_next_button">더욱 다양한 추억을 기록해 보세요</string>

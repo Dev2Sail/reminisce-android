@@ -25,6 +25,7 @@ import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.activity.friend_tag.FriendTagDetailActivity
 import studio.hcmc.reminisce.ui.activity.map.MapTestActivity
 import studio.hcmc.reminisce.ui.activity.tag.TagDetailActivity
+import studio.hcmc.reminisce.ui.activity.writer.options.WriteOptionCategoryActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
@@ -58,7 +59,12 @@ class HomeActivity : AppCompatActivity() {
         viewBinding.homeTest.setOnClickListener {
             Intent(this, MapTestActivity::class.java).apply {
                 startActivity(this)
-                finish()
+
+            }
+        }
+        viewBinding.homeTest2.setOnClickListener {
+            Intent(this, WriteOptionCategoryActivity::class.java).apply {
+                startActivity(this)
             }
         }
     }
@@ -165,11 +171,11 @@ class HomeActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) { adapter.notifyItemInserted(categories.size) }
             }.onFailure {
                 LocalLogger.e(it)
-                withContext(Dispatchers.Main) { onCallError() }
+                withContext(Dispatchers.Main) { onError() }
             }
     }
 
-    private fun onCallError() {
+    private fun onError() {
         CommonError.onMessageDialog(this@HomeActivity, getString(R.string.dialog_error_add_folder))
     }
 

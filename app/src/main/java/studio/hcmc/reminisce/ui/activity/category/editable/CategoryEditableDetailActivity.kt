@@ -54,6 +54,12 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         viewBinding.categoryEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.categoryEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
         viewBinding.categoryEditableDetailAppbar.appbarActionButton1.setOnClickListener { preparePatch(selectedIds) }
+        val set = HashSet<Int>()
+        set.add(1)
+        set.add(2)
+        val list = set.toMutableList()
+        LocalLogger.v("set to list : $list")
+        LocalLogger.v("categoryId : $categoryId =================")
         loadContents()
     }
 
@@ -80,7 +86,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
-        } else { onCallError() }
+        } else { onError() }
     }
 
     private fun prepareContents() {
@@ -99,7 +105,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         viewBinding.categoryEditableDetailItems.adapter = adapter
     }
 
-    private fun onCallError() {
+    private fun onError() {
         CommonError.onMessageDialog(this@CategoryEditableDetailActivity, getString(R.string.dialog_error_common_list_body))
     }
 
@@ -134,9 +140,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     }
 
     private fun launchCategoryEditableDetail() {
-        val intent = Intent()
-        intent.putExtra("isModified", true)
-        intent.setActivity(this@CategoryEditableDetailActivity, Activity.RESULT_OK)
+        Intent().putExtra("isModified", true).setActivity(this@CategoryEditableDetailActivity, Activity.RESULT_OK)
         finish()
     }
 }

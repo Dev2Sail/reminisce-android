@@ -62,9 +62,6 @@ class WriteActivity : AppCompatActivity() {
         if (categoryId == -1) {
             getDefaultCategoryId()
             val place = intent.getStringExtra("place")
-//            val roadAddress = intent.getStringExtra("roadAddress")
-//            val longitude = intent.getDoubleExtra("longitude", -1.0)
-//            val latitude = intent.getDoubleExtra("latitude", -1.0)
             viewBinding.writeAppbar.appbarTitle.text = place
             viewBinding.writeLocation.text = place
             writeOptions["place"] = place
@@ -83,7 +80,6 @@ class WriteActivity : AppCompatActivity() {
 
     private fun prepareContents() {
         val dto = LocationDTO.Post().apply {
-//            this.categoryId = this@WriteActivity.categoryId
             this.markerEmoji = writeOptions["emoji"] as String?
             this.latitude = writeOptions["latitude"] as Double
             this.longitude = writeOptions["longitude"] as Double
@@ -118,10 +114,8 @@ class WriteActivity : AppCompatActivity() {
 
     private fun launchWriteOptions(locationId: Int) {
         val finalCategoryId = if (categoryId == -1) defaultCategoryId else categoryId
-
         val intent = Intent(this@WriteActivity, WriteOptionsActivity::class.java)
             .putExtra("locationId", locationId)
-//            .putExtra("categoryId", categoryId)
             .putExtra("categoryId", finalCategoryId)
             .putExtra("visitedAt", writeOptions["visitedAt"].toString())
             .putExtra("place", writeOptions["place"].toString())

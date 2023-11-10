@@ -18,7 +18,7 @@ class SearchLocationAdapter(
         val id: String, // place.id
         val name: String, // 장소 (place_name)
         val category: String? = null, // 카테고리 (category_group_name)
-        val roadAddress: String // 도로명 주소 (road_address_name)
+        val roadAddress: String? // 도로명 주소 (road_address_name)
     ): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SearchLocationItemViewHolder(parent, itemDelegate)

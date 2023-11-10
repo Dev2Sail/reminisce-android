@@ -50,12 +50,18 @@ class CategoryDetailActivity : AppCompatActivity() {
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<CategoryDetailAdapter.Content>()
+    private val visitInfo = HashMap<Int /* locationId */, Count>()
+
+    private data class Count(
+        val city: String,
+        val province: String,
+        val count: Int
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCategoryDetailBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 
@@ -102,8 +108,17 @@ class CategoryDetailActivity : AppCompatActivity() {
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
-        } else {
-            CommonError.onMessageDialog(this@CategoryDetailActivity,  getString(R.string.dialog_error_common_list_body))
+        } else { onError() }
+    }
+
+    private fun onError() {
+        CommonError.onMessageDialog(this@CategoryDetailActivity,  getString(R.string.dialog_error_common_list_body))
+    }
+
+    private fun prepareVisitInfo() {
+        for (location in locations) {
+            val city = location.roadAddress.split(" ")[0]
+            val province = location.roadAddress.split(" ")[1]
         }
     }
 
@@ -218,9 +233,3 @@ class CategoryDetailActivity : AppCompatActivity() {
         finish()
     }
 }
-/*
-home에서 patch하는 경우
-1) 카테고리 디테일에서 이름 변경
-2) 카테고리 디테일에서 summary 삭제
-3) 카테고리 디테일에서 summary 추가
- */

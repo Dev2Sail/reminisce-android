@@ -1,5 +1,7 @@
 package studio.hcmc.reminisce.ui.activity.writer.options
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +15,7 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.category.CategoryVO
 
 class WriteOptionCategoryActivity : AppCompatActivity() {
@@ -39,7 +42,9 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
         viewBinding.writeOptionsSelectCategoryAppbar.appbarActionButton1.setOnClickListener {
             patchCategory(checkedCategoryId.elementAt(0))
         }
-        checkedCategoryId.add(categoryId)
+//        checkedCategoryId.add(categoryId)
+        checkedCategoryId.add(31)
+//        selectedCategoryId[0] = 31
         prepareCategories()
     }
 
@@ -63,16 +68,20 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.writeOptionsSelectCategoryItems.layoutManager = LinearLayoutManager(this)
+
         adapter = WriteOptionCategoryAdapter(adapterDelegate, itemDelegate)
         viewBinding.writeOptionsSelectCategoryItems.adapter = adapter
     }
 
     private fun patchCategory(categoryId: Int) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.patchCategoryId(locationId, categoryId) }
-            .onSuccess {
-                LocalLogger.v("changed categoryId by locationId")
-                // finish?
-            }.onFailure { LocalLogger.e(it) }
+            .onSuccess { launchOptions() }
+            .onFailure { LocalLogger.e(it) }
+    }
+
+    private fun launchOptions() {
+        Intent().putExtra("isAdded", true).setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 
     private val adapterDelegate = object : WriteOptionCategoryAdapter.Delegate {
@@ -81,15 +90,40 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
     }
 
     private val itemDelegate = object : WriteOptionCategoryItemViewHolder.Delegate {
-        override fun onItemClick(categoryId: Int): Boolean {
+        val checkFlag = BooleanArray(4)
+        override fun onItemClick(categoryId: Int, position: Int): Boolean {
+//            return if (selectedCategoryId[0] != categoryId) {
+//                selectedCategoryId[0] = categoryId
+//                LocalLogger.v("current categoryId (visible true): ${selectedCategoryId[0]}")
+//
+//                true
+//            } else {
+//                LocalLogger.v("current categoryId (visible false): ${selectedCategoryId[0]}")
+//                false
+//            }
+
+
+            // 선택돼있던 상태
             if (!checkedCategoryId.add(categoryId)) {
+                // 선택 해제
                 checkedCategoryId.remove(categoryId)
+
                 return false
             }
             checkedCategoryId.clear()
             checkedCategoryId.add(categoryId)
+
             return true
         }
+
+        override fun validate(categoryId: Int): Boolean {
+            return checkedCategoryId.contains(categoryId)
+        }
+
+//        fun validateCheck(position: Int): Boolean {
+//            if ()
+//
+//        }
     }
 }
 /*

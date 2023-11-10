@@ -26,21 +26,21 @@ class SummaryViewHolder(
     fun bind(content: CategoryEditableDetailAdapter.DetailContent) {
         val (location, tags, friends) = content
         val (year, month, day) = location.visitedAt.split("-")
-        viewBinding.apply {
-            cardCheckableSummaryTitle.text = location.title
-            cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
-            cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-            cardCheckableSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
-            cardCheckableSummaryVisitedCount.root.isGone = true
-        }
+        viewBinding.cardCheckableSummaryTitle.text = location.title
+        viewBinding.cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
+        viewBinding.cardCheckableSummaryVisitedCount.root.isGone = true
+
+        if (location.roadAddress.isNotEmpty()) {
+            viewBinding.cardCheckableSummaryAddress.root.isVisible = true
+            viewBinding.cardCheckableSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
+            viewBinding.cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+        } else { viewBinding.cardCheckableSummaryAddress.root.isGone = true }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
             viewBinding.cardCheckableSummaryMarkerEmoji.root.isVisible = true
             viewBinding.cardCheckableSummaryMarkerEmoji.layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
             viewBinding.cardCheckableSummaryMarkerEmoji.layoutSummaryItemBody.text = location.markerEmoji
-        } else {
-            viewBinding.cardCheckableSummaryMarkerEmoji.root.isGone = true
-        }
+        } else { viewBinding.cardCheckableSummaryMarkerEmoji.root.isGone = true }
 
         val tagText = tags.withIndex().joinToString { it.value.body }
         if (tagText.isNotEmpty()) {

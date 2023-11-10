@@ -41,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="@font/pretendard_semibold"
+        android:paddingHorizontal="@dimen/margin_large"
         android:text="@string/write_options_success_location_message"
         android:textSize="@dimen/title_medium"
         app:layout_constraintEnd_toEndOf="parent"

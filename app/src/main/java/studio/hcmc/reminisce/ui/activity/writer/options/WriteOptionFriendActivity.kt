@@ -1,5 +1,7 @@
 package studio.hcmc.reminisce.ui.activity.writer.options
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +17,7 @@ import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationFriendIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
@@ -37,16 +40,17 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     private fun initView() {
         viewBinding.writeSelectFriendAppbar.appbarTitle.text = getText(R.string.card_home_tag_friend_title)
         viewBinding.writeSelectFriendAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener {
-            val dto = LocationFriendDTO.Post().apply {
-                this.locationId = this@WriteOptionFriendActivity.locationId
-                this.opponentIds = this@WriteOptionFriendActivity.selectedFriendIds.toList()
-            }
-            fetchContents(dto)
-        }
-
+        viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { fetchContents(preparePost()) }
         prepareFriends()
         prepareSelectedFriends()
+    }
+
+    private fun preparePost(): LocationFriendDTO.Post {
+        val dto = LocationFriendDTO.Post().apply {
+            this.locationId = this@WriteOptionFriendActivity.locationId
+            this.opponentIds = this@WriteOptionFriendActivity.selectedFriendIds.toMutableList()
+        }
+        return dto
     }
 
     private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
@@ -89,10 +93,13 @@ class WriteOptionFriendActivity : AppCompatActivity() {
 
     private fun fetchContents(dto: LocationFriendDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationFriendIO.post(dto) }
-            .onSuccess {
-                // finish?
-        }.onFailure { LocalLogger.e(it) }
+            .onSuccess {launchOptions() }
+            .onFailure { LocalLogger.e(it) }
+    }
 
+    private fun launchOptions() {
+        Intent().putExtra("isAdded", true).setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 
     private val adapterDelegate = object : WriteOptionsFriendAdapter.Delegate {
@@ -104,6 +111,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
         override fun onItemClick(opponentId: Int): Boolean {
             if (!selectedFriendIds.add(opponentId)) {
                 selectedFriendIds.remove(opponentId)
+
                 return false
             }
 

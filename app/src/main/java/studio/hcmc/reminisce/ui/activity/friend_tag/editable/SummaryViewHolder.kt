@@ -28,8 +28,12 @@ class SummaryViewHolder(
         viewBinding.cardCheckableSummaryTitle.text = location.title
         viewBinding.cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = location.visitedAt
         viewBinding.cardCheckableSummaryVisitedCount.root.isGone = true
-        viewBinding.cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-        viewBinding.cardCheckableSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
+
+        if (location.roadAddress.isNotEmpty()) {
+            viewBinding.cardCheckableSummaryAddress.root.isVisible = true
+            viewBinding.cardCheckableSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
+            viewBinding.cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+        } else { viewBinding.cardCheckableSummaryAddress.root.isGone = true }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
             viewBinding.cardCheckableSummaryMarkerEmoji.root.isVisible = true

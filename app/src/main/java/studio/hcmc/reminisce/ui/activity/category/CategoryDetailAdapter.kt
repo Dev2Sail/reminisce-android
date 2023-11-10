@@ -24,6 +24,7 @@ class CategoryDetailAdapter(
         val location: LocationVO? = null,
         val tags: List<TagVO>? = null,
         val friends: List<FriendVO>? = null
+//        val count: String
     ): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {

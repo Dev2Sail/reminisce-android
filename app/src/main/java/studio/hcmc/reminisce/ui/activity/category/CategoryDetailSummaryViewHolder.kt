@@ -33,18 +33,20 @@ class CategoryDetailSummaryViewHolder(
             viewBinding.apply {
                 cardSummaryTitle.text = location.title
                 cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
-                cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-                cardSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
                 cardSummaryVisitedCount.root.isGone = true
             }
+
+            if (location.roadAddress.isNotEmpty()) {
+                viewBinding.cardSummaryAddress.root.isVisible = true
+                viewBinding.cardSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
+                viewBinding.cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+            } else { viewBinding.cardSummaryAddress.root.isGone = true }
 
             if (!location.markerEmoji.isNullOrEmpty()) {
                 viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
                 viewBinding.cardSummaryMarkerEmoji.layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
                 viewBinding.cardSummaryMarkerEmoji.layoutSummaryItemBody.text = location.markerEmoji
-            } else {
-                viewBinding.cardSummaryMarkerEmoji.root.isGone = true
-            }
+            } else { viewBinding.cardSummaryMarkerEmoji.root.isGone = true }
             viewBinding.root.setOnClickListener { delegate.onItemClick(location) }
         } else { viewBinding.root.isGone = true }
 

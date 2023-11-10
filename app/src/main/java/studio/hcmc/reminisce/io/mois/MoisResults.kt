@@ -12,7 +12,7 @@ data class MoisResponse(
 @Serializable
 data class MoisResults(
     val common: MoisCommon,
-    val juso: List<MoisJuso>
+    val juso: List<MoisJuso>?
 ): MoisJusoResponse
 
 @Serializable

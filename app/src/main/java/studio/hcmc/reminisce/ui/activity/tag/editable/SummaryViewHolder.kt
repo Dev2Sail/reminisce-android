@@ -30,35 +30,33 @@ class SummaryViewHolder(
             cardCheckableSummaryTitle.text = location.title
             cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = location.visitedAt
             cardCheckableSummaryVisitedCount.root.isGone = true
-            cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-            cardCheckableSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
         }
+
+        if (location.roadAddress.isNotEmpty()) {
+            viewBinding.cardCheckableSummaryAddress.root.isVisible = true
+            viewBinding.cardCheckableSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
+            viewBinding.cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+        } else { viewBinding.cardCheckableSummaryAddress.root.isGone = true }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
             viewBinding.cardCheckableSummaryMarkerEmoji.root.isVisible = true
             viewBinding.cardCheckableSummaryMarkerEmoji.layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
             viewBinding.cardCheckableSummaryMarkerEmoji.layoutSummaryItemBody.text = location.markerEmoji
-        } else {
-            viewBinding.cardCheckableSummaryMarkerEmoji.root.isGone = true
-        }
+        } else { viewBinding.cardCheckableSummaryMarkerEmoji.root.isGone = true }
 
         val tagText = tags.withIndex().joinToString { it.value.body }
         if (tagText.isNotEmpty()) {
             viewBinding.cardCheckableSummaryTags.root.isVisible = true
             viewBinding.cardCheckableSummaryTags.layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
             viewBinding.cardCheckableSummaryTags.layoutSummaryItemBody.text = tagText
-        } else {
-            viewBinding.cardCheckableSummaryTags.root.isGone = true
-        }
+        } else { viewBinding.cardCheckableSummaryTags.root.isGone = true }
 
         val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
         if (friendText.isNotEmpty()) {
             viewBinding.cardCheckableSummaryFriends.root.isVisible = true
             viewBinding.cardCheckableSummaryFriends.layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
             viewBinding.cardCheckableSummaryFriends.layoutSummaryItemBody.text = friendText
-        } else {
-            viewBinding.cardCheckableSummaryFriends.root.isGone = true
-        }
+        } else { viewBinding.cardCheckableSummaryFriends.root.isGone = true }
 
         viewBinding.cardCheckableSummaryCheckbox.setOnClickListener { delegate.onItemClick(location.id) }
         viewBinding.cardCheckableSummaryContainer.setOnClickListener {

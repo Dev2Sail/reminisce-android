@@ -28,19 +28,15 @@ class FriendTagSummaryViewHolder(
         val (location, tags, friends) = content
         viewBinding.cardSummaryVisitedCount.root.isGone = true
 
-        val addressBuilder = StringBuilder()
-        // TODO 좌표 -> 주소로 변환 후 getString에서 정해둔 포맷으로 넣으셈! (date_separator) 참고
-        addressBuilder.append(location.latitude)
-        addressBuilder.append(location.longitude)
-
         val (year, month, day) = location.visitedAt.split("-")
-        viewBinding.apply {
-            cardSummaryTitle.text = location.title
-            cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
-            cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-            cardSummaryAddress.layoutSummaryItemBody.text = addressBuilder.toString()
-            cardSummaryVisitedCount.root.isGone = true
-        }
+        viewBinding.cardSummaryTitle.text = location.title
+        viewBinding.cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
+
+        if (location.roadAddress.isNotEmpty()) {
+            viewBinding.cardSummaryAddress.root.isVisible = true
+            viewBinding.cardSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
+            viewBinding.cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+        } else { viewBinding.cardSummaryAddress.root.isGone = true }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
             viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
@@ -48,9 +44,7 @@ class FriendTagSummaryViewHolder(
                 layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
                 layoutSummaryItemBody.text = location.markerEmoji
             }
-        } else {
-            viewBinding.cardSummaryMarkerEmoji.root.isGone = true
-        }
+        } else { viewBinding.cardSummaryMarkerEmoji.root.isGone = true }
 
         val tagText = tags.withIndex().joinToString { it.value.body }
         if (tagText.isNotEmpty()) {
@@ -59,9 +53,7 @@ class FriendTagSummaryViewHolder(
                 layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
                 layoutSummaryItemBody.text = tagText
             }
-        } else {
-            viewBinding.cardSummaryTags.root.isGone = true
-        }
+        } else { viewBinding.cardSummaryTags.root.isGone = true }
 
         val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
         if (friendText.isNotEmpty()) {
@@ -70,10 +62,7 @@ class FriendTagSummaryViewHolder(
                 layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
                 layoutSummaryItemBody.text = friendText
             }
-        } else {
-            viewBinding.cardSummaryFriends.root.isGone = true
-        }
-
+        } else { viewBinding.cardSummaryFriends.root.isGone = true }
         viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title) }
     }
 }

@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.databinding.ActivitySearchLocationBinding
 import studio.hcmc.reminisce.io.kakao.KKPlaceInfo
 import studio.hcmc.reminisce.io.ktor_client.KakaoIO
@@ -25,10 +24,9 @@ class SearchLocationActivity : AppCompatActivity() {
     private lateinit var places: List<KKPlaceInfo>
     private lateinit var adapter: SearchLocationAdapter
 
-//    private var categoryId = -1
     private val contents = ArrayList<SearchLocationAdapter.Content>()
     private val placeInfo = HashMap<String /* placeId */, Place>()
-    private val roadAddress = HashMap<String /* placeId*/, String>()
+    private val roadAddress = HashMap<String /* placeId */, String?>()
 
     private data class Place(
         val placeName: String,
@@ -44,55 +42,77 @@ class SearchLocationActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-//        LocalLogger.v("Search Location Activity -- CategoryId:${categoryId}")
         viewBinding.searchLocationBackIcon.setOnClickListener { finish() }
         viewBinding.searchLocationField.editText!!.setOnEditorActionListener { _, actionId, event ->
             val input = viewBinding.searchLocationField.string
             if (actionId == EditorInfo.IME_ACTION_SEARCH || event.keyCode == KeyEvent.KEYCODE_SEARCH && event.action == KeyEvent.ACTION_DOWN) {
+                contents.removeAll {it is SearchLocationAdapter.Content}
                 fetchSearchResult(input)
-
                 return@setOnEditorActionListener true
             }
 
             false
         }
-//        getDefaultCategoryId()
     }
 
     private fun fetchSearchResult(value: String) = CoroutineScope(Dispatchers.IO).launch {
         val result = runCatching { KakaoIO.listByKeyword(value) }
             .onSuccess {
                 places = it.documents
-                for (document in it.documents) {
-                    placeInfo[document.id] = Place(document.place_name, document.x, document.y)
-                    roadAddress[document.id] = document.road_address_name.ifEmpty { getRoadAddress(document.address_name) }
+                for (place in places) {
+                    placeInfo[place.id] = Place(place.place_name, place.x, place.y)
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
-            prepareContents()
-            withContext(Dispatchers.Main) { onContentsReady() }
+            prepareGetRoadAddress()
+//            prepareContents()
+//                withContext(Dispatchers.Main) { onContentsReady() }
+
         }
     }
 
-    private suspend fun getRoadAddress(address: String): String = withContext(Dispatchers.IO) {
+    private fun prepareGetRoadAddress() {
+        LocalLogger.v("place size: ${places.size}")
+        for (place in places) {
+            val finalAddress = if (place.road_address_name == "") place.address_name else place.road_address_name
+            getRoadAddress(place.id, finalAddress)
+        }
+        LocalLogger.v("roadAddress size: ${roadAddress.size}")
+    }
+
+    private fun getRoadAddress(placeId: String, address: String) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { MoisIO.getRoadAddress(address) }
             .onSuccess {
-                for (jusoInfo in it.results.juso) {
-                    return@withContext jusoInfo.roadAddr
-                }
+                if (it.results.juso != null) {
+                    for (info in it.results.juso.withIndex()) {
+                        if (info.index == 0) {
+//                            roadAddress[placeId] = info.value.roadAddr
+
+                        }
+                    }
+                } else { roadAddress[placeId] = null }
             }.onFailure { LocalLogger.e(it) }
-    }.toString()
+    }
+
+    private fun test(size: Int,)
+
+    private fun validate() {
+//        for (place in places) {
+//            LocalLogger.v("places -> ${place.id}: ${place.address_name}")
+//        }
+        for (info in roadAddress) {
+            LocalLogger.v("roadAddress -> ${info.key}: ${info.value}")
+        }
+    }
 
     private fun prepareContents() {
-        for (place in places) {
-            contents.add(SearchLocationAdapter.PlaceContent(
-                place.id,
-                place.place_name,
-                place.category_name.split(">").last().trim(' '),
-                roadAddress[place.id]!!
-            ))
-        }
-        //places.mapTo(contents) { SearchLocationAdapter.PlaceContent(it.place_name, it.category_name.split(">").last(), it.road_address_name) }
+        contents.addAll(places.map { SearchLocationAdapter.PlaceContent(
+            it.id, it.place_name, categoryNameFormat(it.category_name), roadAddress[it.id] ?: ""
+        ) })
+    }
+
+    private fun categoryNameFormat(value: String): String {
+        return value.split(">").last().trim(' ')
     }
 
     private fun onContentsReady() {
@@ -108,21 +128,13 @@ class SearchLocationActivity : AppCompatActivity() {
 
     private val itemDelegate = object : SearchLocationItemViewHolder.Delegate {
         override fun onClick(placeId: String) {
-            Intent().apply {
-                putExtra("place", placeInfo[placeId]!!.placeName)
-                putExtra("roadAddress", roadAddress[placeId])
-                putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
-                putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
-                setActivity(this@SearchLocationActivity, Activity.RESULT_OK)
-            }
+            fromWriteLauncher(placeId)
             launchWrite(placeId)
         }
     }
 
-    // 잘못된 게 아닌가
     private fun launchWrite(placeId: String) {
         Intent(this, WriteActivity::class.java).apply {
-//            putExtra("categoryId", categoryId)
             putExtra("place", placeInfo[placeId]!!.placeName)
             putExtra("roadAddress", roadAddress[placeId])
             putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
@@ -130,10 +142,14 @@ class SearchLocationActivity : AppCompatActivity() {
             startActivity(this)
         }
     }
-//    private fun getDefaultCategoryId() = CoroutineScope(Dispatchers.IO).launch {
-//        val user = UserExtension.getUser(this@SearchLocationActivity)
-//        runCatching { CategoryIO.getDefaultCategoryIdByUserId(user.id) }
-//            .onSuccess { categoryId = it.id }
-//            .onFailure { LocalLogger.e(it) }
-//    }
+
+    private fun fromWriteLauncher(placeId: String) {
+        Intent().apply {
+            putExtra("place", placeInfo[placeId]!!.placeName)
+            putExtra("roadAddress", roadAddress[placeId])
+            putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
+            putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
+            setActivity(this@SearchLocationActivity, Activity.RESULT_OK)
+        }
+    }
 }
