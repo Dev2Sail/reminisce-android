@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.databinding.ActivitySearchLocationBinding
 import studio.hcmc.reminisce.io.kakao.KKPlaceInfo
 import studio.hcmc.reminisce.io.ktor_client.KakaoIO
@@ -65,45 +66,43 @@ class SearchLocationActivity : AppCompatActivity() {
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
             prepareGetRoadAddress()
-//            prepareContents()
-//                withContext(Dispatchers.Main) { onContentsReady() }
-
+            if (roadAddress.isNotEmpty()) {
+                prepareContents()
+                withContext(Dispatchers.Main) { onContentsReady() }
+            }
         }
     }
 
     private fun prepareGetRoadAddress() {
-        LocalLogger.v("place size: ${places.size}")
         for (place in places) {
             val finalAddress = if (place.road_address_name == "") place.address_name else place.road_address_name
             getRoadAddress(place.id, finalAddress)
         }
-        LocalLogger.v("roadAddress size: ${roadAddress.size}")
     }
 
+    // 아 왜 안 되냐!!!
     private fun getRoadAddress(placeId: String, address: String) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { MoisIO.getRoadAddress(address) }
+        val result = runCatching { MoisIO.getRoadAddress(address) }
             .onSuccess {
-                if (it.results.juso != null) {
-                    for (info in it.results.juso.withIndex()) {
+                val result = it.results.juso
+                if (!result.isNullOrEmpty()) {
+                    for (info in result.withIndex()) {
                         if (info.index == 0) {
-//                            roadAddress[placeId] = info.value.roadAddr
-
+                            roadAddress[placeId] = info.value.roadAddr
                         }
                     }
-                } else { roadAddress[placeId] = null }
+                } else {
+                    roadAddress[placeId] = "null"
+                }
             }.onFailure { LocalLogger.e(it) }
-    }
+        if (result.isSuccess) {
+            for (info in roadAddress) {
+                LocalLogger.v("roadAddress -> ${info.key}: ${info.value}")
+            }
 
-    private fun test(size: Int,)
-
-    private fun validate() {
-//        for (place in places) {
-//            LocalLogger.v("places -> ${place.id}: ${place.address_name}")
-//        }
-        for (info in roadAddress) {
-            LocalLogger.v("roadAddress -> ${info.key}: ${info.value}")
         }
     }
+    // roadAddress에 하나도 안 들어감
 
     private fun prepareContents() {
         contents.addAll(places.map { SearchLocationAdapter.PlaceContent(

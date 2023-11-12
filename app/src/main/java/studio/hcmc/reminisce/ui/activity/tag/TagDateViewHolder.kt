@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.databinding.CardDateSeparatorBinding
 
-class TagDateDividerViewHolder(
+class TagDateViewHolder(
     private val viewBinding: CardDateSeparatorBinding
 ): ViewHolder(viewBinding.root) {
 

@@ -33,6 +33,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
     private val body by lazy { intent.getStringExtra("tagBody") }
 
     private val users = HashMap<Int /* UserId */, UserVO>()
+    //friend nullable
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
 

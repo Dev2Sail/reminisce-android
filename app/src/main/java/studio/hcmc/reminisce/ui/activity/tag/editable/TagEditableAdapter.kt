@@ -20,7 +20,7 @@ class TagEditableAdapter(
     data class DetailContent(
         val location: LocationVO,
         val tags: List<TagVO>,
-        val friends: List<FriendVO>
+        val friends: List<FriendVO>? = null
     ): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SummaryViewHolder(parent, summaryDelegate)

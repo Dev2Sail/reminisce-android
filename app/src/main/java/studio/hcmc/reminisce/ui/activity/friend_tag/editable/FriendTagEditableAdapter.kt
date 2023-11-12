@@ -19,7 +19,7 @@ class FriendTagEditableAdapter(
 
     data class DetailContent(
         val location: LocationVO,
-        val tags: List<TagVO>,
+        val tags: List<TagVO>? = null,
         val friends: List<FriendVO>
     ): Content
 

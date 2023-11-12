@@ -82,7 +82,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
                     }
                 }
             }.onFailure { LocalLogger.e(it) }
-
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }

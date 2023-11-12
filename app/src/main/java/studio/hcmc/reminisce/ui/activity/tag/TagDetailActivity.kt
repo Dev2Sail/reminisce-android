@@ -45,7 +45,6 @@ class TagDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityTagDetailBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 

@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.tag
+package studio.hcmc.reminisce.ui.activity.map.place
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -10,10 +10,10 @@ import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class TagDetailAdapter(
+class PlaceAdapter(
     private val adapterDelegate: Delegate,
-    private val headerDelegate: TagDetailHeaderViewHolder.Delegate,
-    private val summaryDelegate: TagDetailSummaryViewHolder.Delegate
+    private val headerDelegate: PlaceHeaderViewHolder.Delegate,
+    private val summaryDelegate: PlaceSummaryViewHolder.Delegate
 ): Adapter<ViewHolder>() {
     interface Delegate: SingleTypeAdapterDelegate<Content>
 
@@ -24,22 +24,22 @@ class TagDetailAdapter(
     data class DetailContent(
         val location: LocationVO,
         val tags: List<TagVO>,
-        val friends: List<FriendVO>? = null
+        val friends: List<FriendVO>
     ): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
-        0 -> TagDetailHeaderViewHolder(parent, headerDelegate)
-        1 -> TagDateViewHolder(parent)
-        2 -> TagDetailSummaryViewHolder(parent, summaryDelegate)
+        0 -> PlaceHeaderViewHolder(parent, headerDelegate)
+        1 -> PlaceDateViewHolder(parent)
+        2 -> PlaceSummaryViewHolder(parent, summaryDelegate)
         else -> unknownViewType(viewType)
     }
 
     override fun getItemCount() = adapterDelegate.getItemCount()
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when (holder) {
-        is TagDetailHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position) as HeaderContent)
-        is TagDateViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
-        is TagDetailSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
+        is PlaceHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position) as HeaderContent)
+        is PlaceDateViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
+        is PlaceSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
         else -> unknownViewHolder(holder, position)
     }
 

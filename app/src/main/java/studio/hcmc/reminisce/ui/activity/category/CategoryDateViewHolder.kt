@@ -7,7 +7,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.databinding.CardDateSeparatorBinding
 
-class CategoryDateDividerViewHolder (
+class CategoryDateViewHolder (
     private val viewBinding: CardDateSeparatorBinding
 ) : ViewHolder(viewBinding.root) {
     constructor(parent: ViewGroup): this(

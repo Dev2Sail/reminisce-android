@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
+            android:name=".ui.activity.map.place.PlaceActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.map.MapTestActivity"
             android:exported="false" />
         <activity

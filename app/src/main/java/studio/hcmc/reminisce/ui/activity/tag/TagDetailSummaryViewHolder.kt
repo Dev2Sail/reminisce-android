@@ -7,6 +7,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardSummaryBinding
+import studio.hcmc.reminisce.vo.friend.FriendVO
+import studio.hcmc.reminisce.vo.location.LocationVO
+import studio.hcmc.reminisce.vo.tag.TagVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
 class TagDetailSummaryViewHolder(
@@ -15,7 +18,6 @@ class TagDetailSummaryViewHolder(
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(locationId: Int, title: String)
-
         fun getUser(userId: Int): UserVO
     }
 
@@ -26,39 +28,54 @@ class TagDetailSummaryViewHolder(
 
     fun bind(content: TagDetailAdapter.DetailContent) {
         val (location, tags, friends) = content
-        val (year, month, day) = location.visitedAt.split("-")
+        prepareLocation(location)
+        prepareTags(tags)
+        friends?.let { prepareFriends(it) }
+        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title) }
+    }
+
+    private fun prepareLocation(location: LocationVO) {
         viewBinding.cardSummaryTitle.text = location.title
+        val (year, month, day) = location.visitedAt.split("-")
         viewBinding.cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
         viewBinding.cardSummaryVisitedCount.root.isGone = true
 
         if (location.roadAddress.isNotEmpty()) {
-            viewBinding.cardSummaryAddress.root.isVisible = true
-            viewBinding.cardSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
-            viewBinding.cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+            viewBinding.cardSummaryAddress.apply {
+                root.isVisible = true
+                layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+                layoutSummaryItemBody.text = location.roadAddress
+            }
         } else { viewBinding.cardSummaryAddress.root.isGone = true }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
-            viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
-            viewBinding.cardSummaryMarkerEmoji.layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
-            viewBinding.cardSummaryMarkerEmoji.layoutSummaryItemBody.text = location.markerEmoji
+            viewBinding.cardSummaryMarkerEmoji.apply {
+                root.isVisible = true
+                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
+                layoutSummaryItemBody.text = location.markerEmoji
+            }
         } else { viewBinding.cardSummaryMarkerEmoji.root.isGone = true }
+    }
 
-        val tagText = tags.withIndex().joinToString { it.value.body }
-        if (tagText.isNotEmpty()) {
-            viewBinding.cardSummaryTags.root.isVisible = true
-            viewBinding.cardSummaryTags.layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
-            viewBinding.cardSummaryTags.layoutSummaryItemBody.text = tagText
+    private fun prepareTags(tags: List<TagVO>) {
+        val tagTest = tags.withIndex().joinToString { it.value.body }
+        if (tagTest.isNotEmpty()) {
+            viewBinding.cardSummaryTags.apply {
+                root.isVisible = true
+                layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
+                layoutSummaryItemBody.text = tagTest
+            }
         } else { viewBinding.cardSummaryTags.root.isGone = true }
+    }
 
+    private fun prepareFriends(friends: List<FriendVO>) {
         val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
         if (friendText.isNotEmpty()) {
-            viewBinding.cardSummaryFriends.root.isVisible = true
-            viewBinding.cardSummaryFriends.layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
-            viewBinding.cardSummaryFriends.layoutSummaryItemBody.text = friendText
-        } else {
-            viewBinding.cardSummaryFriends.root.isGone = true
-        }
-
-        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title) }
+            viewBinding.cardSummaryFriends.apply {
+                root.isVisible = true
+                layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
+                layoutSummaryItemBody.text = friendText
+            }
+        } else { viewBinding.cardSummaryFriends.root.isGone = true }
     }
 }

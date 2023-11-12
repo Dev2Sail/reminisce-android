@@ -22,6 +22,7 @@ import studio.hcmc.reminisce.databinding.ActivityMapBinding
 import studio.hcmc.reminisce.databinding.LayoutCustomMarkerBinding
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
+import studio.hcmc.reminisce.ui.activity.map.place.PlaceActivity
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
 
@@ -29,8 +30,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var viewBinding: ActivityMapBinding
     private lateinit var naverMap: NaverMap
     private lateinit var locationSource: FusedLocationSource
-    private var mapView: MapView? = null
 
+    private var mapView: MapView? = null
     private val markerInfo = HashMap<String, Place>()
     private val markers = ArrayList<Marker>(markerInfo.size)
     private val customMarkerInfo = HashMap<String, PlaceWithEmoji>()
@@ -87,6 +88,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val result = runCatching { LocationIO.listByUserId(user.id) }
             .onSuccess { it -> it.forEach {
                 if (it.markerEmoji.isNullOrEmpty()) {
+                    // customMarker 우선순위가 더 높음
+
                     if (!markerInfo.containsKey(it.title)) {
                         markerInfo[it.title] = Place(it.roadAddress, it.latitude, it.longitude)
                     }
@@ -102,18 +105,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun buildMarkers() {
-        for (place in markerInfo) {
-            markers.add(prepareMarker(place.key, place.value.address, place.value.latitude, place.value.longitude))
-        }
-        for (place in customMarkerInfo) {
-            customMarkers.add(prepareCustomMarker(
-                place.value.emoji,
-                place.key,
-                place.value.address,
-                place.value.latitude,
-                place.value.longitude
-            ))
-        }
+        markerInfo.forEach { markers.add(prepareMarker(it.key, it.value.address, it.value.latitude, it.value.longitude)) }
+        customMarkerInfo.forEach { customMarkers.add(prepareCustomMarker(it.value.emoji, it.key, it.value.address, it.value.latitude, it.value.longitude)) }
+//        for (place in markerInfo) {
+//            markers.add(prepareMarker(
+//                place.key,
+//                place.value.address,
+//                place.value.latitude,
+//                place.value.longitude
+//            ))
+//        }
+//        for (place in customMarkerInfo) {
+//            customMarkers.add(prepareCustomMarker(
+//                place.value.emoji,
+//                place.key,
+//                place.value.address,
+//                place.value.latitude,
+//                place.value.longitude
+//            ))
+//        }
     }
 
     private fun prepareMarker(place: String, address: String, latitude: Double, longitude: Double): Marker {
@@ -122,6 +132,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             icon = MarkerIcons.BLACK
             iconTintColor = getColor(R.color.md_theme_light_primary)
             isHideCollidedSymbols = true
+            isHideCollidedMarkers = true
             setOnClickListener {
                 MarkerDetailDialog(this@MapActivity, detailDialogDelegate, place, address)
 
@@ -138,6 +149,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             position = LatLng(latitude, longitude)
             icon = OverlayImage.fromView(emojiView.root)
             isHideCollidedSymbols = true
+            isHideCollidedMarkers = true
+            zIndex = 100
             setOnClickListener {
                 MarkerDetailDialog(this@MapActivity, detailDialogDelegate, place, address)
 
@@ -149,7 +162,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val detailDialogDelegate = object : MarkerDetailDialog.Delegate {
         override fun onClick(placeName: String) {
-            // TODO getByTitle recyclerview
+            launchPlace(placeName)
+        }
+    }
+
+    private fun launchPlace(value: String) {
+        Intent(this, PlaceActivity::class.java).apply {
+            putExtra("location", value)
+            startActivity(this)
         }
     }
 

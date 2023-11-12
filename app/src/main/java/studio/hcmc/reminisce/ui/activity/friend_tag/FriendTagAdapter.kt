@@ -24,13 +24,13 @@ class FriendTagAdapter(
     class DateContent(val body: String? = null): Content
     data class DetailContent(
         val location: LocationVO,
-        val tags: List<TagVO>,
+        val tags: List<TagVO>? = null,
         val friends: List<FriendVO>
     ): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {
         0 -> FriendTagHeaderViewHolder(parent, headerDelegate)
-        1 -> FriendTagDateDividerViewHolder(parent)
+        1 -> FriendTagDateViewHolder(parent)
         2 -> FriendTagSummaryViewHolder(parent, summaryDelegate)
         else -> unknownViewType(viewType)
     }
@@ -39,7 +39,7 @@ class FriendTagAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when (holder) {
         is FriendTagHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position) as HeaderContent)
-        is FriendTagDateDividerViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
+        is FriendTagDateViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
         is FriendTagSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
         else -> unknownViewHolder(holder, position)
     }

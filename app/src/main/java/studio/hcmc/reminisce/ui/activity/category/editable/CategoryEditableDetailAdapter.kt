@@ -19,8 +19,8 @@ class CategoryEditableDetailAdapter(
 
     data class DetailContent(
         val location: LocationVO,
-        val tags: List<TagVO>,
-        val friends: List<FriendVO>
+        val tags: List<TagVO>? = null,
+        val friends: List<FriendVO>? = null
     ): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SummaryViewHolder(parent, summaryDelegate)

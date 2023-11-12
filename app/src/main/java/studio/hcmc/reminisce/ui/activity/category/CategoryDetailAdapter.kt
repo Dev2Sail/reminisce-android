@@ -21,7 +21,7 @@ class CategoryDetailAdapter(
     class HeaderContent(val title: String): Content
     class DateContent(val body: String? = null): Content
     data class DetailContent(
-        val location: LocationVO? = null,
+        val location: LocationVO,
         val tags: List<TagVO>? = null,
         val friends: List<FriendVO>? = null
 //        val count: String
@@ -29,7 +29,7 @@ class CategoryDetailAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {
         0 -> CategoryDetailHeaderViewHolder(parent, headerDelegate)
-        1 -> CategoryDateDividerViewHolder(parent)
+        1 -> CategoryDateViewHolder(parent)
         2 -> CategoryDetailSummaryViewHolder(parent, summaryDelegate)
         else -> unknownViewType(viewType)
     }
@@ -38,7 +38,7 @@ class CategoryDetailAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when(holder) {
         is CategoryDetailHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position) as HeaderContent)
-        is CategoryDateDividerViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
+        is CategoryDateViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
         is CategoryDetailSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
         else -> unknownViewHolder(holder, position)
     }
