@@ -12,9 +12,11 @@ package studio.hcmc.reminisce
 
 
 // * Report
-// TODO 일년전 오늘
+// TODO 일년전 오늘 -> 없다면 gone ? 빈 문자열? -> 퍋ㅈ gone
 // TODO 가장 많이 태그된 친구
 // TODO 이번 달에 저장된 추억의 수
+// TODO 해수욕장 기준 방문 횟수 ? / 255
+// TODO 휴게소 방문 횟수 ? / 255
 
 // * Setting
 // TODO 회원탈퇴 시 모든 activity 종료 후 launch 화면으로 이동

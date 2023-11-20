@@ -10,17 +10,233 @@
         android:id="@+id/report_header"
         layout="@layout/card_common_header" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/report_1year_ago_container"
+        style="@style/Widget.Material3.CardView.Elevated"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingBottom="80dp"
-        app:layout_constraintTop_toBottomOf="@id/report_header"
-        app:layout_constraintBottom_toTopOf="@id/report_nav_view"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_large"
+        app:cardElevation="@dimen/card_elevation_standard"
+        app:contentPaddingBottom="@dimen/margin_regular"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:contentPaddingTop="@dimen/margin_regular"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/report_header">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/report_1year_ago_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_medium"
+                android:text="@string/report_year_ago"
+                android:textSize="@dimen/title_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/report_1year_ago_body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="청운대학교"
+                android:textColor="@color/md_theme_light_primary"
+                android:textSize="@dimen/body_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/report_1year_ago_next"
+                app:layout_constraintTop_toBottomOf="@id/report_1year_ago_title" />
+
+            <ImageView
+                android:id="@+id/report_1year_ago_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_arrow_outward_24"
+                app:layout_constraintBottom_toBottomOf="@id/report_1year_ago_body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/report_1year_ago_body" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/report_friend_container"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_large"
+        app:cardElevation="@dimen/card_elevation_standard"
+        app:contentPaddingBottom="@dimen/margin_regular"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:contentPaddingTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/report_1year_ago_container">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/report_friend_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_medium"
+                android:text="@string/report_most_added_friend"
+                android:textSize="@dimen/title_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/report_friend_body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="애기오빠자기"
+                android:textColor="@color/md_theme_light_primary"
+                android:textSize="@dimen/body_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/report_friend_next"
+                app:layout_constraintTop_toBottomOf="@id/report_friend_title" />
+
+            <ImageView
+                android:id="@+id/report_friend_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_arrow_outward_24"
+                app:layout_constraintBottom_toBottomOf="@id/report_friend_body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/report_friend_body" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/report_ocean_container"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_large"
+        app:cardElevation="@dimen/card_elevation_standard"
+        app:contentPaddingBottom="@dimen/margin_regular"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:contentPaddingTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/report_friend_container">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/report_ocean_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_medium"
+                android:text="@string/report_ocean"
+                android:textSize="@dimen/title_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/report_ocean_body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="@string/report_ocean_body"
+                android:textColor="@color/md_theme_light_primary"
+                android:textSize="@dimen/body_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/report_ocean_next"
+                app:layout_constraintTop_toBottomOf="@id/report_ocean_title" />
+
+            <ImageView
+                android:id="@+id/report_ocean_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_arrow_outward_24"
+                app:layout_constraintBottom_toBottomOf="@id/report_ocean_body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/report_ocean_body" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/report_service_area_container"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_2xlarge"
+        android:layout_marginTop="@dimen/margin_large"
+        app:cardElevation="@dimen/card_elevation_standard"
+        app:contentPaddingBottom="@dimen/margin_regular"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:contentPaddingTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/report_ocean_container">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/report_service_area_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_medium"
+                android:text="@string/report_service_area"
+                android:textSize="@dimen/title_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/report_service_area_body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="@string/report_service_area_body"
+                android:textColor="@color/md_theme_light_primary"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:textSize="@dimen/body_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/report_service_area_next"
+                app:layout_constraintTop_toBottomOf="@id/report_service_area_title" />
+
+            <ImageView
+                android:id="@+id/report_service_area_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_arrow_outward_24"
+                app:layout_constraintBottom_toBottomOf="@id/report_service_area_body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/report_service_area_body" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <include
         android:id="@+id/report_nav_view"

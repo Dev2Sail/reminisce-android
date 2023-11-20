@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <include
+        android:id="@+id/test_report_header"
+        layout="@layout/card_common_header" />
+
+    <HorizontalScrollView
+        android:id="@+id/test_scroll"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/test_report_header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/test_container_0"
+            style="@style/Widget.Material3.CardView.Elevated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_4xlarge"
+            android:layout_marginTop="@dimen/margin_large"
+            android:clickable="false"
+            app:cardElevation="@dimen/card_elevation_standard"
+            app:contentPaddingBottom="@dimen/margin_regular"
+            app:contentPaddingLeft="@dimen/margin_regular"
+            app:contentPaddingRight="@dimen/margin_regular"
+            app:contentPaddingTop="@dimen/margin_regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/test_report_header">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/test_title_0"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/pretendard_medium"
+                    android:text="@string/report_service_area"
+                    android:textSize="@dimen/title_large"
+                    android:layout_marginEnd="@dimen/margin_2xlarge"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/test_body_0"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_large"
+                    android:layout_marginTop="@dimen/margin_4xlarge"
+                    android:fontFamily="@font/pretendard_regular"
+                    android:text="@string/report_service_area_body"
+                    android:textColor="@color/md_theme_light_primary"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    android:textSize="@dimen/body_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/test_title_0"
+                    app:layout_constraintTop_toBottomOf="@id/test_title_0" />
+
+                <ImageView
+                    android:id="@+id/test_next_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/round_arrow_outward_24"
+                    app:layout_constraintBottom_toBottomOf="@id/test_body_0"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/test_body_0" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+    </HorizontalScrollView>
+
+    <!-- horizontal scroll ?-->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/test_container_1"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_4xlarge"
+        android:layout_marginTop="@dimen/margin_large"
+        android:clickable="false"
+        app:cardElevation="@dimen/card_elevation_standard"
+        app:contentPaddingBottom="@dimen/margin_regular"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:contentPaddingTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/test_scroll">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/test_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_medium"
+                android:text="@string/report_service_area"
+                android:textSize="@dimen/title_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/test_body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_4xlarge"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="@string/report_service_area_body"
+                android:textColor="@color/md_theme_light_primary"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:textSize="@dimen/body_large"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/test_next"
+                app:layout_constraintTop_toBottomOf="@id/test_title" />
+
+            <ImageView
+                android:id="@+id/test_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_arrow_outward_24"
+                app:layout_constraintBottom_toBottomOf="@id/test_body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/test_body" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/test_container_2"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_3xlarge"
+        android:layout_marginTop="@dimen/margin_large"
+        android:clickable="false"
+        app:cardElevation="@dimen/card_elevation_standard"
+        app:contentPaddingBottom="@dimen/margin_regular"
+        app:contentPaddingLeft="@dimen/margin_regular"
+        app:contentPaddingRight="@dimen/margin_regular"
+        app:contentPaddingTop="@dimen/margin_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/test_container_1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/test_title_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_medium"
+                android:text="@string/report_service_area"
+                android:textSize="@dimen/title_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/test_body_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_3xlarge"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="@string/report_service_area_body"
+                android:textColor="@color/md_theme_light_primary"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:textSize="@dimen/body_large"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/test_next_2"
+                app:layout_constraintTop_toBottomOf="@id/test_title_2" />
+
+            <ImageView
+                android:id="@+id/test_next_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/round_arrow_outward_24"
+                app:layout_constraintBottom_toBottomOf="@id/test_body_2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/test_body_2" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

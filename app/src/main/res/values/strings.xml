@@ -30,7 +30,6 @@
     <string name="appbar_title">Title</string>
     <string name="appbar_button_text">완료</string>
 
-
     <string name="home_header">Nav Title</string>
     <string name="home_header_sub">action</string>
 
@@ -39,30 +38,7 @@
 
     <string name="category_view_holder_title">한눈에 보기</string>
 
-    <string name="write_option">Options</string>
-    <string name="write_date">Date</string>
-    <string name="write_location_title">Location</string>
-    <string name="writer_options_category">폴더</string>
-    <string name="write_options_add_tag_title">해시태그 추가</string>
-    <string name="write_options_add_tag_new_tag_container">저장할 해시태그</string>
-    <string name="write_options_add_tag_old_tag_container">이전에 사용된 해시태그</string>
-    <string name="write_options_add_tag_placeholderText">해시태그 입력 후 엔터를 입력해주세요.</string>
-
-
-    <string name="visited_at_format">%d%d%d%d-%d%d-%d%d</string>
-    <string name="visit_count_format">%s %s %d번째 추억</string>
-    <string name="write_options_success_date_message">%s년 %s월 %s일에 다녀온</string>
-    <string name="write_options_success_location_message">"%s" 추억이 저장되었어요!</string>
-    <string name="write_options_next_button">더욱 다양한 추억을 기록해 보세요</string>
-    <string name="write_options_select_category_title">카테고리 선택</string>
-
-
-    <string name="add_friend_title">친구 검색</string>
-    <string name="add_friend_placeholder_text">오늘추억 사용자 이메일을 검색해 보세요</string>
-
-    <string name="add_friend_helper_text">내 이메일 : dev2sail@google.com</string>
-
-
+    <!-- Use Setting -->
     <string name="setting_account">프로필 설정</string>
     <string name="setting_account_detail_nickname_title">닉네임 설정</string>
     <string name="setting_account_detail_password_title">비밀번호 설정</string>
@@ -71,6 +47,9 @@
     <string name="setting_signout_body">오늘추억에서 로그아웃 할까요?</string>
 
 
+    <string name="add_friend_title">친구 검색</string>
+    <string name="add_friend_placeholder_text">오늘추억 사용자 이메일을 검색해 보세요</string>
+    <string name="add_friend_helper_text">내 이메일 : dev2sail@google.com</string>
     <string name="setting_friend">친구 관리</string>
     <string name="setting_signout">로그아웃</string>
 
@@ -78,7 +57,7 @@
     <string name="setting_friend_item">friend nickname</string>
     <string name="friend_setting_activity_appbar_title">친구 목록</string>
 
-
+    <!-- Dialog Message && Dialog Button -->
     <string name="dialog_sign_in_error_title">로그인 오류</string>
     <string name="dialog_sign_in_error_body">로그인 정보를 확인해 주세요.</string>
 
@@ -97,7 +76,6 @@
 
     <string name="dialog_summary_delete">추억 삭제</string>
     <string name="dialog_summary_delete_body">기록을 삭제할까요?</string>
-
 
     <string name="dialog_add_friend_title">친구 추가</string>
     <string name="dialog_add_friend_body">친구로 등록할까요?</string>
@@ -134,6 +112,7 @@
     <string name="dialog_error_add_folder">폴더를 추가하는데 실패했어요. \n다시 시도해 주세요.</string>
     <string name="dialog_error_tag_load">태그를 불러오는데 실패했어요. \n다시 시도해 주세요.</string>
 
+    <!-- Use Writer -->
     <string name="card_category_item_body">100</string>
     <string name="card_category_item_title">Category Name</string>
     <string name="card_home_tag_city_title">어디에서</string>
@@ -147,8 +126,6 @@
     <string name="add_category_body">새로운 폴더</string>
     <string name="header_action">편집</string>
 
-    <string name="activity_report_title">Report</string>
-
     <string name="layout_not_found">검색 결과가 없어요.</string>
 
     <string name="write_visited_at">언제</string>
@@ -157,18 +134,41 @@
     <string name="write_friend">누구와</string>
     <string name="write_hashtag">해시태그</string>
     <string name="write_category">카테고리</string>
+    <string name="error_location_miss">방문 장소를 선택해 주세요.</string>
+    <string name="error_visited_at_miss">날짜를 다시 입력해 주세요.</string>
 
     <string name="category_title_edit_appbar">폴더 이름 변경</string>
     <string name="message_account_setting_detail_nickname">닉네임이 변경되었어요.</string>
-    <string name="map_header_title">지도</string>
-    <string name="map_header_search_title">어디를 다녀오셨나요?</string>
-
-    <string name="most_added_friend">가장 많이 등록된 친구</string>
-
-    <string name="error_location_miss">방문 장소를 선택해 주세요.</string>
-    <string name="error_visited_at_miss">날짜를 다시 입력해 주세요.</string>
     <string name="error_get_nickname">닉네임을 불러올 수 없어요.</string>
 
+    <string name="write_option">Options</string>
+    <string name="write_date">Date</string>
+    <string name="write_location_title">Location</string>
+    <string name="writer_options_category">폴더</string>
+    <string name="write_options_add_tag_title">해시태그 추가</string>
+    <string name="write_options_add_tag_new_tag_container">저장할 해시태그</string>
+    <string name="write_options_add_tag_old_tag_container">이전에 사용된 해시태그</string>
+    <string name="write_options_add_tag_placeholderText">해시태그 입력 후 엔터를 입력해주세요.</string>
+
+    <string name="visited_at_format">%d%d%d%d-%d%d-%d%d</string>
+    <string name="visit_count_format">%s %s %d번째 추억</string>
+    <string name="write_options_success_date_message">%s년 %s월 %s일에 다녀온</string>
+    <string name="write_options_success_location_message">"%s" 추억이 저장되었어요!</string>
+    <string name="write_options_next_button">더욱 다양한 추억을 기록해 보세요</string>
+    <string name="write_options_select_category_title">카테고리 선택</string>
+
+    <!-- Use Map -->
+    <string name="map_header_search_title">어디를 다녀오셨나요?</string>
     <string name="dialog_marker_detail_next">저장된 추억</string>
+
+
+    <!-- Use Report -->
+    <string name="report_ocean">해수욕장</string>
+    <string name="report_ocean_body">%d / 227</string>
+    <string name="report_service_area">휴게소</string>
+    <string name="report_service_area_body"> %d / 205</string>
+    <string name="report_most_added_friend">가장 많이 등록된 친구</string>
+    <string name="report_month">이번 달에 저장된 추억</string>
+    <string name="report_year_ago">1년 전 오늘</string>
 
 </resources>

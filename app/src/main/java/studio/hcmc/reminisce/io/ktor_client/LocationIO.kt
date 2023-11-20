@@ -94,4 +94,27 @@ object LocationIO {
                 parameter("title", title)
             }.body()
     }
+
+    /// userId에 저장된 해수욕장 리스트
+    suspend fun beachListByUserId(userId: Int): List<LocationVO> {
+        return httpClient
+            .get("/location/list/beach") { parameter("userId", userId) }
+            .body()
+    }
+
+    // userId에 저장된 휴게소 리스트
+    suspend fun serviceAreaListByUserId(userId: Int): List<LocationVO> {
+        return httpClient
+            .get("/location/list/service") { parameter("userId", userId) }
+            .body()
+    }
+
+    // userId별로 1년 전 오늘 저장된 location 조회
+    suspend fun getYearAgoTodayByUserIdAndToday(userId: Int, yearAgoToday: String): LocationVO {
+        return httpClient
+            .get("/location/today") {
+                parameter("userId", userId)
+                parameter("yearAgoToday", yearAgoToday)
+            }.body()
+    }
 }
