@@ -12,8 +12,7 @@ import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
 class WriteDetailAdapter(
-    private val adapterDelegate: Delegate,
-    private val optionsDelegate: WriteDetailOptionsViewHolder.Delegate
+    private val adapterDelegate: Delegate
 ): Adapter<ViewHolder>() {
     interface Delegate: SingleTypeAdapterDelegate<Content>
 
@@ -28,7 +27,7 @@ class WriteDetailAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {
         0 -> WriteDetailContentViewHolder(parent)
-        1 -> WriteDetailOptionsViewHolder(parent, optionsDelegate)
+        1 -> WriteDetailOptionsViewHolder(parent)
         else -> unknownViewType(viewType)
     }
 

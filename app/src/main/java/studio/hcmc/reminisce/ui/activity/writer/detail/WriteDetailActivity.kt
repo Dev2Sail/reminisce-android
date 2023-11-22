@@ -14,19 +14,16 @@ import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class WriteDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteDetailBinding
     private lateinit var adapter: WriteDetailAdapter
-
     private lateinit var location: LocationVO
     private lateinit var categoryInfo: CategoryVO
     private lateinit var tagInfo: List<TagVO>
@@ -35,7 +32,6 @@ class WriteDetailActivity : AppCompatActivity() {
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
     private val title by lazy { intent.getStringExtra("title") }
 
-    private val users = HashMap<Int /* UserId */, UserVO>()
     private val contents = ArrayList<WriteDetailAdapter.Content>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,8 +42,6 @@ class WriteDetailActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        loadContents()
-
         viewBinding.writeDetailAppbar.apply {
             appbarTitle.text = title
             appbarActionButton1.text = getString(R.string.header_action)
@@ -56,7 +50,7 @@ class WriteDetailActivity : AppCompatActivity() {
             }
             appbarBack.setOnClickListener {finish() }
         }
-
+        loadContents()
     }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
@@ -67,13 +61,6 @@ class WriteDetailActivity : AppCompatActivity() {
                 categoryInfo = CategoryIO.getById(it.categoryId)
                 tagInfo = TagIO.listByLocationId(it.id)
                 friendInfo = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-
-                for (friend in friendInfo) {
-                    if (friend.nickname == null) {
-                        val opponent = UserIO.getById(friend.opponentId)
-                        users[opponent.id] = opponent
-                    }
-                }
             }.onFailure { LocalLogger.e(it) }
 
         if (result.isSuccess) {
@@ -93,18 +80,12 @@ class WriteDetailActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.writeDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = WriteDetailAdapter(adapterDelegate, optionsDelegate)
+        adapter = WriteDetailAdapter(adapterDelegate)
         viewBinding.writeDetailItems.adapter = adapter
     }
 
     private val adapterDelegate = object : WriteDetailAdapter.Delegate {
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
-    }
-
-    private val optionsDelegate = object : WriteDetailOptionsViewHolder.Delegate {
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
-        }
     }
 }

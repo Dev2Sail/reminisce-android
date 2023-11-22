@@ -7,19 +7,12 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardWriteDetailOptionsBinding
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class WriteDetailOptionsViewHolder(
     private val viewBinding: CardWriteDetailOptionsBinding,
-    private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
-    interface Delegate {
-        fun getUser(userId: Int): UserVO
-    }
-
-    constructor(parent: ViewGroup, delegate: Delegate): this(
-        viewBinding = CardWriteDetailOptionsBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-        delegate = delegate
+    constructor(parent: ViewGroup): this(
+        viewBinding = CardWriteDetailOptionsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     )
 
     fun  bind(content: WriteDetailAdapter.OptionsContent) {
@@ -38,7 +31,7 @@ class WriteDetailOptionsViewHolder(
             viewBinding.cardWriteDetailOptionsTags.root.isGone = true
         }
 
-        val friendText = friends?.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
+        val friendText = friends?.joinToString { it.nickname!! }
         if (!friends.isNullOrEmpty()) {
             viewBinding.cardWriteDetailOptionsFriends.root.isVisible = true
             viewBinding.cardWriteDetailOptionsFriends.writeDetailItemIcon.setImageResource(R.drawable.round_group_16)

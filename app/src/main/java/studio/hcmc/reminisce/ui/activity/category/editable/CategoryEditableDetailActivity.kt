@@ -15,14 +15,12 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class CategoryEditableDetailActivity : AppCompatActivity() {
     lateinit var viewBinding: ActivityCategoryEditableDetailBinding
@@ -32,7 +30,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val title by lazy { intent.getStringExtra("categoryTitle") }
 
-    private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<CategoryEditableDetailAdapter.Content>()
@@ -54,12 +51,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         viewBinding.categoryEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.categoryEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
         viewBinding.categoryEditableDetailAppbar.appbarActionButton1.setOnClickListener { preparePatch(selectedIds) }
-        val set = HashSet<Int>()
-        set.add(1)
-        set.add(2)
-        val list = set.toMutableList()
-        LocalLogger.v("set to list : $list")
-        LocalLogger.v("categoryId : $categoryId =================")
         loadContents()
     }
 
@@ -71,15 +62,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
                 for (location in it) {
                     tagInfo[location.id] = TagIO.listByLocationId(location.id)
                     friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
-                }
-
-                for (friends in friendInfo.values) {
-                    for (friend in friends) {
-                        if (friend.nickname == null) {
-                            val opponent = UserIO.getById(friend.opponentId)
-                            users[opponent.id] = opponent
-                        }
-                    }
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
@@ -121,10 +103,6 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
                 return false
             }
             return true
-        }
-
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
         }
     }
 

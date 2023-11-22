@@ -14,12 +14,10 @@ import studio.hcmc.reminisce.databinding.ActivityFriendsBinding
 import studio.hcmc.reminisce.dto.friend.FriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.user.UserVO
-import kotlin.collections.set
 
 class FriendsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityFriendsBinding
@@ -48,15 +46,10 @@ class FriendsActivity : AppCompatActivity() {
 
     private fun onLoadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendsActivity)
-        val result = runCatching { FriendIO.listByUserId(user.id) }
-            .onSuccess {it ->
-                friends = it.sortedBy { it.requestedAt }
-                for (friend in it) {
-                    val opponent = UserIO.getById(friend.opponentId)
-                    users[opponent.id] = opponent
-                }
+        val result = runCatching { FriendIO.listByUserId(user.id, false) }
+            .onSuccess {
+                friends = it
             }.onFailure { LocalLogger.e(it) }
-
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
@@ -90,10 +83,6 @@ class FriendsActivity : AppCompatActivity() {
         // to DeleteFriendDialog
         override fun onItemLongClick(opponentId: Int, position: Int) {
             DeleteFriendDialog(this@FriendsActivity, opponentId, position, deleteDialogDelegate)
-        }
-
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
         }
     }
 

@@ -74,10 +74,7 @@ class AddFriendActivity : AppCompatActivity() {
             addFriendItemNickname.text = nickname
         }
 
-        cardView.root.setOnClickListener {
-            AddFriendDialog(this, opponentId, nickname, addFriendDialogDelegate)
-        }
-
+        cardView.root.setOnClickListener { AddFriendDialog(this, opponentId, nickname, addFriendDialogDelegate) }
         viewBinding.addFriendItems.addView(cardView.root)
     }
 

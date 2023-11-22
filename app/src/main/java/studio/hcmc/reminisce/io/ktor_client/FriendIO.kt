@@ -53,21 +53,28 @@ object FriendIO {
             .body()
     }
 
-    suspend fun listByUserId(userId: Int): List<FriendVO> {
+    suspend fun listByUserId(userId: Int, nullableState: Boolean): List<FriendVO> {
         return httpClient
-            .get("/friend/list/all") { parameter("userId", userId) }
-            .body()
-    }
-
-    suspend fun listByUserIdAndLocationId(userId: Int, locationId: Int): List<FriendVO> {
-        return httpClient
-            .get("/friend/list") {
+            .get("/friend/list/all") {
                 parameter("userId", userId)
-                parameter("locationId", locationId)
+                parameter("nullableState", nullableState)
             }.body()
     }
 
-    suspend fun addedListByUserId(userId: Int): List<FriendVO> {
+    suspend fun distinctListByUserId(userId: Int): List<FriendVO> {
+        return httpClient
+            .get("/friend/list") { parameter("userId", userId) }
+            .body()
+    }
+
+
+    suspend fun listByUserIdAndLocationId(userId: Int, locationId: Int): List<FriendVO> {
+        return httpClient
+            .get("/friend/${locationId}/list") { parameter("userId", userId) }
+            .body()
+    }
+
+    suspend fun mostAddedListByUserId(userId: Int): List<FriendVO> {
         return httpClient
             .get("/report/${userId}/friend/list")
             .body()

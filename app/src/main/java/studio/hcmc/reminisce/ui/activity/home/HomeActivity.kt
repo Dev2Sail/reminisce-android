@@ -18,9 +18,7 @@ import studio.hcmc.reminisce.dto.category.CategoryDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
-import studio.hcmc.reminisce.io.ktor_client.LocationFriendIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.activity.friend_tag.FriendTagDetailActivity
 import studio.hcmc.reminisce.ui.activity.map.MapTestActivity
@@ -32,19 +30,19 @@ import studio.hcmc.reminisce.util.navigationController
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var adapter: HomeAdapter
-    private lateinit var friends: MutableList<FriendVO>
+//    private lateinit var friends: MutableList<FriendVO>
+//    private val users = HashMap<Int /* UserId */, UserVO>()
+//    private val friendTagOpponentIds = HashSet<Int /* LocationFriendVO.opponentId */>()
 
-    private val users = HashMap<Int /* UserId */, UserVO>()
     private var defaultCategoryId = -1
     private val categories = ArrayList<CategoryVO>()
-    private val categoryInfo = HashMap<Int /* categoryId */, Int /* countById */>()
-    private val friendTagOpponentIds = HashSet<Int /* LocationFriendVO.opponentId */>()
+    private val countByCategoryId = HashMap<Int /* categoryId */, Int /* countById */>()
     private val tags = ArrayList<TagVO>()
+    private val friends = ArrayList<FriendVO>()
     private val contents = ArrayList<HomeAdapter.Content>()
 
     private val categoryDetailLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onCategoryEditResult)
@@ -82,30 +80,23 @@ class HomeActivity : AppCompatActivity() {
             listOf(
                 launch { categories.addAll(CategoryIO.listByUserId(user.id).sortedBy { it.sortOrder }) },
                 launch { tags.addAll(TagIO.listByUserId(user.id).sortedByDescending { it.id }) },
-                launch { LocationFriendIO.listByUserId(user.id).mapTo(friendTagOpponentIds) { it.opponentId } }
+                launch { friends.addAll(FriendIO.distinctListByUserId(user.id)) }
+//                launch { LocationFriendIO.listByUserId(user.id).mapTo(friendTagOpponentIds) { it.opponentId } }
             ).joinAll()
 
-            friends = friendTagOpponentIds.mapTo(ArrayList(friendTagOpponentIds.size)) { FriendIO.getByUserIdAndOpponentId(user.id, it) }
-            friends.sortByDescending { it.requestedAt }
-
-            for (friend in friends) {
-                if (friend.nickname == null) {
-                    // IO 코드 호출하는 애가 try catch, runCatching 해줘야 함
-                    val opponent = UserIO.getById(friend.opponentId)
-                    users[opponent.id] = opponent
-                }
-            }
+//            friends = friendTagOpponentIds.mapTo(ArrayList(friendTagOpponentIds.size)) { FriendIO.getByUserIdAndOpponentId(user.id, it) }
+//            friends.sortByDescending { it.requestedAt }
 
             for (category in categories) {
                 when (category.title) {
                     "Default" -> {
                         defaultCategoryId = category.id
                         val totalCount = CategoryIO.getTotalCountByUserId(user.id).get("totalCount").asInt
-                        categoryInfo[category.id] = totalCount
+                        countByCategoryId[category.id] = totalCount
                     }
                     else -> {
                         val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, category.id).get("count").asInt
-                        categoryInfo[category.id] = count
+                        countByCategoryId[category.id] = count
                     }
                 }
             }
@@ -120,7 +111,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun prepareContents() {
         contents.add(HomeAdapter.HeaderContent())
-        contents.addAll(categories.map { HomeAdapter.CategoryContent(it, categoryInfo[it.id] ?: 0) })
+        contents.addAll(categories.map { HomeAdapter.CategoryContent(it, countByCategoryId[it.id] ?: 0) })
         contents.add(HomeAdapter.TagContent(tags))
         contents.add(HomeAdapter.FriendContent(friends))
     }
@@ -165,7 +156,7 @@ class HomeActivity : AppCompatActivity() {
             .onSuccess { it ->
                 val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, it.id).get("count").asInt
                 categories.add(it)
-                categoryInfo[it.id] = count
+                countByCategoryId[it.id] = count
                 categories.sortedBy { it.sortOrder }
                 contents.add(categories.size, HomeAdapter.CategoryContent(it, count))
                 withContext(Dispatchers.Main) { adapter.notifyItemInserted(categories.size) }
@@ -203,7 +194,7 @@ class HomeActivity : AppCompatActivity() {
         runCatching { CategoryIO.delete(categoryId) }
             .onSuccess {
                 categories.removeAt(position)
-                categoryInfo.remove(categoryId)
+                countByCategoryId.remove(categoryId)
                 contents.removeAt(position)
                 withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position + 1) }
             }.onFailure { LocalLogger.e(it) }
@@ -240,10 +231,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val friendTagDelegate = object : FriendTagViewHolder.Delegate {
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
-        }
-
         override fun onItemClick(opponentId: Int, nickname: String) {
             Intent(this@HomeActivity, FriendTagDetailActivity::class.java).apply {
                 putExtra("opponentId", opponentId)
@@ -303,7 +290,7 @@ class HomeActivity : AppCompatActivity() {
             .onSuccess {
                 val count = it.get("totalCount").asInt
                 val first = categories[0]
-                categoryInfo[first.id] = count
+                countByCategoryId[first.id] = count
                 contents[1] = HomeAdapter.CategoryContent(first, count)
                 withContext(Dispatchers.Main) { adapter.notifyItemChanged(1) }
             }.onFailure { LocalLogger.e(it) }

@@ -15,14 +15,12 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class TagEditableDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityTagEditableDetailBinding
@@ -32,7 +30,6 @@ class TagEditableDetailActivity : AppCompatActivity() {
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
     private val body by lazy { intent.getStringExtra("tagBody") }
 
-    private val users = HashMap<Int /* UserId */, UserVO>()
     //friend nullable
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
@@ -64,15 +61,6 @@ class TagEditableDetailActivity : AppCompatActivity() {
                 it.forEach {
                     tagInfo[it.id] = TagIO.listByLocationId(it.id)
                     friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                }
-
-                for (friends in friendInfo.values) {
-                    for (friend in friends) {
-                        if (friend.nickname == null) {
-                            val opponent = UserIO.getById(friend.opponentId)
-                            users[opponent.id] = opponent
-                        }
-                    }
                 }
             }.onFailure { LocalLogger.e(it) }
 
@@ -114,10 +102,6 @@ class TagEditableDetailActivity : AppCompatActivity() {
             }
 
             return true
-        }
-
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
         }
     }
 

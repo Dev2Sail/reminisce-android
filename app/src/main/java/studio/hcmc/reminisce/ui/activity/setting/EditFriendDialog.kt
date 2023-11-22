@@ -22,9 +22,11 @@ class EditFriendDialog(
     }
 
     init {
+        //TODO 수정
         val viewBinding = DialogEditFriendBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
         // friend로 등록된 user의 nickname
+        // TODO getUser -> userIO getById로 조회해서 들고 있기
         viewBinding.dialogEditFriendFieldEditText.hint = delegate.getUser(opponentId).nickname
         // friend로 등록된 user의 email
         viewBinding.dialogEditFriendField.helperText = delegate.getUser(opponentId).email

@@ -10,7 +10,6 @@ import studio.hcmc.reminisce.databinding.CardSummaryBinding
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class CategoryDetailSummaryViewHolder(
     private val viewBinding: CardSummaryBinding,
@@ -18,7 +17,7 @@ class CategoryDetailSummaryViewHolder(
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(location: LocationVO)
-        fun getUser(userId: Int): UserVO
+        fun onItemLongClick(locationId: Int, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -32,6 +31,11 @@ class CategoryDetailSummaryViewHolder(
         tags?.let { prepareTags(it) }
         friends?.let { prepareFriends(it) }
         viewBinding.root.setOnClickListener { delegate.onItemClick(location) }
+        viewBinding.root.setOnLongClickListener {
+            delegate.onItemLongClick(location.id, bindingAdapterPosition)
+
+            false
+        }
     }
 
     private fun prepareLocation(location: LocationVO) {
@@ -69,7 +73,7 @@ class CategoryDetailSummaryViewHolder(
     }
 
     private fun prepareFriends(friends: List<FriendVO>) {
-        val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
+        val friendText = friends.joinToString { it.nickname!! }
         if (friendText.isNotEmpty()) {
             viewBinding.cardSummaryFriends.apply {
                 root.isVisible = true

@@ -17,7 +17,6 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.tag.editable.TagEditableDetailActivity
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
@@ -25,7 +24,6 @@ import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class TagDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityTagDetailBinding
@@ -36,7 +34,6 @@ class TagDetailActivity : AppCompatActivity() {
     private val tagEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
 
-    private val users = HashMap<Int /* UserId */, UserVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<TagDetailAdapter.Content>()
@@ -72,15 +69,6 @@ class TagDetailActivity : AppCompatActivity() {
                 it.forEach {
                     tagInfo[it.id] = TagIO.listByLocationId(it.id)
                     friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                }
-
-                for (friends in friendInfo.values) {
-                    for (friend in friends) {
-                        if (friend.nickname == null) {
-                            val opponent = UserIO.getById(friend.opponentId)
-                            users[opponent.id] = opponent
-                        }
-                    }
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
@@ -137,10 +125,6 @@ class TagDetailActivity : AppCompatActivity() {
                 putExtra("title", title)
                 startActivity(this)
             }
-        }
-
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
         }
     }
 

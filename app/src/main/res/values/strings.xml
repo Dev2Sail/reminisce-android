@@ -167,8 +167,10 @@
     <string name="report_ocean_body">%d / 227</string>
     <string name="report_service_area">휴게소</string>
     <string name="report_service_area_body"> %d / 205</string>
-    <string name="report_most_added_friend">가장 많이 등록된 친구</string>
+    <string name="report_most_added_friend">가장 많이 태그된 친구</string>
     <string name="report_month">이번 달에 저장된 추억</string>
     <string name="report_year_ago">1년 전 오늘</string>
+    <string name="report_category_korea">국내여행</string>
+    <string name="report_year_ago_body">2022-11-22</string>
 
 </resources>

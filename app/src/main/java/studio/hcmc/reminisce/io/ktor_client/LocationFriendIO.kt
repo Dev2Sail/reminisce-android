@@ -3,7 +3,6 @@ package studio.hcmc.reminisce.io.ktor_client
 import com.google.gson.Gson
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
-import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -24,15 +23,15 @@ object LocationFriendIO {
             .bodyAsText()
     }
 
-    suspend fun listByUserId(userId: Int): List<LocationFriendVO> {
-        return httpClient
-            .get("/location/options/friend/list/all") { parameter("userId", userId) }
-            .body()
-    }
+//    suspend fun listByUserId(userId: Int): List<LocationFriendVO> {
+//        return httpClient
+//            .get("/location/options/friend/list/all") { parameter("userId", userId) }
+//            .body()
+//    }
 
-    suspend fun listByLocationId(locationId: Int): List<LocationFriendVO> {
-        return httpClient
-            .get("/location/options/friend/list") { parameter("locationId", locationId) }
-            .body()
-    }
+//    suspend fun listByLocationId(locationId: Int): List<LocationFriendVO> {
+//        return httpClient
+//            .get("/location/options/friend/list") { parameter("locationId", locationId) }
+//            .body()
+//    }
 }

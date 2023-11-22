@@ -9,6 +9,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
@@ -17,7 +19,7 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
+import studio.hcmc.reminisce.ui.activity.category.SummaryDeleteDialog
 import studio.hcmc.reminisce.ui.activity.friend_tag.editable.FriendTagEditableDetailActivity
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
@@ -25,22 +27,19 @@ import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class FriendTagDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityFriendTagDetailBinding
     private lateinit var adapter: FriendTagAdapter
-    private lateinit var locations: List<LocationVO>
     private lateinit var friend: FriendVO
 
     private val friendTagEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
     private val opponentId by lazy { intent.getIntExtra("opponentId", -1) }
     private val nickname by lazy { intent.getStringExtra("nickname") }
 
-    private val users = HashMap<Int /* UserId */, UserVO>()
+    private val locations = ArrayList<LocationVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
-
     private val contents = ArrayList<FriendTagAdapter.Content>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,38 +53,46 @@ class FriendTagDetailActivity : AppCompatActivity() {
         viewBinding.friendTagDetailAppbar.appbarTitle.text = getString(R.string.header_view_holder_title)
         viewBinding.friendTagDetailAppbar.appbarActionButton1.isVisible = false
         viewBinding.friendTagDetailAppbar.appbarBack.setOnClickListener { finish() }
-        prepareFriend()
+
+        try {
+            if (CoroutineScope(Dispatchers.IO).launch { testLoad1() }.isCompleted) {
+                prepareContents()
+                CoroutineScope(Dispatchers.Main).launch{ onContentsReady() }
+                // ...?
+            }
+
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+        }
     }
 
-    private fun prepareFriend() = CoroutineScope(Dispatchers.IO).launch {
+    private suspend fun testLoad1() = coroutineScope {
         val user = UserExtension.getUser(this@FriendTagDetailActivity)
-        runCatching { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
-            .onSuccess {
-                friend = it
-                loadContents()
-            }.onFailure { LocalLogger.e(it) }
+        // friend -> locations -> tags & friends => async
+        val friendDeferred = async { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
+        friend = friendDeferred.await()
+
+        val locationsDeferred = async { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId) }
+//        locations = locationsDeferred.await()
+        locations.addAll(locationsDeferred.await())
+
+        for (location in locations) {
+            val tagsDeferred = async { TagIO.listByLocationId(location.id) }
+            val friendsDeferred = async { FriendIO.listByUserIdAndLocationId(user.id, location.id) }
+            tagInfo[location.id] = tagsDeferred.await()
+            friendInfo[location.id] = friendsDeferred.await()
+        }
     }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendTagDetailActivity)
         val result = runCatching { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId) }
             .onSuccess { it ->
-                locations = it
+//                locations = it
+                locations.addAll(it)
                 it.forEach {
                     tagInfo[it.id] = TagIO.listByLocationId(it.id)
                     friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                }
-
-//                friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId } }
-//                LocalLogger.v("${friendInfo.values.distinctBy { it -> it.groupBy { it.opponentId } }}")
-
-                for (friends in friendInfo.values) {
-                    for (friendVO in friends) {
-                        if (friendVO.nickname == null) {
-                            val opponent = UserIO.getById(friendVO.opponentId)
-                            users[opponent.id] = opponent
-                        }
-                    }
                 }
             }.onFailure { LocalLogger.e(it) }
 
@@ -127,7 +134,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
         override fun onEditClick() {
             val intent = Intent(this@FriendTagDetailActivity, FriendTagEditableDetailActivity::class.java)
                 .putExtra("opponentId", friend.opponentId)
-                .putExtra("nickname", friend.nickname ?: users[friend.opponentId]!!.nickname)
+                .putExtra("nickname", friend.nickname)
             friendTagEditableLauncher.launch(intent)
         }
     }
@@ -135,6 +142,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
     private val summaryDelegate = object : FriendTagSummaryViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String) {
             // TODO intent result
+            // 편집 시 원래 저장돼있던 내용 고대로 들어가야지
             Intent(this@FriendTagDetailActivity, WriteDetailActivity::class.java).apply {
                 putExtra("locationId", locationId)
                 putExtra("title", title)
@@ -142,9 +150,28 @@ class FriendTagDetailActivity : AppCompatActivity() {
             }
         }
 
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
+        override fun onItemLongClick(locationId: Int, position: Int) {
+            SummaryDeleteDialog(this@FriendTagDetailActivity, deleteDialogDelegate, locationId, position)
         }
+    }
+
+    private val deleteDialogDelegate = object : SummaryDeleteDialog.Delegate {
+        override fun onItemClick(locationId: Int, position: Int) {
+            deleteContent(locationId, position)
+        }
+    }
+
+    private fun deleteContent(locationId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@FriendTagDetailActivity)
+        runCatching { LocationIO.delete(locationId) }
+            .onSuccess {
+                locations.removeAt(position)
+                tagInfo.remove(locationId)
+                friendInfo.remove(locationId)
+                // 인덱스 확인
+                withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position + 2)}
+            }
+            .onFailure { LocalLogger.e(it) }
     }
 
     private fun onModifiedResult(activityResult: ActivityResult) {

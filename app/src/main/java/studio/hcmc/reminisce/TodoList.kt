@@ -10,7 +10,7 @@ package studio.hcmc.reminisce
 // * Folder > Write > WriteOptions
 // TODO Select category 완성 (recyclerView 단일 선택 && currentCategryId가 기본 선택돼있어야 함)
 
-
+// TODO 무한 스크롤 바닥치면 새로 fetch content
 // * Report
 // TODO 일년전 오늘 -> 없다면 gone ? 빈 문자열? -> 퍋ㅈ gone
 // TODO 가장 많이 태그된 친구
@@ -40,8 +40,46 @@ onItemClick
 
  */
 
+/*
+async는 deferred라는 결과 반환, await()
+suspend fun -> 쭉쭉 suspend로 불러와서 마지막 result 필요한 애가 withContext(Dispatchers.IO)로 감싸
+모든 작업이 개별적으로만 일어나지 않고 영향을 끼친다면 suspend로 기다리게 해야
+async를 await 하는 게 join 되는 것임 하지만 결과는 잃어버림
+
+ */
+
+/*
+1121 backend
+FriendController
+LocationController
+
+가장 많이 등록된 friendVO ->
 
 
+getStoredInLocationByUserIdAndLocationId ->
+locations 불러오고
+
+
+ */
+/*
+1122
+- WriteDetailActivity
+- AddFriendActivity
+
+무한스크롤
+- Category
+    - CategoryEditableDetailActivity
+    - CategoryDetailActivity
+- FriendTag
+    -FriendTagEditableDetailActivity
+    -FriendTagDetailActivity
+- Home
+    - home Activity
+-Setting
+    - friends activity
+
+report로 테스트
+ */
 
 
 // TODO XML make standard

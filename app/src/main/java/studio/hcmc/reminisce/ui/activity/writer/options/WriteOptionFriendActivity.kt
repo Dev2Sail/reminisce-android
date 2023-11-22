@@ -15,18 +15,16 @@ import studio.hcmc.reminisce.dto.location.LocationFriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationFriendIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class WriteOptionFriendActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteSelectFriendBinding
     private lateinit var friends: List<FriendVO>
+
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
 
-    private val users = HashMap<Int /* userId */, UserVO>()
     private val selectedFriendIds = HashSet<Int>()
     private val contents = ArrayList<WriteOptionsFriendAdapter.Content>()
 
@@ -42,7 +40,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
         viewBinding.writeSelectFriendAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { fetchContents(preparePost()) }
         prepareFriends()
-        prepareSelectedFriends()
+        prepareSavedFriends()
     }
 
     private fun preparePost(): LocationFriendDTO.Post {
@@ -55,22 +53,18 @@ class WriteOptionFriendActivity : AppCompatActivity() {
 
     private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@WriteOptionFriendActivity)
-        val result = runCatching { FriendIO.listByUserId(user.id) }
-            .onSuccess {
-                friends = it
-                for (friend in it) {
-                    val opponent = UserIO.getById(friend.opponentId)
-                    users[opponent.id] = opponent
-                }
-            }.onFailure { LocalLogger.e(it) }
+        val result = runCatching { FriendIO.listByUserId(user.id, false) }
+            .onSuccess { friends = it }
+            .onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         }
     }
 
-    private fun prepareSelectedFriends() = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { LocationFriendIO.listByLocationId(locationId) }
+    private fun prepareSavedFriends() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@WriteOptionFriendActivity)
+        runCatching { FriendIO.listByUserIdAndLocationId(user.id, locationId) }
             .onSuccess {
                 for (vo in it) {
                     selectedFriendIds.add(vo.opponentId)
@@ -80,9 +74,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
 
     private fun prepareContents() {
         for (friend in friends) {
-            contents.add(WriteOptionsFriendAdapter.DetailContent(
-                friend.opponentId, friend.nickname ?: users[friend.opponentId]!!.nickname
-            ))
+            contents.add(WriteOptionsFriendAdapter.DetailContent(friend.opponentId, friend.nickname!!))
         }
     }
 

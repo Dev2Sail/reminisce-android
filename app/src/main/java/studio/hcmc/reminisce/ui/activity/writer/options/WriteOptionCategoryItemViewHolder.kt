@@ -32,6 +32,8 @@ class WriteOptionCategoryItemViewHolder(
         // 기본 선택된 카테고리
         viewBinding.writeOptionsSelectCategoryIcon.isVisible = delegate.validate(category.id)
 
+        // 변경할 카테고리 선택 시 !validate && onItemClick 이면 visible?
+
 
         viewBinding.root.setOnClickListener {
 //            viewBinding.writeOptionsSelectCategoryIcon.isVisible = delegate.onItemClick(category.id, bindingAdapterPosition)

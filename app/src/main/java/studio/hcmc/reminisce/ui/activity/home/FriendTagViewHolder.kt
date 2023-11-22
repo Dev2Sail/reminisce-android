@@ -6,14 +6,12 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.databinding.CardHomeTagFriendBinding
 import studio.hcmc.reminisce.databinding.ChipTagBinding
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class FriendTagViewHolder(
     private val viewBinding: CardHomeTagFriendBinding,
     private val delegate: Delegate
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun getUser(userId: Int): UserVO
         fun onItemClick(opponentId: Int, nickname: String)
         fun onItemLongClick(opponentId: Int, friendIdx: Int, position: Int)
     }
@@ -33,11 +31,11 @@ class FriendTagViewHolder(
                     .let { ChipTagBinding.inflate(it, viewBinding.homePersonTagChips, false) }
                     .root
                     .apply {
-                        text = vo.nickname ?: delegate.getUser(vo.opponentId).nickname
+                        text = vo.nickname
                         isCheckable = false
                         isSelected = true
                         setOnClickListener {
-                            delegate.onItemClick(vo.opponentId, vo.nickname ?: delegate.getUser(vo.opponentId).nickname)
+                            delegate.onItemClick(vo.opponentId, vo.nickname!!)
                         }
                         setOnLongClickListener {
                             delegate.onItemLongClick(friend.value.opponentId, friend.index, bindingAdapterPosition)

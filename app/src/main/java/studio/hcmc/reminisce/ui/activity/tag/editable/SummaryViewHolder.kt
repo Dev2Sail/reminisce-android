@@ -10,7 +10,6 @@ import studio.hcmc.reminisce.databinding.CardCheckableSummaryBinding
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class SummaryViewHolder(
     private val viewBinding: CardCheckableSummaryBinding,
@@ -18,7 +17,6 @@ class SummaryViewHolder(
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(locationId: Int): Boolean
-        fun getUser(userId: Int): UserVO
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -72,7 +70,7 @@ class SummaryViewHolder(
     }
 
     private fun prepareFriends(friends: List<FriendVO>) {
-        val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
+        val friendText = friends.joinToString { it.nickname!! }
         if (friendText.isNotEmpty()) {
             viewBinding.cardCheckableSummaryFriends.apply {
                 root.isVisible = true
