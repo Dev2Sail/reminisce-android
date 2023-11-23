@@ -99,12 +99,12 @@ class FriendsActivity : AppCompatActivity() {
                 this.nickname = body
             }
 
-            onFetchContent(dto, position)
+            onPatchContent(dto, position)
         }
     }
 
     // FriendIo.put : userId, FriendDto.Put
-    private fun onFetchContent(dto: FriendDTO.Put, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun onPatchContent(dto: FriendDTO.Put, position: Int) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendsActivity)
         runCatching { FriendIO.put(user.id, dto) }
             .onSuccess {

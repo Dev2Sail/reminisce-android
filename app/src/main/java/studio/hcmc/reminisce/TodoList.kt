@@ -79,6 +79,10 @@ locations 불러오고
     - friends activity
 
 report로 테스트
+
+categoryDetailActivity summaryDelete reference
+
+userExtension.getUser -> 로그아웃 시 제대로 작동 안 함
  */
 
 

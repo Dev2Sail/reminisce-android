@@ -67,14 +67,15 @@ object FriendIO {
             .body()
     }
 
-
     suspend fun listByUserIdAndLocationId(userId: Int, locationId: Int): List<FriendVO> {
         return httpClient
-            .get("/friend/${locationId}/list") { parameter("userId", userId) }
-            .body()
+            .get("/friend/list") {
+                parameter("userId", userId)
+                parameter("locationId", locationId)
+            }.body()
     }
 
-    suspend fun mostAddedListByUserId(userId: Int): List<FriendVO> {
+    suspend fun mostStoredInLocationByUserId(userId: Int): List<FriendVO> {
         return httpClient
             .get("/report/${userId}/friend/list")
             .body()

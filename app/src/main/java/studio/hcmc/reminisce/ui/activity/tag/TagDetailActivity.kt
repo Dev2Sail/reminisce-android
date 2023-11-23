@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.tag
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResult
@@ -17,10 +18,12 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
+import studio.hcmc.reminisce.ui.activity.category.SummaryDeleteDialog
 import studio.hcmc.reminisce.ui.activity.tag.editable.TagEditableDetailActivity
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
@@ -28,12 +31,12 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 class TagDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityTagDetailBinding
     private lateinit var adapter: TagDetailAdapter
-    private lateinit var locations: List<LocationVO>
     private lateinit var tag: TagVO
 
     private val tagEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
 
+    private val locations = ArrayList<LocationVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<TagDetailAdapter.Content>()
@@ -64,19 +67,21 @@ class TagDetailActivity : AppCompatActivity() {
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@TagDetailActivity)
         val result = runCatching { LocationIO.listByTagId(tag.id) }
-            .onSuccess { it ->
-                locations = it
-                it.forEach {
-                    tagInfo[it.id] = TagIO.listByLocationId(it.id)
-                    friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
+            .onSuccess {
+                for (vo in it) {
+                    locations.add(vo)
+                    tagInfo[vo.id] = TagIO.listByLocationId(vo.id)
+                    friendInfo[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
-        } else {
-            CommonError.onMessageDialog(this@TagDetailActivity, getString(R.string.dialog_error_common_list_body))
-        }
+        } else { onError() }
+    }
+
+    private fun onError() {
+        CommonError.onMessageDialog(this@TagDetailActivity, getString(R.string.dialog_error_common_list_body))
     }
 
     private fun prepareContents() {
@@ -85,11 +90,7 @@ class TagDetailActivity : AppCompatActivity() {
             val (year, month) = date.split("-")
             contents.add(TagDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
             for (location in locations.sortedByDescending { it.id }) {
-                contents.add(TagDetailAdapter.DetailContent(
-                    location,
-                    tagInfo[location.id].orEmpty(),
-                    friendInfo[location.id].orEmpty()
-                ))
+                contents.add(TagDetailAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
             }
         }
     }
@@ -126,6 +127,39 @@ class TagDetailActivity : AppCompatActivity() {
                 startActivity(this)
             }
         }
+
+        override fun onItemLongClick(locationId: Int, position: Int) {
+            SummaryDeleteDialog(this@TagDetailActivity, deleteDialogDelegate, locationId, position)
+        }
+    }
+
+    private val deleteDialogDelegate = object : SummaryDeleteDialog.Delegate {
+        override fun onClick(locationId: Int, position: Int) {
+            LocalLogger.v("locationId:$locationId, position:$position")
+            var locationIdx = -1
+            for (item in locations.withIndex()) {
+                if (item.value.id == locationId) {
+                    locationIdx = item.index
+                }
+            }
+            deleteContent(locationId, position, locationIdx)
+        }
+    }
+
+    private fun deleteContent(locationId: Int, position: Int, locationIdx: Int) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { LocationIO.delete(locationId) }
+            .onSuccess {
+                locations.removeAt(locationIdx)
+                tagInfo.remove(locationId)
+                friendInfo.remove(locationId)
+                withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position) }
+                viewBinding.tagDetailAppbar.appbarBack.setOnClickListener { launchModifiedHome() }
+            }.onFailure { LocalLogger.e(it) }
+    }
+
+    private fun launchModifiedHome() {
+        Intent().putExtra("isModified", true).setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 
     private fun onModifiedResult(activityResult: ActivityResult) {

@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.databinding.ActivitySearchLocationBinding
@@ -27,7 +29,7 @@ class SearchLocationActivity : AppCompatActivity() {
 
     private val contents = ArrayList<SearchLocationAdapter.Content>()
     private val placeInfo = HashMap<String /* placeId */, Place>()
-    private val roadAddress = HashMap<String /* placeId */, String?>()
+    private val roadAddress = HashMap<String /* placeId */, String>()
 
     private data class Place(
         val placeName: String,
@@ -48,7 +50,8 @@ class SearchLocationActivity : AppCompatActivity() {
             val input = viewBinding.searchLocationField.string
             if (actionId == EditorInfo.IME_ACTION_SEARCH || event.keyCode == KeyEvent.KEYCODE_SEARCH && event.action == KeyEvent.ACTION_DOWN) {
                 contents.removeAll {it is SearchLocationAdapter.Content}
-                fetchSearchResult(input)
+//                patchSearchResult(input)
+                testLoadContents(input)
                 return@setOnEditorActionListener true
             }
 
@@ -56,57 +59,26 @@ class SearchLocationActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchSearchResult(value: String) = CoroutineScope(Dispatchers.IO).launch {
-        val result = runCatching { KakaoIO.listByKeyword(value) }
-            .onSuccess {
-                places = it.documents
-                for (place in places) {
-                    placeInfo[place.id] = Place(place.place_name, place.x, place.y)
-                }
-            }.onFailure { LocalLogger.e(it) }
-        if (result.isSuccess) {
-            prepareGetRoadAddress()
-            if (roadAddress.isNotEmpty()) {
-                prepareContents()
-                withContext(Dispatchers.Main) { onContentsReady() }
+    private fun testLoadContents(value: String) = CoroutineScope(Dispatchers.IO).launch {
+        val result = runCatching {
+            val kakaoResultDeferred = async { KakaoIO.listByKeyword(value) }
+            val kakaoResult = kakaoResultDeferred.await()
+            places = kakaoResult.documents
+//            var moisResultDeferred: Deferred<MoisResponse>
+            for (place in places) {
+                placeInfo[place.id] = Place(place.place_name, place.x, place.y)
+                roadAddress[place.id] = if (place.road_address_name == "") place.address_name else place.road_address_name
             }
-        }
-    }
-
-    private fun prepareGetRoadAddress() {
-        for (place in places) {
-            val finalAddress = if (place.road_address_name == "") place.address_name else place.road_address_name
-            getRoadAddress(place.id, finalAddress)
-        }
-    }
-
-    // 아 왜 안 되냐!!!
-    private fun getRoadAddress(placeId: String, address: String) = CoroutineScope(Dispatchers.IO).launch {
-        val result = runCatching { MoisIO.getRoadAddress(address) }
-            .onSuccess {
-                val result = it.results.juso
-                if (!result.isNullOrEmpty()) {
-                    for (info in result.withIndex()) {
-                        if (info.index == 0) {
-                            roadAddress[placeId] = info.value.roadAddr
-                        }
-                    }
-                } else {
-                    roadAddress[placeId] = "null"
-                }
-            }.onFailure { LocalLogger.e(it) }
+        }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
-            for (info in roadAddress) {
-                LocalLogger.v("roadAddress -> ${info.key}: ${info.value}")
-            }
-
+            prepareContents()
+            withContext(Dispatchers.Main) { onContentsReady() }
         }
     }
-    // roadAddress에 하나도 안 들어감
 
     private fun prepareContents() {
         contents.addAll(places.map { SearchLocationAdapter.PlaceContent(
-            it.id, it.place_name, categoryNameFormat(it.category_name), roadAddress[it.id] ?: ""
+            it.id, it.place_name, categoryNameFormat(it.category_name), roadAddress[it.id]!!
         ) })
     }
 
@@ -127,25 +99,101 @@ class SearchLocationActivity : AppCompatActivity() {
 
     private val itemDelegate = object : SearchLocationItemViewHolder.Delegate {
         override fun onClick(placeId: String) {
-            fromWriteLauncher(placeId)
-            launchWrite(placeId)
+//            testTransFormRoadAddress(placeId)
+            LocalLogger.v("input info : ${roadAddress[placeId]}")
+            try {
+                CoroutineScope(Dispatchers.IO).launch {
+                    LocalLogger.v("now : ${test3(placeId)}")
+                    fromWriteLauncher(placeId, test3(placeId))
+                    launchWrite(placeId, test3(placeId))
+                }
+            } catch (e: Throwable) {
+                LocalLogger.e(e)
+            }
         }
     }
 
-    private fun launchWrite(placeId: String) {
+    private suspend fun testTransform2(placeId: String): String = withContext(Dispatchers.IO) {
+        val keyword = roadAddress[placeId]
+        val finalAddress : String
+        runCatching { MoisIO.getRoadAddress(keyword!!) }
+            .onSuccess {
+                val juso = it.results.juso
+                if (juso != null) {
+                    finalAddress = juso[0].roadAddr
+                } else {
+                    finalAddress = buildAddress(keyword!!)
+                }
+                return@withContext finalAddress
+            }.onFailure { LocalLogger.e(it) }
+    }.toString()
+
+    private suspend fun test3(placeId: String): String = coroutineScope {
+        val keyword = roadAddress[placeId]
+        val moisDeferred = async { MoisIO.getRoadAddress(keyword!!) }
+        val moisResponse = moisDeferred.await()
+        val moisFlag = moisResponse.results.common
+        val finalAddress: String
+        if (moisFlag.totalCount != "0" && moisResponse.results.juso != null) {
+            finalAddress = moisResponse.results.juso[0].roadAddr
+        } else {
+            finalAddress = buildAddress(keyword!!)
+        }
+
+        return@coroutineScope finalAddress
+    }.toString()
+
+
+    private enum class InternalIdentifier() {
+        서울특별시, 인천광역시, 부산광역시, 대전광역시,
+        대구광역시, 광주광역시, 울산광역시, 경기도,
+        충청북도, 충청남도, 전라북도, 전라남도, 경상북도, 경상남도;
+    }
+    private fun buildAddress(addressByKakao: String): String {
+        val kakaoAddr = addressByKakao.split(" ")
+        return buildString {
+            when(kakaoAddr[0]) {
+                "서울" -> append(InternalIdentifier.서울특별시)
+                "인천" -> append(InternalIdentifier.인천광역시)
+                "부산" -> append(InternalIdentifier.부산광역시)
+                "대전" -> append(InternalIdentifier.대전광역시) // 구/군
+                "대구" -> append(InternalIdentifier.대구광역시) // 구/군
+                "광주" -> append(InternalIdentifier.광주광역시) // 구/군
+                "울산" -> append(InternalIdentifier.울산광역시) // 구/군
+                "경기" -> append(InternalIdentifier.경기도)
+                "충북" -> append(InternalIdentifier.충청북도) // -> 시 -> 구/동/읍/면
+                "충남" -> append(InternalIdentifier.충청남도) // -> 시 -> 구/동/읍/면
+                "전북" -> append(InternalIdentifier.전라북도) // -> 시 -> 구/동/읍/면
+                "전남" -> append(InternalIdentifier.전라남도) // -> 시 -> 구/동/읍/면
+                "경북" -> append(InternalIdentifier.경상북도) // -> 시 -> 구/동/읍/면
+                "경남" -> append(InternalIdentifier.경상남도) // -> 시 -> 구/동/읍/면
+                else -> append(kakaoAddr[0])
+            }
+            append(" ")
+            append(kakaoAddr[1])
+            append(" ")
+            if (this.contains("특별시") || this.contains("광역시")) {
+                append(kakaoAddr[2])
+            } else if (this.contains("도")) {
+                append(kakaoAddr[2])
+            }
+        }
+    }
+
+    private fun launchWrite(placeId: String, roadAddress: String) {
         Intent(this, WriteActivity::class.java).apply {
             putExtra("place", placeInfo[placeId]!!.placeName)
-            putExtra("roadAddress", roadAddress[placeId])
+            putExtra("roadAddress", roadAddress)
             putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
             putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
             startActivity(this)
         }
     }
 
-    private fun fromWriteLauncher(placeId: String) {
+    private fun fromWriteLauncher(placeId: String, roadAddress: String) {
         Intent().apply {
             putExtra("place", placeInfo[placeId]!!.placeName)
-            putExtra("roadAddress", roadAddress[placeId])
+            putExtra("roadAddress", roadAddress)
             putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
             putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
             setActivity(this@SearchLocationActivity, Activity.RESULT_OK)

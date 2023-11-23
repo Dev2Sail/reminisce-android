@@ -107,10 +107,10 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     }
 
     private fun preparePatch(ids: HashSet<Int>) {
-        for (id in ids) { fetchContents(id) }
+        for (id in ids) { patchContents(id) }
     }
 
-    private fun fetchContents(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun patchContents(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.delete(locationId) }
             .onSuccess { launchCategoryEditableDetail() }
             .onFailure { LocalLogger.e(it) }

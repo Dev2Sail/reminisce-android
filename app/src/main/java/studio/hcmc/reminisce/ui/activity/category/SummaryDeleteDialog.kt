@@ -13,7 +13,7 @@ class SummaryDeleteDialog(
     position: Int
 ) {
     interface Delegate {
-        fun onItemClick(locationId: Int, position: Int)
+        fun onClick(locationId: Int, position: Int)
     }
 
     init {
@@ -24,7 +24,7 @@ class SummaryDeleteDialog(
         viewBinding.dialogHomeCategoryDeleteCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogHomeCategoryDeleteRemove.setOnClickListener {
             dialog.dismiss()
-            delegate.onItemClick(locationId, position)
+            delegate.onClick(locationId, position)
         }
         dialog.show()
     }

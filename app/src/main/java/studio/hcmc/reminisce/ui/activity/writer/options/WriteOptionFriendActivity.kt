@@ -38,7 +38,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     private fun initView() {
         viewBinding.writeSelectFriendAppbar.appbarTitle.text = getText(R.string.card_home_tag_friend_title)
         viewBinding.writeSelectFriendAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { fetchContents(preparePost()) }
+        viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { patchContents(preparePost()) }
         prepareFriends()
         prepareSavedFriends()
     }
@@ -83,7 +83,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
         viewBinding.writeSelectFriendItems.adapter = WriteOptionsFriendAdapter(adapterDelegate, friendItemDelegate)
     }
 
-    private fun fetchContents(dto: LocationFriendDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
+    private fun patchContents(dto: LocationFriendDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationFriendIO.post(dto) }
             .onSuccess {launchOptions() }
             .onFailure { LocalLogger.e(it) }

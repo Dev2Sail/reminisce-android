@@ -28,6 +28,7 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
 
     private val checkedCategoryId = HashSet<Int>(1)
     private val contents = ArrayList<WriteOptionCategoryAdapter.Content>()
+    private val states = HashMap<Int, Boolean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,11 +41,11 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
         viewBinding.writeOptionsSelectCategoryAppbar.appbarTitle.text = getText(R.string.write_options_select_category_title)
         viewBinding.writeOptionsSelectCategoryAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.writeOptionsSelectCategoryAppbar.appbarActionButton1.setOnClickListener {
-            patchCategory(checkedCategoryId.elementAt(0))
+//            patchCategory(checkedCategoryId.elementAt(0))
         }
-//        checkedCategoryId.add(categoryId)
-        checkedCategoryId.add(31)
-//        selectedCategoryId[0] = 31
+////        checkedCategoryId.add(categoryId)
+//        checkedCategoryId.add(31)
+////        selectedCategoryId[0] = 31
         prepareCategories()
     }
 
@@ -64,11 +65,11 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
         for (category in categories) {
             contents.add(WriteOptionCategoryAdapter.DetailContent(category))
         }
+        prepareStates()
     }
 
     private fun onContentsReady() {
         viewBinding.writeOptionsSelectCategoryItems.layoutManager = LinearLayoutManager(this)
-
         adapter = WriteOptionCategoryAdapter(adapterDelegate, itemDelegate)
         viewBinding.writeOptionsSelectCategoryItems.adapter = adapter
     }
@@ -89,35 +90,54 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
         override fun getItem(position: Int) = contents[position]
     }
 
-    private val itemDelegate = object : WriteOptionCategoryItemViewHolder.Delegate {
-        val checkFlag = BooleanArray(4)
-        override fun onItemClick(categoryId: Int, position: Int): Boolean {
-//            return if (selectedCategoryId[0] != categoryId) {
-//                selectedCategoryId[0] = categoryId
-//                LocalLogger.v("current categoryId (visible true): ${selectedCategoryId[0]}")
-//
-//                true
-//            } else {
-//                LocalLogger.v("current categoryId (visible false): ${selectedCategoryId[0]}")
-//                false
-//            }
+    private fun prepareStates() {
+        for (category in categories) {
+            states[category.id] = category.id == categoryId
+        }
+    }
 
-
-            // 선택돼있던 상태
-            if (!checkedCategoryId.add(categoryId)) {
-                // 선택 해제
-                checkedCategoryId.remove(categoryId)
-
-                return false
+    private fun buildStates(categoryId: Int) {
+        for (item in states.keys) {
+            if (item == categoryId) {
+                states[categoryId] = true
+            } else {
+                states[item] = false
             }
-            checkedCategoryId.clear()
-            checkedCategoryId.add(categoryId)
+        }
+    }
 
-            return true
+    private val itemDelegate = object : WriteOptionCategoryItemViewHolder.Delegate {
+        override fun onItemClick(categoryId: Int, position: Int): Boolean {
+            buildStates(categoryId)
+            return states[categoryId]!!
         }
 
+
+//        override fun onItemClick(categoryId: Int, position: Int): Boolean {
+////            return if (selectedCategoryId[0] != categoryId) {
+////                selectedCategoryId[0] = categoryId
+////                LocalLogger.v("current categoryId (visible true): ${selectedCategoryId[0]}")
+////
+////                true
+////            } else {
+////                LocalLogger.v("current categoryId (visible false): ${selectedCategoryId[0]}")
+////                false
+////            }
+//            // 선택돼있던 상태
+//            if (!checkedCategoryId.add(categoryId)) {
+//                // 선택 해제
+//                checkedCategoryId.remove(categoryId)
+//
+//                return false
+//            }
+//            checkedCategoryId.clear()
+//            checkedCategoryId.add(categoryId)
+//
+//            return true
+//        }
+
         override fun validate(categoryId: Int): Boolean {
-            return checkedCategoryId.contains(categoryId)
+            return states[categoryId]!!
         }
 
 //        fun validateCheck(position: Int): Boolean {

@@ -34,9 +34,6 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var adapter: HomeAdapter
-//    private lateinit var friends: MutableList<FriendVO>
-//    private val users = HashMap<Int /* UserId */, UserVO>()
-//    private val friendTagOpponentIds = HashSet<Int /* LocationFriendVO.opponentId */>()
 
     private var defaultCategoryId = -1
     private val categories = ArrayList<CategoryVO>()
@@ -46,6 +43,9 @@ class HomeActivity : AppCompatActivity() {
     private val contents = ArrayList<HomeAdapter.Content>()
 
     private val categoryDetailLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onCategoryEditResult)
+    private val friendDetailLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onFriendModifiedResult)
+    private val tagDetailLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onTagModifiedResult)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityHomeBinding.inflate(layoutInflater)
@@ -70,11 +70,11 @@ class HomeActivity : AppCompatActivity() {
     private fun initView() {
         val menuId = intent.getIntExtra("menuId", -1)
         navigationController(viewBinding.homeNavView, menuId)
-        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
+        CoroutineScope(Dispatchers.IO).launch { patchContents() }
         test()
     }
 
-    private suspend fun fetchContents() = coroutineScope {
+    private suspend fun patchContents() = coroutineScope {
         val result = runCatching {
             val user = UserExtension.getUser(this@HomeActivity)
             listOf(
@@ -203,10 +203,9 @@ class HomeActivity : AppCompatActivity() {
     /* TAG */
     private val tagDelegate = object : TagViewHolder.Delegate {
         override fun onItemClick(tagId: Int) {
-            Intent(this@HomeActivity, TagDetailActivity::class.java).apply {
-                putExtra("tagId", tagId)
-                startActivity(this)
-            }
+            val intent = Intent(this@HomeActivity, TagDetailActivity::class.java)
+                .putExtra("tagId", tagId)
+            tagDetailLauncher.launch(intent)
         }
 
         override fun onItemLongClick(tagId: Int, tagIdx: Int, position: Int) {
@@ -232,11 +231,10 @@ class HomeActivity : AppCompatActivity() {
 
     private val friendTagDelegate = object : FriendTagViewHolder.Delegate {
         override fun onItemClick(opponentId: Int, nickname: String) {
-            Intent(this@HomeActivity, FriendTagDetailActivity::class.java).apply {
-                putExtra("opponentId", opponentId)
-                putExtra("nickname", nickname)
-                startActivity(this)
-            }
+            val intent = Intent(this@HomeActivity, FriendTagDetailActivity::class.java)
+                .putExtra("opponentId", opponentId)
+                .putExtra("nickname", nickname)
+            friendDetailLauncher.launch(intent)
         }
 
         override fun onItemLongClick(opponentId: Int, friendIdx: Int, position: Int) {
@@ -260,21 +258,55 @@ class HomeActivity : AppCompatActivity() {
             }.onFailure { LocalLogger.e(it) }
     }
 
+
+
     private fun onCategoryEditResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isEdited", false) == true) {
             val categoryId = activityResult.data?.getIntExtra("categoryId", -1)
             val position = activityResult.data?.getIntExtra("position", -1)
-            onFetchCategory(categoryId!!, position!!)
+            onPatchCategory(categoryId!!, position!!)
+            onPatchFriend()
         }
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             val categoryId = activityResult.data?.getIntExtra("categoryId", -1)
             val position = activityResult.data?.getIntExtra("position", -1)
-            onFetchCategory(categoryId!!, position!!)
-            onFetchTotalCount()
+            onPatchCategory(categoryId!!, position!!)
+            onPatchTotalCount()
+            onPatchFriend()
         }
     }
 
-    private fun onFetchCategory(categoryId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun onFriendModifiedResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
+            onPatchFriend()
+        }
+    }
+
+    private fun onTagModifiedResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
+            onPatchFriend()
+        }
+    }
+
+    // TODO 1122 추가 테스트 필요
+    private fun onPatchFriend() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@HomeActivity)
+        val result = runCatching { FriendIO.distinctListByUserId(user.id) }
+            .onSuccess {
+                friends.clear()
+                for (vo in it) {
+                    friends.add(vo)
+                }
+            }.onFailure { LocalLogger.e(it) }
+        if (result.isSuccess) {
+            contents.add(HomeAdapter.FriendContent(friends))
+            withContext(Dispatchers.Main) {
+                adapter.notifyItemChanged(contents.size - 1)
+            }
+        }
+    }
+
+    private fun onPatchCategory(categoryId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@HomeActivity)
         runCatching { CategoryIO.getById(categoryId) }
             .onSuccess {
@@ -284,7 +316,7 @@ class HomeActivity : AppCompatActivity() {
             }.onFailure { LocalLogger.e(it) }
     }
 
-    private fun onFetchTotalCount() = CoroutineScope(Dispatchers.IO).launch {
+    private fun onPatchTotalCount() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@HomeActivity)
         runCatching { CategoryIO.getTotalCountByUserId(user.id) }
             .onSuccess {

@@ -111,11 +111,11 @@ object LocationIO {
     }
 
     // userId에 저장된 location 중 visitedAt 기준 1년 전 오늘 저장된 location list
-    suspend fun yearAgoTodayByUserIdAndDate(userId: Int, today: String): List<LocationVO> {
+    suspend fun yearAgoTodayByUserIdAndDate(userId: Int, date: String): List<LocationVO> {
         return httpClient
-            .get("/location/today") {
+            .get("/location/list/today") {
                 parameter("userId", userId)
-                parameter("yearAgoToday", today)
+                parameter("date", date)
             }.body()
     }
 }

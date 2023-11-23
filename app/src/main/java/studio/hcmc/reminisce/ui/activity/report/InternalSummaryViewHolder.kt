@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.tag
+package studio.hcmc.reminisce.ui.activity.report
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,13 +11,13 @@ import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class TagDetailSummaryViewHolder(
+class InternalSummaryViewHolder(
     private val viewBinding: CardSummaryBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(locationId: Int, title: String)
-        fun onItemLongClick(locationId: Int, position: Int)
+        fun onItemClick(locationId: Int, title: String, position: Int)
+//        fun onItemLongClick(locationId: Int, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -25,24 +25,24 @@ class TagDetailSummaryViewHolder(
         delegate = delegate
     )
 
-    fun bind(content: TagDetailAdapter.DetailContent) {
+    fun bind(content: InternalDetailAdapter.DetailContent) {
         val (location, tags, friends) = content
         prepareLocation(location)
-        prepareTags(tags)
+        tags?.let { prepareTags(it) }
         friends?.let { prepareFriends(it) }
-        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title) }
-        viewBinding.root.setOnLongClickListener {
-            delegate.onItemLongClick(location.id, bindingAdapterPosition)
-
-            false
-        }
+        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title, bindingAdapterPosition) }
+//        viewBinding.root.setOnLongClickListener {
+//            delegate.onItemLongClick(location.id, bindingAdapterPosition)
+//
+//            false
+//        }
     }
 
     private fun prepareLocation(location: LocationVO) {
         viewBinding.cardSummaryTitle.text = location.title
+        viewBinding.cardSummaryVisitedCount.root.isGone = true
         val (year, month, day) = location.visitedAt.split("-")
         viewBinding.cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
-        viewBinding.cardSummaryVisitedCount.root.isGone = true
 
         if (location.roadAddress.isNotEmpty()) {
             viewBinding.cardSummaryAddress.apply {

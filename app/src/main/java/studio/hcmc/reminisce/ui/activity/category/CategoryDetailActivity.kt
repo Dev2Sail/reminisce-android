@@ -85,15 +85,17 @@ class CategoryDetailActivity : AppCompatActivity() {
         }
 
         val result = runCatching { fetch() }
-            .onSuccess { it ->
+            .onSuccess {
 //                locations.addAll(it)
                 for (vo in it) {
                     locations.add(vo)
+                    tagInfo[vo.id] = TagIO.listByLocationId(vo.id)
+                    friendInfo[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
                 }
-                it.forEach {
-                    tagInfo[it.id] = TagIO.listByLocationId(it.id)
-                    friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                }
+//                it.forEach {
+//                    tagInfo[it.id] = TagIO.listByLocationId(it.id)
+//                    friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
+//                }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
             prepareContents()
@@ -119,11 +121,7 @@ class CategoryDetailActivity : AppCompatActivity() {
             val (year, month) = date.split("-")
             contents.add(CategoryDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
             for (location in locations.sortedByDescending { it.id }) {
-                contents.add(CategoryDetailAdapter.DetailContent(
-                    location,
-                    tagInfo[location.id].orEmpty(),
-                    friendInfo[location.id].orEmpty()
-                ))
+                contents.add(CategoryDetailAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
             }
         }
     }
@@ -154,11 +152,11 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private val dialogDelegate = object : CategoryTitleEditDialog.Delegate {
         override fun onSaveClick(editedTitle: String) {
-            onFetchTitle(editedTitle)
+            onPatchTitle(editedTitle)
         }
     }
 
-    private fun onFetchTitle(body: String) = CoroutineScope(Dispatchers.IO).launch {
+    private fun onPatchTitle(body: String) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@CategoryDetailActivity)
         val dto = CategoryDTO.Patch().apply {
             title = body
@@ -200,19 +198,27 @@ class CategoryDetailActivity : AppCompatActivity() {
     }
 
     private val deleteDialogDelegate = object : SummaryDeleteDialog.Delegate {
-        override fun onItemClick(locationId: Int, position: Int) {
-            deleteContent(locationId, position)
+        override fun onClick(locationId: Int, position: Int) {
+            var locationIdx = -1
+            for (item in locations.withIndex()) {
+                if (item.value.id == locationId) {
+                    locationIdx = item.index
+                }
+            }
+            LocalLogger.v("locationId:$locationId, position: $position, locationIdx:$locationIdx")
+            deleteContent(locationId, position, locationIdx)
         }
     }
 
-    private fun deleteContent(locationId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun deleteContent(locationId: Int, position: Int, locationIdx: Int) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.delete(locationId) }
             .onSuccess {
-                locations.removeAt(position)
+                locations.removeAt(locationIdx)
                 tagInfo.remove(locationId)
                 friendInfo.remove(locationId)
                 contents.removeAt(position)
-                withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position + 2) }
+                withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position) }
+                viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { launchModifiedHome() }
             }.onFailure { LocalLogger.e(it) }
     }
 

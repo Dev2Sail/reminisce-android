@@ -25,7 +25,7 @@
         android:layout_marginTop="@dimen/margin_regular"
         android:layout_marginEnd="@dimen/margin_3xlarge"
         android:layout_marginBottom="@dimen/margin_large"
-        android:fontFamily="@font/pretendard_medium"
+        android:fontFamily="@font/pretendard_semibold"
         android:text="@string/home_header_sub"
         android:textColor="@color/md_theme_light_primary"
         android:textSize="@dimen/title_medium"

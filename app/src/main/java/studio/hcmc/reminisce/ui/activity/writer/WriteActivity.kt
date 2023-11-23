@@ -58,14 +58,16 @@ class WriteActivity : AppCompatActivity() {
         }
     }
 
+    // TODO searchLocation 다녀오면 date 날짜 날라감 !!!
     private fun fromSearchLocation() {
         if (categoryId == -1) {
             getDefaultCategoryId()
             val place = intent.getStringExtra("place")
+            val address = intent.getStringExtra("roadAddress")
             viewBinding.writeAppbar.appbarTitle.text = place
-            viewBinding.writeLocation.text = place
+            viewBinding.writeLocation.text = address
             writeOptions["place"] = place
-            writeOptions["roadAddress"] = intent.getStringExtra("roadAddress")
+            writeOptions["roadAddress"] = address
             writeOptions["longitude"] = intent.getDoubleExtra("longitude", -1.0)
             writeOptions["latitude"] = intent.getDoubleExtra("latitude", -1.0)
         }
@@ -132,6 +134,7 @@ class WriteActivity : AppCompatActivity() {
 
             viewBinding.writeLocation.text = roadAddress
             viewBinding.writeAppbar.appbarTitle.text = place
+            viewBinding.writeVisitedAt.text = writeOptions["visitedAt"].toString()
             writeOptions["place"] = place!!
             writeOptions["roadAddress"] = roadAddress
             writeOptions["longitude"] = longitude!!

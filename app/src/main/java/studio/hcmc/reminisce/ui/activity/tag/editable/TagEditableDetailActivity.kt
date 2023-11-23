@@ -49,7 +49,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
         viewBinding.tagEditableDetailAppbar.appbarTitle.text = body
         viewBinding.tagEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.tagEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
-        viewBinding.tagEditableDetailAppbar.appbarActionButton1.setOnClickListener { fetchContents(selectedIds) }
+        viewBinding.tagEditableDetailAppbar.appbarActionButton1.setOnClickListener { patchContents(selectedIds) }
         loadContents()
     }
 
@@ -105,7 +105,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
+    private fun patchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { locationIds.forEach { LocationIO.delete(it) } }
             .onSuccess {
                 Intent().putExtra("isModified", true).setActivity(this@TagEditableDetailActivity, Activity.RESULT_OK)

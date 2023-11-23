@@ -9,6 +9,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/margin_small"
         android:clickable="false"
         android:fontFamily="@font/pretendard_medium"
         android:text="@string/card_date_separator"

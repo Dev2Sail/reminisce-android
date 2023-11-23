@@ -46,7 +46,7 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
         viewBinding.friendTagEditableDetailAppbar.appbarTitle.text = nickname
         viewBinding.friendTagEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.friendTagEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
-        viewBinding.friendTagEditableDetailAppbar.appbarActionButton1.setOnClickListener { fetchContents(selectedIds) }
+        viewBinding.friendTagEditableDetailAppbar.appbarActionButton1.setOnClickListener { patchContents(selectedIds) }
         loadContents()
     }
 
@@ -97,7 +97,7 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
+    private fun patchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { locationIds.forEach { LocationIO.delete(it) } }
             .onSuccess {
                 Intent().putExtra("isModified", true).setActivity(this@FriendTagEditableDetailActivity, Activity.RESULT_OK)
