@@ -12,7 +12,7 @@ import studio.hcmc.reminisce.dto.tag.TagDTO
 import studio.hcmc.reminisce.vo.location.LocationTagVO
 
 object LocationTagIO {
-    suspend fun post(locationId: Int, dto: TagDTO.Post): LocationTagVO {
+    suspend fun post(locationId: Int, dto: TagDTO.Post): List<LocationTagVO> {
         return httpClient
             .post("/location/options/tag") {
                 parameter("locationId", locationId)

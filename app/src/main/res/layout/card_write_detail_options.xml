@@ -4,12 +4,13 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/write_detail_options"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_large"
-        android:layout_marginTop="@dimen/margin_regular"
+        android:layout_marginTop="@dimen/margin_2xlarge"
         android:fontFamily="@font/pretendard_semibold"
         android:text="@string/write_option"
         android:textColor="@color/md_theme_light_secondary"

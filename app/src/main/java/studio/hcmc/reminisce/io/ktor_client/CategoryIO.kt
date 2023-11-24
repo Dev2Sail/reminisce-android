@@ -21,6 +21,7 @@ object CategoryIO {
             .body()
     }
 
+    // category 순서 목록 변경
     suspend fun put(userId: Int, dto: CategoryDTO.Put) {
         httpClient
             .put("/category") {
@@ -29,6 +30,7 @@ object CategoryIO {
             }.bodyAsText()
     }
 
+    // category title 수정
     suspend fun patch(userId: Int, categoryId: Int, dto: CategoryDTO.Patch) {
         httpClient
             .patch("/category/${categoryId}") {
@@ -49,6 +51,7 @@ object CategoryIO {
             .body()
     }
 
+    // userId의 'Default' categoryId 조회
     suspend fun getDefaultCategoryIdByUserId(userId: Int): CategoryVO {
         return httpClient
             .get("/category") { parameter("userId", userId) }

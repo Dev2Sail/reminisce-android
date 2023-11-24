@@ -26,6 +26,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
 
     private val selectedFriendIds = HashSet<Int>()
+    private val preparePostIds = ArrayList<Int>()
     private val contents = ArrayList<WriteOptionsFriendAdapter.Content>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,17 +39,9 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     private fun initView() {
         viewBinding.writeSelectFriendAppbar.appbarTitle.text = getText(R.string.card_home_tag_friend_title)
         viewBinding.writeSelectFriendAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { patchContents(preparePost()) }
+        viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { patchContents() }
         prepareFriends()
         prepareSavedFriends()
-    }
-
-    private fun preparePost(): LocationFriendDTO.Post {
-        val dto = LocationFriendDTO.Post().apply {
-            this.locationId = this@WriteOptionFriendActivity.locationId
-            this.opponentIds = this@WriteOptionFriendActivity.selectedFriendIds.toMutableList()
-        }
-        return dto
     }
 
     private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
@@ -83,14 +76,38 @@ class WriteOptionFriendActivity : AppCompatActivity() {
         viewBinding.writeSelectFriendItems.adapter = WriteOptionsFriendAdapter(adapterDelegate, friendItemDelegate)
     }
 
-    private fun patchContents(dto: LocationFriendDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
+    private fun preparePost(): LocationFriendDTO.Post {
+        for (id in selectedFriendIds) {
+            preparePostIds.add(id)
+        }
+        val dto = LocationFriendDTO.Post().apply {
+            this.locationId = this@WriteOptionFriendActivity.locationId
+            this.opponentIds = this@WriteOptionFriendActivity.preparePostIds
+        }
+        return dto
+    }
+
+    private fun patchContents() = CoroutineScope(Dispatchers.IO).launch {
+        val dto = preparePost()
+        val body = ArrayList<String>()
+        for (friend in friends) {
+            for (id in selectedFriendIds) {
+                if (friend.opponentId == id) {
+                    body.add(friend.nickname!!)
+                }
+            }
+        }
+        LocalLogger.v("body ${body.joinToString { it }}")
         runCatching { LocationFriendIO.post(dto) }
-            .onSuccess {launchOptions() }
+            .onSuccess { launchOptions(body.joinToString { it }) }
             .onFailure { LocalLogger.e(it) }
     }
 
-    private fun launchOptions() {
-        Intent().putExtra("isAdded", true).setActivity(this, Activity.RESULT_OK)
+    private fun launchOptions(body: String) {
+        Intent()
+            .putExtra("isAdded", true)
+            .putExtra("body", body)
+            .setActivity(this, Activity.RESULT_OK)
         finish()
     }
 
@@ -108,6 +125,10 @@ class WriteOptionFriendActivity : AppCompatActivity() {
             }
 
             return true
+        }
+
+        override fun validate(opponentId: Int): Boolean {
+            return selectedFriendIds.contains(opponentId)
         }
     }
 }

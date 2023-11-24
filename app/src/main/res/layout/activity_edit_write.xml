@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.activity.writer.edit.EditWriteActivity"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include
+                android:id="@+id/edit_write_appbar"
+                layout="@layout/layout_appbar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/edit_write_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_small"
+                android:fontFamily="@font/pretendard_semibold"
+                android:text="@string/write_date"
+                android:textColor="@color/md_theme_light_secondary"
+                android:textSize="@dimen/title_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_write_appbar" />
+
+            <ImageView
+                android:id="@+id/edit_write_visited_at_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_2xlarge"
+                android:src="@drawable/outline_calendar_month_16"
+                app:layout_constraintBottom_toBottomOf="@id/edit_write_visited_at"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edit_write_visited_at"
+                app:tint="@color/md_theme_light_primary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/edit_write_visited_at"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginEnd="@dimen/margin_large"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="@string/write_visited_at"
+                android:textColor="@color/md_theme_light_onSurfaceVariant"
+                android:textSize="@dimen/body_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/edit_write_visited_at_icon"
+                app:layout_constraintTop_toBottomOf="@id/edit_write_date" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/edit_write_location_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:fontFamily="@font/pretendard_semibold"
+                android:text="@string/write_location_title"
+                android:textColor="@color/md_theme_light_secondary"
+                android:textSize="@dimen/title_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_write_visited_at" />
+
+            <ImageView
+                android:id="@+id/edit_write_location_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_2xlarge"
+                android:src="@drawable/outline_add_location_alt_16"
+                app:layout_constraintBottom_toBottomOf="@id/edit_write_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edit_write_location"
+                app:tint="@color/md_theme_light_primary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/edit_write_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginEnd="@dimen/margin_large"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="@string/write_location"
+                android:textColor="@color/md_theme_light_onSurfaceVariant"
+                android:textSize="@dimen/body_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/edit_write_location_icon"
+                app:layout_constraintTop_toBottomOf="@id/edit_write_location_title" />
+
+            <ImageView
+                android:id="@+id/edit_write_marker_emoji_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_2xlarge"
+                android:src="@drawable/outline_add_reaction_16"
+                app:layout_constraintBottom_toBottomOf="@id/edit_write_marker_emoji"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edit_write_marker_emoji"
+                app:tint="@color/md_theme_light_primary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/edit_write_marker_emoji"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginEnd="@dimen/margin_large"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="@string/write_emoji"
+                android:textColor="@color/md_theme_light_onSurfaceVariant"
+                android:textSize="@dimen/body_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/edit_write_marker_emoji_icon"
+                app:layout_constraintTop_toBottomOf="@id/edit_write_location" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/edit_write_divider1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_regular"
+                android:layout_marginBottom="@dimen/margin_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_write_marker_emoji" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/edit_write_text_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_regular"
+                app:counterEnabled="true"
+                app:counterMaxLength="1000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_write_divider1">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_write_text_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/md_theme_light_surface"
+                    android:fontFamily="@font/pretendard_regular"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine"
+                    android:minHeight="400dp"
+                    android:textSize="@dimen/body_medium" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</FrameLayout>

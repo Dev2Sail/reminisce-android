@@ -17,6 +17,7 @@ import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.ui.activity.writer.options.WriteOptionCategoryActivity
 import studio.hcmc.reminisce.ui.activity.writer.options.WriteOptionFriendActivity
 import studio.hcmc.reminisce.ui.activity.writer.options.WriteOptionTagActivity
+import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.setActivity
 
@@ -31,6 +32,12 @@ class WriteOptionsActivity : AppCompatActivity() {
     private val tagOptionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onTagResult)
     private val friendOptionsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onFriendResult)
     private val categoryOptionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onCategoryResult)
+    private val options = HashMap<String, OptionState>()
+
+    private data class OptionState(
+        val isEdited: Boolean,
+        val body: String?
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +55,12 @@ class WriteOptionsActivity : AppCompatActivity() {
             finish()
         }
         val (year, month, day) = visitedAt!!.split("-")
-        viewBinding.writeOptionsSuccessDateMessage.text = getString(R.string.write_options_success_date_message, year, month.trim('0'), day.trim('0'))
+        viewBinding.writeOptionsSuccessDateMessage.text = getString(R.string.write_options_success_date_message, year, month.removePrefix("0"), day.removePrefix("0"))
         viewBinding.writeOptionsSuccessLocationMessage.text = getString(R.string.write_options_success_location_message, place)
         viewBinding.writeOptionsNextButton.setOnClickListener { WriteOptionsDialog(this, dialogDelegate, title) }
+        options["friend"] = OptionState(false, null)
+        options["tag"] = OptionState(false, null)
+        options["category"] = OptionState(false, null)
     }
 
     private fun prepareCategory() = CoroutineScope(Dispatchers.IO).launch {
@@ -80,25 +90,69 @@ class WriteOptionsActivity : AppCompatActivity() {
 
     private fun onTagResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
-            val dialogViewBinding = DialogWriteOptionsBinding.inflate(layoutInflater)
-            dialogViewBinding.writeOptionsTagIcon.setImageResource(R.drawable.round_favorite_24)
-            dialogViewBinding.writeOptionsTagIcon.setColorFilter(R.color.md_theme_light_primary)
+            val body = activityResult.data?.getStringExtra("body")
+            options["tag"] = OptionState(true, body)
+            dialogChanger(title)
         }
     }
 
     private fun onFriendResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
-            val dialogViewBinding = DialogWriteOptionsBinding.inflate(layoutInflater)
-            dialogViewBinding.writeOptionsTagIcon.setImageResource(R.drawable.round_favorite_24)
-            dialogViewBinding.writeOptionsTagIcon.setColorFilter(R.color.md_theme_light_primary)
+            val body = activityResult.data?.getStringExtra("body")
+            options["friend"] = OptionState(true, body)
+            dialogChanger(title)
         }
     }
 
+
     private fun onCategoryResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
-            val title = activityResult.data?.getStringExtra("title")
-            val dialogViewBinding = DialogWriteOptionsBinding.inflate(layoutInflater)
-            dialogViewBinding.writeOptionsCategoryName.text = title
+            val body = activityResult.data?.getStringExtra("title")
+            options["category"] = OptionState(true, body)
+            dialogChanger(title)
         }
+    }
+
+    private fun dialogChanger(categoryTitle: String) {
+        val dialogViewBinding = DialogWriteOptionsBinding.inflate(layoutInflater)
+        val dialog = BottomSheetDialog(this, dialogViewBinding)
+        if (options["friend"]!!.isEdited) {
+            dialogViewBinding.writeOptionsFriendIcon.setImageResource(R.drawable.round_favorite_24)
+            dialogViewBinding.writeOptionsFriendBody.text = options["friend"]!!.body
+        }
+        if (options["tag"]!!.isEdited) {
+            dialogViewBinding.writeOptionsTagIcon.setImageResource(R.drawable.round_favorite_24)
+            dialogViewBinding.writeOptionsTagBody.text = options["tag"]!!.body
+        }
+//        if (options["category"]!!.isEdited) {
+//            dialogViewBinding.writeOptionsCategoryBody.text = when(options["category"]!!.body) {
+//                "Default" -> viewBinding.root.context.getString(R.string.category_view_holder_title)
+//                "new" -> viewBinding.root.context.getString(R.string.add_category_body)
+//                else -> options["category"]!!.body
+//            }
+//        } else {
+//            dialogViewBinding.writeOptionsCategoryBody.text = when(categoryTitle) {
+//                "Default" -> viewBinding.root.context.getString(R.string.category_view_holder_title)
+//                "new" -> viewBinding.root.context.getString(R.string.add_category_body)
+//                else -> categoryTitle
+//            }
+//        }
+
+        dialogViewBinding.writeOptionsNextFriend.setOnClickListener {
+            dialogDelegate.onFriendClick()
+        }
+        dialogViewBinding.writeOptionsNextTag.setOnClickListener {
+            dialogDelegate.onTagClick()
+        }
+        dialogViewBinding.writeOptionsNextCategory.setOnClickListener {
+            dialogDelegate.onCategoryClick()
+        }
+        val categoryName = options["category"]!!.body ?: categoryTitle
+        dialogViewBinding.writeOptionsCategoryBody.text = when (categoryName) {
+            "Default" -> viewBinding.root.context.getString(R.string.category_view_holder_title)
+            "new" -> viewBinding.root.context.getString(R.string.add_category_body)
+            else -> categoryName
+        }
+        dialog.show()
     }
 }

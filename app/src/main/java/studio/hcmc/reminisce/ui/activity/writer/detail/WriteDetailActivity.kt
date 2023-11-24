@@ -1,5 +1,6 @@
 package studio.hcmc.reminisce.ui.activity.writer.detail
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +15,7 @@ import studio.hcmc.reminisce.io.ktor_client.CategoryIO
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
+import studio.hcmc.reminisce.ui.activity.writer.edit.EditWriteActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.category.CategoryVO
@@ -47,6 +49,11 @@ class WriteDetailActivity : AppCompatActivity() {
             appbarActionButton1.text = getString(R.string.header_action)
             appbarActionButton1.setOnClickListener {
                 // TODO writeActivity intent
+                Intent(this@WriteDetailActivity, EditWriteActivity::class.java).apply {
+                    putExtra("locationId", locationId)
+                    startActivity(this)
+                    finish()
+                }
             }
             appbarBack.setOnClickListener {finish() }
         }

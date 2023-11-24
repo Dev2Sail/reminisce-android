@@ -12,7 +12,6 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 
 class PlaceAdapter(
     private val adapterDelegate: Delegate,
-    private val headerDelegate: PlaceHeaderViewHolder.Delegate,
     private val summaryDelegate: PlaceSummaryViewHolder.Delegate
 ): Adapter<ViewHolder>() {
     interface Delegate: SingleTypeAdapterDelegate<Content>
@@ -28,7 +27,7 @@ class PlaceAdapter(
     ): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
-        0 -> PlaceHeaderViewHolder(parent, headerDelegate)
+        0 -> PlaceHeaderViewHolder(parent)
         1 -> PlaceDateViewHolder(parent)
         2 -> PlaceSummaryViewHolder(parent, summaryDelegate)
         else -> unknownViewType(viewType)

@@ -89,7 +89,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             .onSuccess { it -> it.forEach {
                 if (it.markerEmoji.isNullOrEmpty()) {
                     // customMarker 우선순위가 더 높음
-
                     if (!markerInfo.containsKey(it.title)) {
                         markerInfo[it.title] = Place(it.roadAddress, it.latitude, it.longitude)
                     }
@@ -105,25 +104,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun buildMarkers() {
-        markerInfo.forEach { markers.add(prepareMarker(it.key, it.value.address, it.value.latitude, it.value.longitude)) }
-        customMarkerInfo.forEach { customMarkers.add(prepareCustomMarker(it.value.emoji, it.key, it.value.address, it.value.latitude, it.value.longitude)) }
-//        for (place in markerInfo) {
-//            markers.add(prepareMarker(
-//                place.key,
-//                place.value.address,
-//                place.value.latitude,
-//                place.value.longitude
-//            ))
-//        }
-//        for (place in customMarkerInfo) {
-//            customMarkers.add(prepareCustomMarker(
-//                place.value.emoji,
-//                place.key,
-//                place.value.address,
-//                place.value.latitude,
-//                place.value.longitude
-//            ))
-//        }
+//        markerInfo.forEach { markers.add(prepareMarker(it.key, it.value.address, it.value.latitude, it.value.longitude)) }
+//        customMarkerInfo.forEach { customMarkers.add(prepareCustomMarker(it.value.emoji, it.key, it.value.address, it.value.latitude, it.value.longitude)) }
+        for (place in markerInfo) {
+            markers.add(prepareMarker(
+                place.key,
+                place.value.address,
+                place.value.latitude,
+                place.value.longitude
+            ))
+        }
+        for (place in customMarkerInfo) {
+            customMarkers.add(prepareCustomMarker(
+                place.value.emoji,
+                place.key,
+                place.value.address,
+                place.value.latitude,
+                place.value.longitude
+            ))
+        }
     }
 
     private fun prepareMarker(place: String, address: String, latitude: Double, longitude: Double): Marker {

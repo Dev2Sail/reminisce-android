@@ -68,7 +68,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.categoryDetailAddButton.setOnClickListener {
             val intent = Intent(this, WriteActivity::class.java)
-                .putExtra("categoryId", categoryId)
+                .putExtra("categoryId", category.id)
             writeByCategoryIdLauncher.launch(intent)
         }
         loadContents()
@@ -86,16 +86,11 @@ class CategoryDetailActivity : AppCompatActivity() {
 
         val result = runCatching { fetch() }
             .onSuccess {
-//                locations.addAll(it)
                 for (vo in it) {
                     locations.add(vo)
                     tagInfo[vo.id] = TagIO.listByLocationId(vo.id)
                     friendInfo[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
                 }
-//                it.forEach {
-//                    tagInfo[it.id] = TagIO.listByLocationId(it.id)
-//                    friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-//                }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
             prepareContents()

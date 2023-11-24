@@ -23,7 +23,6 @@ import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.activity.friend_tag.FriendTagDetailActivity
 import studio.hcmc.reminisce.ui.activity.map.MapTestActivity
 import studio.hcmc.reminisce.ui.activity.tag.TagDetailActivity
-import studio.hcmc.reminisce.ui.activity.writer.options.WriteOptionCategoryActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
@@ -58,11 +57,6 @@ class HomeActivity : AppCompatActivity() {
             Intent(this, MapTestActivity::class.java).apply {
                 startActivity(this)
 
-            }
-        }
-        viewBinding.homeTest2.setOnClickListener {
-            Intent(this, WriteOptionCategoryActivity::class.java).apply {
-                startActivity(this)
             }
         }
     }
@@ -299,6 +293,7 @@ class HomeActivity : AppCompatActivity() {
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
+            contents.removeAt(contents.size - 1)
             contents.add(HomeAdapter.FriendContent(friends))
             withContext(Dispatchers.Main) {
                 adapter.notifyItemChanged(contents.size - 1)

@@ -27,6 +27,8 @@ class SearchLocationActivity : AppCompatActivity() {
     private lateinit var places: List<KKPlaceInfo>
     private lateinit var adapter: SearchLocationAdapter
 
+    private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
+
     private val contents = ArrayList<SearchLocationAdapter.Content>()
     private val placeInfo = HashMap<String /* placeId */, Place>()
     private val roadAddress = HashMap<String /* placeId */, String>()
@@ -50,8 +52,7 @@ class SearchLocationActivity : AppCompatActivity() {
             val input = viewBinding.searchLocationField.string
             if (actionId == EditorInfo.IME_ACTION_SEARCH || event.keyCode == KeyEvent.KEYCODE_SEARCH && event.action == KeyEvent.ACTION_DOWN) {
                 contents.removeAll {it is SearchLocationAdapter.Content}
-//                patchSearchResult(input)
-                testLoadContents(input)
+                loadContentsByKakao(input)
                 return@setOnEditorActionListener true
             }
 
@@ -59,13 +60,12 @@ class SearchLocationActivity : AppCompatActivity() {
         }
     }
 
-    private fun testLoadContents(value: String) = CoroutineScope(Dispatchers.IO).launch {
+    private fun loadContentsByKakao(value: String) = CoroutineScope(Dispatchers.IO).launch {
         val result = runCatching {
             val kakaoResultDeferred = async { KakaoIO.listByKeyword(value) }
             val kakaoResult = kakaoResultDeferred.await()
             places = kakaoResult.documents
-//            var moisResultDeferred: Deferred<MoisResponse>
-            for (place in places) {
+            for (place in kakaoResult.documents) {
                 placeInfo[place.id] = Place(place.place_name, place.x, place.y)
                 roadAddress[place.id] = if (place.road_address_name == "") place.address_name else place.road_address_name
             }
@@ -78,7 +78,10 @@ class SearchLocationActivity : AppCompatActivity() {
 
     private fun prepareContents() {
         contents.addAll(places.map { SearchLocationAdapter.PlaceContent(
-            it.id, it.place_name, categoryNameFormat(it.category_name), roadAddress[it.id]!!
+            it.id,
+            it.place_name,
+            categoryNameFormat(it.category_name),
+            roadAddress[it.id]!!
         ) })
     }
 
@@ -99,13 +102,14 @@ class SearchLocationActivity : AppCompatActivity() {
 
     private val itemDelegate = object : SearchLocationItemViewHolder.Delegate {
         override fun onClick(placeId: String) {
-//            testTransFormRoadAddress(placeId)
-            LocalLogger.v("input info : ${roadAddress[placeId]}")
             try {
                 CoroutineScope(Dispatchers.IO).launch {
-                    LocalLogger.v("now : ${test3(placeId)}")
-                    fromWriteLauncher(placeId, test3(placeId))
-                    launchWrite(placeId, test3(placeId))
+                    LocalLogger.v("now : ${onTransformAddressByMois(placeId)}")
+                    if (categoryId == -1) {
+                        launchWrite(placeId, onTransformAddressByMois(placeId))
+                    } else {
+                        fromWriteLauncher(placeId, onTransformAddressByMois(placeId))
+                    }
                 }
             } catch (e: Throwable) {
                 LocalLogger.e(e)
@@ -113,22 +117,7 @@ class SearchLocationActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun testTransform2(placeId: String): String = withContext(Dispatchers.IO) {
-        val keyword = roadAddress[placeId]
-        val finalAddress : String
-        runCatching { MoisIO.getRoadAddress(keyword!!) }
-            .onSuccess {
-                val juso = it.results.juso
-                if (juso != null) {
-                    finalAddress = juso[0].roadAddr
-                } else {
-                    finalAddress = buildAddress(keyword!!)
-                }
-                return@withContext finalAddress
-            }.onFailure { LocalLogger.e(it) }
-    }.toString()
-
-    private suspend fun test3(placeId: String): String = coroutineScope {
+    private suspend fun onTransformAddressByMois(placeId: String): String = coroutineScope {
         val keyword = roadAddress[placeId]
         val moisDeferred = async { MoisIO.getRoadAddress(keyword!!) }
         val moisResponse = moisDeferred.await()
@@ -144,11 +133,12 @@ class SearchLocationActivity : AppCompatActivity() {
     }.toString()
 
 
-    private enum class InternalIdentifier() {
+    private enum class InternalIdentifier {
         서울특별시, 인천광역시, 부산광역시, 대전광역시,
         대구광역시, 광주광역시, 울산광역시, 경기도,
         충청북도, 충청남도, 전라북도, 전라남도, 경상북도, 경상남도;
     }
+
     private fun buildAddress(addressByKakao: String): String {
         val kakaoAddr = addressByKakao.split(" ")
         return buildString {
@@ -187,6 +177,7 @@ class SearchLocationActivity : AppCompatActivity() {
             putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
             putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
             startActivity(this)
+            finish()
         }
     }
 
@@ -197,6 +188,11 @@ class SearchLocationActivity : AppCompatActivity() {
             putExtra("longitude", placeInfo[placeId]!!.longitude.toDouble())
             putExtra("latitude", placeInfo[placeId]!!.latitude.toDouble())
             setActivity(this@SearchLocationActivity, Activity.RESULT_OK)
+            finish()
         }
     }
 }
+/*
+경로 1. MapActivity -> SearchLocationActivity (defaultCategoryId) -> WriteActivity
+경로 2. HomeActivity -> CategoryDetailActivity (selectedCategoryId) -> WriteActivity
+ */

@@ -11,7 +11,7 @@ import studio.hcmc.reminisce.dto.location.LocationFriendDTO
 import studio.hcmc.reminisce.vo.location_friend.LocationFriendVO
 
 object LocationFriendIO {
-    suspend fun post(dto: LocationFriendDTO.Post): LocationFriendVO {
+    suspend fun post(dto: LocationFriendDTO.Post): List<LocationFriendVO> {
         return httpClient
             .post("/location/options/friend") { setBody(Gson().toJsonTree(dto)) }
             .body()
@@ -22,16 +22,4 @@ object LocationFriendIO {
             .delete("/location/options/friend/${opponentId}") { parameter("locationId", locationId) }
             .bodyAsText()
     }
-
-//    suspend fun listByUserId(userId: Int): List<LocationFriendVO> {
-//        return httpClient
-//            .get("/location/options/friend/list/all") { parameter("userId", userId) }
-//            .body()
-//    }
-
-//    suspend fun listByLocationId(locationId: Int): List<LocationFriendVO> {
-//        return httpClient
-//            .get("/location/options/friend/list") { parameter("locationId", locationId) }
-//            .body()
-//    }
 }

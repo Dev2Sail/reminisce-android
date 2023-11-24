@@ -12,8 +12,7 @@ class WriteOptionCategoryItemViewHolder(
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(categoryId: Int, position: Int): Boolean
-
+        fun onItemClick(categoryId: Int, title: String)
         fun validate(categoryId: Int): Boolean
     }
 
@@ -31,26 +30,9 @@ class WriteOptionCategoryItemViewHolder(
         }
         // 기본 선택된 카테고리
         viewBinding.writeOptionsSelectCategoryIcon.isVisible = delegate.validate(category.id)
+        // 변경할 카테고리
         viewBinding.root.setOnClickListener {
-            viewBinding.writeOptionsSelectCategoryIcon.isVisible = delegate.onItemClick(category.id, bindingAdapterPosition)
-            viewBinding.writeOptionsSelectCategoryIcon.isVisible = delegate.validate(category.id)
+            delegate.onItemClick(category.id, category.title)
         }
-
-
-        // 변경할 카테고리 선택 시 !validate && onItemClick 이면 visible?
-
-//        viewBinding.root.setOnClickListener {
-////            viewBinding.writeOptionsSelectCategoryIcon.isVisible = delegate.onItemClick(category.id, bindingAdapterPosition)
-//            delegate.onItemClick(category.id, bindingAdapterPosition)
-//            viewBinding.writeOptionsSelectCategoryIcon.isVisible = delegate.validate(category.id)
-//        }
     }
 }
-/*
-1. intent로 받아온 categoryId와 동일한 경우 visible true
-2. 다른 item 선택 시 해당 item만 visible true
-
-
-map? categoryId, position
-new data class?
- */

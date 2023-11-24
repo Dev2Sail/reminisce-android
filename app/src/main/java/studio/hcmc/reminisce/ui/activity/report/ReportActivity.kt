@@ -42,14 +42,7 @@ class ReportActivity : AppCompatActivity() {
         navigationController(viewBinding.reportNavView, menuId)
         viewBinding.reportHeader.commonHeaderAction1.isGone = true
         viewBinding.reportHeader.commonHeaderTitle.text = getString(R.string.nav_main_report)
-
-//        try {
-//            CoroutineScope(Dispatchers.IO).launch { test3() }
-//        } catch (e: Throwable) {
-//            LocalLogger.e(e)
-//        }
-//        prepareContents()
-        test2()
+        loadContents()
     }
 
     // 모든 변수는 서로에게 영향 끼치지 않음
@@ -76,7 +69,7 @@ class ReportActivity : AppCompatActivity() {
         }
     }
 
-    private fun test2() = CoroutineScope(Dispatchers.IO).launch {
+    private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val result = runCatching {
             val user = UserExtension.getUser(this@ReportActivity)
             // 개별적이니까 바로 await?
@@ -151,3 +144,11 @@ class ReportActivity : AppCompatActivity() {
         }
     }
 }
+/*
+        try {
+            CoroutineScope(Dispatchers.IO).launch { test3() }
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+        }
+        prepareContents()
+ */

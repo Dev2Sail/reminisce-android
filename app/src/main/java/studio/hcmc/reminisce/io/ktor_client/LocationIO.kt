@@ -50,17 +50,15 @@ object LocationIO {
     // userId로 저장된 모든 location list
     suspend fun listByUserId(userId: Int): List<LocationVO> {
         return httpClient
-            .get("/location/list/all") {
-                parameter("userId", userId)
-            }.body()
+            .get("/location/list/all") { parameter("userId", userId) }
+            .body()
     }
 
     // userId의 category별로 저장된 location list
     suspend fun listByCategoryId(categoryId: Int): List<LocationVO> {
         return httpClient
-            .get("/location/list") {
-                parameter("categoryId", categoryId)
-            }.body()
+            .get("/location/list") { parameter("categoryId", categoryId) }
+            .body()
     }
 
     suspend fun listByTagId(tagId: Int): List<LocationVO> {

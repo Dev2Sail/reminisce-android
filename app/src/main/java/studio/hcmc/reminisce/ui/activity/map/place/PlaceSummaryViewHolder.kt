@@ -10,7 +10,6 @@ import studio.hcmc.reminisce.databinding.CardSummaryBinding
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class PlaceSummaryViewHolder(
     private val viewBinding: CardSummaryBinding,
@@ -18,8 +17,6 @@ class PlaceSummaryViewHolder(
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(locationId: Int, title: String)
-
-        fun getUser(userId: Int): UserVO
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -70,7 +67,7 @@ class PlaceSummaryViewHolder(
     }
 
     private fun prepareFriends(friends: List<FriendVO>) {
-        val friendText = friends.joinToString { it.nickname ?: delegate.getUser(it.opponentId).nickname }
+        val friendText = friends.joinToString { it.nickname!! }
         if (friendText.isNotEmpty()) {
             viewBinding.cardSummaryFriends.apply {
                 root.isVisible = true

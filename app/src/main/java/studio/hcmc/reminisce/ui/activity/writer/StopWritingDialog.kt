@@ -6,7 +6,14 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.DialogDeleteHomeCategoryBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
-class StopWritingDialog(activity: Activity) {
+class StopWritingDialog(
+    activity: Activity,
+    delegate: Delegate
+) {
+    interface Delegate {
+        fun onClick()
+    }
+
     init {
         val viewBinding = DialogDeleteHomeCategoryBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)

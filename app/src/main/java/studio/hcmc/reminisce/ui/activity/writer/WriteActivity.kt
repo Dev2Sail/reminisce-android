@@ -39,12 +39,16 @@ class WriteActivity : AppCompatActivity() {
 
     private fun initView() {
         viewBinding.writeAppbar.appbarTitle.text = ""
-        viewBinding.writeAppbar.appbarBack.setOnClickListener { finish() }
+//        viewBinding.writeAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.writeAppbar.appbarBack.setOnClickListener { StopWritingDialog(this, stopDialogDelegate) }
         viewBinding.writeAppbar.appbarActionButton1.setOnClickListener { onValidatePost() }
         viewBinding.writeVisitedAt.setOnClickListener { WriteSelectVisitedAtDialog(this, visitedAtDelegate) }
         viewBinding.writeMarkerEmoji.setOnClickListener { WriteSelectEmojiDialog(this, emojiDelegate) }
         viewBinding.writeLocation.setOnClickListener {
-            searchLocationLauncher.launch(Intent(this, SearchLocationActivity::class.java))
+            searchLocationLauncher.launch(
+                Intent(this, SearchLocationActivity::class.java)
+                    .putExtra("categoryId", categoryId)
+            )
         }
         fromSearchLocation()
     }
@@ -58,7 +62,6 @@ class WriteActivity : AppCompatActivity() {
         }
     }
 
-    // TODO searchLocation 다녀오면 date 날짜 날라감 !!!
     private fun fromSearchLocation() {
         if (categoryId == -1) {
             getDefaultCategoryId()
@@ -90,7 +93,7 @@ class WriteActivity : AppCompatActivity() {
             this.body = writeOptions["body"] as String
             this.visitedAt = writeOptions["visitedAt"] as String
         }
-        dto.categoryId = if (categoryId == -1) defaultCategoryId else this.categoryId
+        dto.categoryId = if (categoryId != -1) this.categoryId else defaultCategoryId
         postContents(dto)
     }
 
@@ -98,6 +101,12 @@ class WriteActivity : AppCompatActivity() {
         runCatching { LocationIO.post(dto) }
             .onSuccess { launchWriteOptions(it.id) }
             .onFailure { LocalLogger.e(it) }
+    }
+
+    private val stopDialogDelegate = object : StopWritingDialog.Delegate {
+        override fun onClick() {
+            finish()
+        }
     }
 
     private val visitedAtDelegate = object : WriteSelectVisitedAtDialog.Delegate {
@@ -122,7 +131,6 @@ class WriteActivity : AppCompatActivity() {
             .putExtra("visitedAt", writeOptions["visitedAt"].toString())
             .putExtra("place", writeOptions["place"].toString())
         writeOptionsLauncher.launch(intent)
-        finish()
     }
 
     private fun onSearchLocationResult(activityResult: ActivityResult) {
@@ -134,7 +142,9 @@ class WriteActivity : AppCompatActivity() {
 
             viewBinding.writeLocation.text = roadAddress
             viewBinding.writeAppbar.appbarTitle.text = place
-            viewBinding.writeVisitedAt.text = writeOptions["visitedAt"].toString()
+            if (writeOptions["visitedAt"] != null) {
+                viewBinding.writeVisitedAt.text = writeOptions["visitedAt"].toString()
+            }
             writeOptions["place"] = place!!
             writeOptions["roadAddress"] = roadAddress
             writeOptions["longitude"] = longitude!!

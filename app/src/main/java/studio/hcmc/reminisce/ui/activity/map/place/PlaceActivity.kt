@@ -2,8 +2,6 @@ package studio.hcmc.reminisce.ui.activity.map.place
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,23 +15,19 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
-import studio.hcmc.reminisce.vo.user.UserVO
 
 class PlaceActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPlaceBinding
     private lateinit var adapter: PlaceAdapter
     private lateinit var locations: List<LocationVO>
 
-    private val placeEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
     private val location by lazy { intent.getStringExtra("location") }
 
-    private val users = HashMap<Int, UserVO>()
     private val friends = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tags = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<PlaceAdapter.Content>()
@@ -57,17 +51,9 @@ class PlaceActivity : AppCompatActivity() {
         val result = runCatching { LocationIO.listByUserIdAndTitle(user.id, value) }
             .onSuccess { it ->
                 locations = it
-                it.forEach {
-                    friends[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                    tags[it.id] = TagIO.listByLocationId(it.id)
-                }
-                friends.values.forEach {
-                    for (friend in it) {
-                        if (friend.nickname == null) {
-                            val opponent = UserIO.getById(friend.opponentId)
-                            users[opponent.id] = opponent
-                        }
-                    }
+                for (vo in it) {
+                    friends[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
+                    tags[vo.id] = TagIO.listByLocationId(vo.id)
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
@@ -89,20 +75,13 @@ class PlaceActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.placeItems.layoutManager = LinearLayoutManager(this)
-        adapter = PlaceAdapter(adapterDelegate, headerDelegate, summaryDelegate)
+        adapter = PlaceAdapter(adapterDelegate, summaryDelegate)
         viewBinding.placeItems.adapter = adapter
     }
 
     private val adapterDelegate = object : PlaceAdapter.Delegate {
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
-    }
-
-    private val headerDelegate = object : PlaceHeaderViewHolder.Delegate {
-        override fun onEditClick() {
-//            val intent = Intent().putExtra("title", location)
-//            placeEditableLauncher.launch(intent)
-        }
     }
 
     private val summaryDelegate = object : PlaceSummaryViewHolder.Delegate {
@@ -112,17 +91,6 @@ class PlaceActivity : AppCompatActivity() {
                 putExtra("title", title)
                 startActivity(this)
             }
-        }
-
-        override fun getUser(userId: Int): UserVO {
-            return users[userId]!!
-        }
-    }
-
-    private fun onModifiedResult(activityResult: ActivityResult) {
-        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
-            contents.removeAll { it is PlaceAdapter.Content }
-            location?.let { loadLocations(it) }
         }
     }
 }

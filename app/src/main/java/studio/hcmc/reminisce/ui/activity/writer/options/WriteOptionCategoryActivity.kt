@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,9 +27,7 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
 
-    private val checkedCategoryId = HashSet<Int>(1)
     private val contents = ArrayList<WriteOptionCategoryAdapter.Content>()
-    private val states = HashMap<Int, Boolean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,12 +39,7 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
     private fun initView() {
         viewBinding.writeOptionsSelectCategoryAppbar.appbarTitle.text = getText(R.string.write_options_select_category_title)
         viewBinding.writeOptionsSelectCategoryAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.writeOptionsSelectCategoryAppbar.appbarActionButton1.setOnClickListener {
-//            patchCategory(checkedCategoryId.elementAt(0))
-        }
-////        checkedCategoryId.add(categoryId)
-//        checkedCategoryId.add(31)
-////        selectedCategoryId[0] = 31
+        viewBinding.writeOptionsSelectCategoryAppbar.appbarActionButton1.isVisible = false
         prepareCategories()
     }
 
@@ -65,7 +59,6 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
         for (category in categories) {
             contents.add(WriteOptionCategoryAdapter.DetailContent(category))
         }
-        prepareStates()
     }
 
     private fun onContentsReady() {
@@ -74,92 +67,32 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
         viewBinding.writeOptionsSelectCategoryItems.adapter = adapter
     }
 
-    private fun patchCategory(categoryId: Int) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { LocationIO.patchCategoryId(locationId, categoryId) }
-            .onSuccess { launchOptions() }
-            .onFailure { LocalLogger.e(it) }
-    }
-
-    private fun launchOptions() {
-        Intent().putExtra("isAdded", true).setActivity(this, Activity.RESULT_OK)
-        finish()
-    }
-
     private val adapterDelegate = object : WriteOptionCategoryAdapter.Delegate {
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }
 
-    private fun prepareStates() {
-        for (category in categories) {
-            states[category.id] = category.id == categoryId
-        }
-    }
-
-    private fun buildStates(categoryId: Int) {
-        for (item in states.keys) {
-            if (item == categoryId) {
-                states[categoryId] = true
-            } else {
-                states[item] = false
-            }
-        }
-    }
-
     private val itemDelegate = object : WriteOptionCategoryItemViewHolder.Delegate {
-        override fun onItemClick(categoryId: Int, position: Int): Boolean {
-            buildStates(categoryId)
-            return states[categoryId]!!
+        override fun onItemClick(categoryId: Int, title: String) {
+            patchCategory(categoryId, title)
         }
-
-
-//        override fun onItemClick(categoryId: Int, position: Int): Boolean {
-////            return if (selectedCategoryId[0] != categoryId) {
-////                selectedCategoryId[0] = categoryId
-////                LocalLogger.v("current categoryId (visible true): ${selectedCategoryId[0]}")
-////
-////                true
-////            } else {
-////                LocalLogger.v("current categoryId (visible false): ${selectedCategoryId[0]}")
-////                false
-////            }
-//            // 선택돼있던 상태
-//            if (!checkedCategoryId.add(categoryId)) {
-//                // 선택 해제
-//                checkedCategoryId.remove(categoryId)
-//
-//                return false
-//            }
-//            checkedCategoryId.clear()
-//            checkedCategoryId.add(categoryId)
-//
-//            return true
-//        }
 
         override fun validate(categoryId: Int): Boolean {
-            return states[categoryId]!!
+            return categoryId == this@WriteOptionCategoryActivity.categoryId
         }
+    }
 
-//        fun validateCheck(position: Int): Boolean {
-//            if ()
-//
-//        }
+    private fun patchCategory(categoryId: Int, title: String) = CoroutineScope(Dispatchers.IO).launch {
+        runCatching { LocationIO.patchCategoryId(locationId, categoryId) }
+            .onSuccess { launchOptions(title) }
+            .onFailure { LocalLogger.e(it) }
+    }
+
+    private fun launchOptions(title: String) {
+        Intent()
+            .putExtra("isAdded", true)
+            .putExtra("title", title)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 }
-/*
-val set = HashSet<Int>(1)
-    set.add(1)
-
-
-    fun test(id: Int): Boolean {
-        if (!set.add(id)) {
-            set.remove(id)
-            set.add(id)
-            return false
-        }
-        set.clear()
-        set.add(id)
-
-        return true
-    }
- */

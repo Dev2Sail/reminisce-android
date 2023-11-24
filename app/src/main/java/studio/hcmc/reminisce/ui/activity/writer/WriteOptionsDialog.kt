@@ -9,7 +9,7 @@ import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 class WriteOptionsDialog(
     activity: Activity,
     delegate: Delegate,
-    categoryName: String
+    categoryTitle: String
 ) {
     interface Delegate {
         fun onTagClick()
@@ -17,18 +17,25 @@ class WriteOptionsDialog(
         fun onCategoryClick()
     }
 
-    private var viewBinding: DialogWriteOptionsBinding
-
     init {
-        viewBinding = DialogWriteOptionsBinding.inflate(LayoutInflater.from(activity))
+        val viewBinding = DialogWriteOptionsBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        viewBinding.writeOptionsNextFriend.setOnClickListener { delegate.onFriendClick() }
-        viewBinding.writeOptionsNextTag.setOnClickListener { delegate.onTagClick() }
-        viewBinding.writeOptionsNextCategory.setOnClickListener { delegate.onCategoryClick() }
-        viewBinding.writeOptionsCategoryName.text = when(categoryName) {
+        viewBinding.writeOptionsNextFriend.setOnClickListener {
+            delegate.onFriendClick()
+            dialog.dismiss()
+        }
+        viewBinding.writeOptionsNextTag.setOnClickListener {
+            delegate.onTagClick()
+            dialog.dismiss()
+        }
+        viewBinding.writeOptionsNextCategory.setOnClickListener {
+            delegate.onCategoryClick()
+            dialog.dismiss()
+        }
+        viewBinding.writeOptionsCategoryBody.text = when(categoryTitle) {
             "Default" -> viewBinding.root.context.getString(R.string.category_view_holder_title)
             "new" -> viewBinding.root.context.getString(R.string.add_category_body)
-            else -> categoryName
+            else -> categoryTitle
         }
         dialog.show()
     }

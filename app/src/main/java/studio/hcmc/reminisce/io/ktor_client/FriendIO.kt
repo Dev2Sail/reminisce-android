@@ -47,12 +47,14 @@ object FriendIO {
             .bodyAsText()
     }
 
+    // 단일 FriendVO 조회
     suspend fun getByUserIdAndOpponentId(userId: Int, opponentId: Int): FriendVO {
         return httpClient
             .get("/friend/${userId}/${opponentId}")
             .body()
     }
 
+    // userId에 등록된 모든 FriendVO List
     suspend fun listByUserId(userId: Int, nullableState: Boolean): List<FriendVO> {
         return httpClient
             .get("/friend/list/all") {
@@ -61,12 +63,14 @@ object FriendIO {
             }.body()
     }
 
+    // userId로 location_friend에 저장된 데이터 중 중복이 없는 opponentIds 조회
     suspend fun distinctListByUserId(userId: Int): List<FriendVO> {
         return httpClient
             .get("/friend/list") { parameter("userId", userId) }
             .body()
     }
 
+    // userId로 단일 location에 저장된 FriendVO list
     suspend fun listByUserIdAndLocationId(userId: Int, locationId: Int): List<FriendVO> {
         return httpClient
             .get("/friend/list") {
@@ -75,6 +79,7 @@ object FriendIO {
             }.body()
     }
 
+    // userId로 저장된 location_friend 중 가장 많은 횟수로 저장된 FriendVO
     suspend fun mostStoredInLocationByUserId(userId: Int): List<FriendVO> {
         return httpClient
             .get("/report/${userId}/friend/list")

@@ -1,5 +1,7 @@
 package studio.hcmc.reminisce.ui.activity.writer.options
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
@@ -11,10 +13,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityWriteOptionsAddTagBinding
+import studio.hcmc.reminisce.dto.tag.TagDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
+import studio.hcmc.reminisce.io.ktor_client.LocationTagIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
+import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 import studio.hcmc.reminisce.vo.tag.TagVO
@@ -22,11 +27,13 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 class WriteOptionTagActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteOptionsAddTagBinding
     private lateinit var tags: List<TagVO>
+
+    private val locationId by lazy { intent.getIntExtra("locationId", -1) }
+
     // 저장할 태그 body
-    private val newTags = ArrayList<String>()
-    private val savedTagIds = HashSet<Int>()
+    private val postTags = ArrayList<String>()
     // 저장돼있던 태그 중 해당 location에 저장할 tagId
-    private val selectedTagIds = HashSet<Int>()
+    private val isChecked = HashSet<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,17 +43,18 @@ class WriteOptionTagActivity : AppCompatActivity() {
         prepareTags()
     }
 
+    // TODO 기존에 저장된 태그들 조회해서 newChip에 붙이기
+
+
     private fun initView() {
         viewBinding.writeOptionsAddTagAppbar.apply {
             appbarTitle.text = getText(R.string.write_options_add_tag_title)
             appbarActionButton1.isEnabled = false
             appbarBack.setOnClickListener { finish() }
             appbarActionButton1.setOnClickListener {
-//                Intent(this@WriteOptionAddTagActivity, WriteActivity::class.java).apply {
-//                    putStringArrayListExtra("tags", newTags)
-//                    startActivity(this)
-//                    finish()
-//                }
+                LocalLogger.v("tag body : $postTags")
+//                LocalLogger.v("dto : ${preparePostTags(30).body}")
+                postContents()
             }
         }
 
@@ -56,7 +64,7 @@ class WriteOptionTagActivity : AppCompatActivity() {
                 event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN &&
                 viewBinding.writeOptionsAddTagField.text.length <= 10
                 ) {
-                if (!newTags.contains(inputtedValue.string)) {
+                if (!postTags.contains(inputtedValue.string)) {
                     addNewChip(inputtedValue.string)
                 }
 
@@ -66,7 +74,6 @@ class WriteOptionTagActivity : AppCompatActivity() {
             false
         }
     }
-    // TODO AutoCompleteTextView
 
     private fun prepareTags() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@WriteOptionTagActivity)
@@ -76,20 +83,46 @@ class WriteOptionTagActivity : AppCompatActivity() {
                 for (item in it) {
                     withContext(Dispatchers.Main) { addSavedChip(item.id, item.body) }
                 }
-            }
-            .onFailure {
+            }.onFailure {
                 LocalLogger.e(it)
                 CommonError.onMessageDialog(this@WriteOptionTagActivity, getString(R.string.dialog_error_tag_load))
-//                CommonError.debugError(it)
             }
+    }
+
+    private fun preparePostTags(userId: Int): TagDTO.Post {
+        for (tag in tags) {
+            for (selectedId in isChecked) {
+                if (tag.id == selectedId) {
+                    postTags.add(tag.body)
+                }
+            }
+        }
+
+        val dto = TagDTO.Post().apply {
+            this.userId = userId
+            this.body = this@WriteOptionTagActivity.postTags
+        }
+        return dto
     }
 
     private fun postContents() = CoroutineScope(Dispatchers.IO).launch {
+        val user  = UserExtension.getUser(this@WriteOptionTagActivity)
+        val dto = preparePostTags(user.id)
+        runCatching { LocationTagIO.post(locationId, dto) }
+            .onSuccess { launchOptions() }
+            .onFailure { LocalLogger.e(it) }
+    }
 
+    private fun launchOptions() {
+        Intent()
+            .putExtra("isAdded", true)
+            .putExtra("body", postTags.joinToString { it })
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 
     private fun addNewChip(value: String) {
-        newTags.add(value)
+        postTags.add(value)
         val field = viewBinding.writeOptionsAddTagNew
         val newChip = Chip(this).apply {
             text = value
@@ -99,7 +132,7 @@ class WriteOptionTagActivity : AppCompatActivity() {
         }
         newChip.setOnCloseIconClickListener {
             field.removeView(it)
-            newTags.remove(value)
+            postTags.remove(value)
 
             viewBinding.writeOptionsAddTagAppbar.apply {
                 appbarActionButton1.isEnabled = field.childCount != 0
@@ -120,11 +153,11 @@ class WriteOptionTagActivity : AppCompatActivity() {
         }
 
         chip.setOnCheckedChangeListener { _, _ ->
-            if (!selectedTagIds.add(id)) {
-                selectedTagIds.remove(id)
+            if (!isChecked.add(id)) {
+                isChecked.remove(id)
             }
 
-            viewBinding.writeOptionsAddTagAppbar.appbarActionButton1.isEnabled = newTags.isNotEmpty() && selectedTagIds.isNotEmpty()
+            viewBinding.writeOptionsAddTagAppbar.appbarActionButton1.isEnabled = postTags.isNotEmpty() || isChecked.isNotEmpty()
         }
 
         viewBinding.writeOptionsAddTagOld.addView(chip)
