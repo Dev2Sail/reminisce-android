@@ -16,7 +16,7 @@ class CategoryDetailSummaryViewHolder(
     private val delegate: Delegate
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(location: LocationVO)
+        fun onItemClick(locationId: Int, title: String, position: Int)
         fun onItemLongClick(locationId: Int, position: Int)
     }
 
@@ -30,7 +30,7 @@ class CategoryDetailSummaryViewHolder(
         prepareLocation(location)
         tags?.let { prepareTags(it) }
         friends?.let { prepareFriends(it) }
-        viewBinding.root.setOnClickListener { delegate.onItemClick(location) }
+        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title, bindingAdapterPosition) }
         viewBinding.root.setOnLongClickListener {
             delegate.onItemLongClick(location.id, bindingAdapterPosition)
 

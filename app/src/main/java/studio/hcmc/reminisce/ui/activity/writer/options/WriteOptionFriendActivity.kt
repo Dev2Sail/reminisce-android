@@ -132,3 +132,4 @@ class WriteOptionFriendActivity : AppCompatActivity() {
         }
     }
 }
+// TODO 기존에 선택돼있던 친구 삭제가 안 됨

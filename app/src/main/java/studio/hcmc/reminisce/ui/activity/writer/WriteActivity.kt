@@ -23,12 +23,13 @@ import studio.hcmc.reminisce.util.string
 
 class WriteActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteBinding
-    private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
-    private val writeOptions = HashMap<String, Any?>()
 
+    private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private var defaultCategoryId = -1
     private val searchLocationLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onSearchLocationResult)
     private val writeOptionsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onOptionsResult)
+
+    private val writeOptions = HashMap<String, Any?>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,26 +40,20 @@ class WriteActivity : AppCompatActivity() {
 
     private fun initView() {
         viewBinding.writeAppbar.appbarTitle.text = ""
-//        viewBinding.writeAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.writeAppbar.appbarBack.setOnClickListener { StopWritingDialog(this, stopDialogDelegate) }
-        viewBinding.writeAppbar.appbarActionButton1.setOnClickListener { onValidatePost() }
+        viewBinding.writeAppbar.appbarActionButton1.setOnClickListener { onValidate() }
         viewBinding.writeVisitedAt.setOnClickListener { WriteSelectVisitedAtDialog(this, visitedAtDelegate) }
         viewBinding.writeMarkerEmoji.setOnClickListener { WriteSelectEmojiDialog(this, emojiDelegate) }
-        viewBinding.writeLocation.setOnClickListener {
-            searchLocationLauncher.launch(
-                Intent(this, SearchLocationActivity::class.java)
-                    .putExtra("categoryId", categoryId)
-            )
-        }
+        viewBinding.writeLocation.setOnClickListener { launchSearchLocation() }
         fromSearchLocation()
     }
 
-    private fun onValidatePost() {
+    private fun onValidate() {
         writeOptions["visitedAt"] ?: Toast.makeText(this, getString(R.string.error_visited_at_miss), Toast.LENGTH_SHORT).show()
         writeOptions["place"] ?: Toast.makeText(this, getString(R.string.error_location_miss), Toast.LENGTH_SHORT).show()
         if (writeOptions["place"] != null && writeOptions["visitedAt"] != null) {
             writeOptions["body"] = viewBinding.writeTextContainer.string
-            prepareContents()
+            preparePostContents()
         }
     }
 
@@ -83,7 +78,7 @@ class WriteActivity : AppCompatActivity() {
             .onFailure { LocalLogger.e(it) }
     }
 
-    private fun prepareContents() {
+    private fun preparePostContents() {
         val dto = LocationDTO.Post().apply {
             this.markerEmoji = writeOptions["emoji"] as String?
             this.latitude = writeOptions["latitude"] as Double
@@ -123,6 +118,12 @@ class WriteActivity : AppCompatActivity() {
         }
     }
 
+    private fun launchSearchLocation () {
+        val intent = Intent(this, SearchLocationActivity::class.java)
+            .putExtra("categoryId", this.categoryId)
+        searchLocationLauncher.launch(intent)
+    }
+
     private fun launchWriteOptions(locationId: Int) {
         val finalCategoryId = if (categoryId == -1) defaultCategoryId else categoryId
         val intent = Intent(this@WriteActivity, WriteOptionsActivity::class.java)
@@ -154,8 +155,16 @@ class WriteActivity : AppCompatActivity() {
 
     private fun onOptionsResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
-            Intent().putExtra("isAdded", true).setActivity(this, Activity.RESULT_OK)
-            finish()
+            val locationId = activityResult.data?.getIntExtra("locationId", -1)
+            launchCategoryDetail(locationId!!)
         }
+    }
+
+    private fun launchCategoryDetail(locationId: Int) {
+        Intent()
+            .putExtra("isAdded", true)
+            .putExtra("locationId", locationId)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 }

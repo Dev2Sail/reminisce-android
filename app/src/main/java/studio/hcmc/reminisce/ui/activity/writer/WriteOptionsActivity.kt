@@ -23,16 +23,18 @@ import studio.hcmc.reminisce.util.setActivity
 
 class WriteOptionsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteOptionsBinding
+
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
+    private val position by lazy { intent.getIntExtra("position", -1) }
     private val visitedAt by lazy { intent.getStringExtra("visitedAt") }
     private val place by lazy { intent.getStringExtra("place") }
     private var title = ""
+    private val options = HashMap<String, OptionState>()
 
     private val tagOptionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onTagResult)
     private val friendOptionsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onFriendResult)
     private val categoryOptionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onCategoryResult)
-    private val options = HashMap<String, OptionState>()
 
     private data class OptionState(
         val isEdited: Boolean,
@@ -50,10 +52,7 @@ class WriteOptionsActivity : AppCompatActivity() {
         prepareCategory()
         viewBinding.writeOptionsAppbar.appbarTitle.text = ""
         viewBinding.writeOptionsAppbar.appbarActionButton1.isVisible = false
-        viewBinding.writeOptionsAppbar.appbarBack.setOnClickListener {
-            Intent().putExtra("isAdded", true).setActivity(this, Activity.RESULT_OK)
-            finish()
-        }
+        viewBinding.writeOptionsAppbar.appbarBack.setOnClickListener { divideLaunch() }
         val (year, month, day) = visitedAt!!.split("-")
         viewBinding.writeOptionsSuccessDateMessage.text = getString(R.string.write_options_success_date_message, year, month.removePrefix("0"), day.removePrefix("0"))
         viewBinding.writeOptionsSuccessLocationMessage.text = getString(R.string.write_options_success_location_message, place)
@@ -70,21 +69,53 @@ class WriteOptionsActivity : AppCompatActivity() {
     }
 
     private val dialogDelegate = object : WriteOptionsDialog.Delegate {
-        override fun onTagClick() {
-            val intent = Intent(this@WriteOptionsActivity, WriteOptionTagActivity::class.java).putExtra("locationId", locationId)
-            tagOptionLauncher.launch(intent)
-        }
+        override fun onTagClick() { launchTagOption() }
+        override fun onFriendClick() { launchFriendOption() }
+        override fun onCategoryClick() { launchCategoryOption() }
+    }
 
-        override fun onFriendClick() {
-            val intent = Intent(this@WriteOptionsActivity, WriteOptionFriendActivity::class.java).putExtra("locationId", locationId)
-            friendOptionsLauncher.launch(intent)
-        }
+    private fun launchTagOption() {
+        val intent = Intent(this, WriteOptionTagActivity::class.java)
+            .putExtra("locationId", locationId)
+        tagOptionLauncher.launch(intent)
+    }
 
-        override fun onCategoryClick() {
-            val intent = Intent(this@WriteOptionsActivity, WriteOptionCategoryActivity::class.java)
-                .putExtra("categoryId", categoryId)
-                .putExtra("locationId", locationId)
-            categoryOptionLauncher.launch(intent)
+    private fun launchFriendOption() {
+        val intent = Intent(this, WriteOptionFriendActivity::class.java)
+            .putExtra("locationId", locationId)
+        friendOptionsLauncher.launch(intent)
+    }
+
+    private fun launchCategoryOption() {
+        val intent = Intent(this, WriteOptionCategoryActivity::class.java)
+            .putExtra("categoryId", categoryId)
+            .putExtra("locationId", locationId)
+        categoryOptionLauncher.launch(intent)
+    }
+
+
+    private fun launchWriteDetail() {
+        Intent()
+            .putExtra("isAdded", true)
+            .putExtra("locationId", locationId)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
+    }
+
+    private fun launchWriteDetailByEdit() {
+        Intent()
+            .putExtra("isModified", true)
+            .putExtra("locationId", locationId)
+            .putExtra("position", position)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
+    }
+
+    private fun divideLaunch() {
+        if (position == -1) {
+            launchWriteDetail()
+        } else {
+            launchWriteDetailByEdit()
         }
     }
 
@@ -103,7 +134,6 @@ class WriteOptionsActivity : AppCompatActivity() {
             dialogChanger(title)
         }
     }
-
 
     private fun onCategoryResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
@@ -124,28 +154,18 @@ class WriteOptionsActivity : AppCompatActivity() {
             dialogViewBinding.writeOptionsTagIcon.setImageResource(R.drawable.round_favorite_24)
             dialogViewBinding.writeOptionsTagBody.text = options["tag"]!!.body
         }
-//        if (options["category"]!!.isEdited) {
-//            dialogViewBinding.writeOptionsCategoryBody.text = when(options["category"]!!.body) {
-//                "Default" -> viewBinding.root.context.getString(R.string.category_view_holder_title)
-//                "new" -> viewBinding.root.context.getString(R.string.add_category_body)
-//                else -> options["category"]!!.body
-//            }
-//        } else {
-//            dialogViewBinding.writeOptionsCategoryBody.text = when(categoryTitle) {
-//                "Default" -> viewBinding.root.context.getString(R.string.category_view_holder_title)
-//                "new" -> viewBinding.root.context.getString(R.string.add_category_body)
-//                else -> categoryTitle
-//            }
-//        }
 
         dialogViewBinding.writeOptionsNextFriend.setOnClickListener {
             dialogDelegate.onFriendClick()
+            dialog.dismiss()
         }
         dialogViewBinding.writeOptionsNextTag.setOnClickListener {
             dialogDelegate.onTagClick()
+            dialog.dismiss()
         }
         dialogViewBinding.writeOptionsNextCategory.setOnClickListener {
             dialogDelegate.onCategoryClick()
+            dialog.dismiss()
         }
         val categoryName = options["category"]!!.body ?: categoryTitle
         dialogViewBinding.writeOptionsCategoryBody.text = when (categoryName) {

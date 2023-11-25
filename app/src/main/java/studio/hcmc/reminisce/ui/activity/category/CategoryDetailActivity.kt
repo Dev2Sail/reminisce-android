@@ -37,9 +37,6 @@ class CategoryDetailActivity : AppCompatActivity() {
     private lateinit var adapter: CategoryDetailAdapter
     private lateinit var category: CategoryVO
 
-    private val categoryEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
-    private val writeByCategoryIdLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onWriteResult)
-
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val position by lazy { intent.getIntExtra("position", -1) }
 
@@ -48,6 +45,9 @@ class CategoryDetailActivity : AppCompatActivity() {
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<CategoryDetailAdapter.Content>()
     private val visitInfo = HashMap<Int /* locationId */, Count>()
+    private val categoryEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedCategoryEditableResult)
+    private val editWriteLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onEditWriteResult)
+    private val addWriteLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onWriteResult)
 
     private data class Count(
         val city: String,
@@ -67,9 +67,10 @@ class CategoryDetailActivity : AppCompatActivity() {
         viewBinding.categoryDetailAppbar.appbarActionButton1.isVisible = false
         viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.categoryDetailAddButton.setOnClickListener {
-            val intent = Intent(this, WriteActivity::class.java)
-                .putExtra("categoryId", category.id)
-            writeByCategoryIdLauncher.launch(intent)
+            launchWrite()
+//            val intent = Intent(this, WriteActivity::class.java)
+//                .putExtra("categoryId", category.id)
+//            writeLauncher.launch(intent)
         }
         loadContents()
     }
@@ -168,23 +169,10 @@ class CategoryDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun launchEditedHome() {
-        Intent()
-            .putExtra("isEdited", true)
-            .putExtra("categoryId", categoryId)
-            .putExtra("position", position)
-            .setActivity(this, Activity.RESULT_OK)
-        finish()
-    }
-
     private val summaryDelegate= object : CategoryDetailSummaryViewHolder.Delegate {
-        override fun onItemClick(location: LocationVO) {
-            // edit 후 result 받아야 함
-            Intent(this@CategoryDetailActivity, WriteDetailActivity::class.java).apply {
-                putExtra("locationId", location.id)
-                putExtra("title", location.title)
-                startActivity(this)
-            }
+        override fun onItemClick(locationId: Int, title: String, position: Int) {
+            LocalLogger.v("summary click : locationId:$locationId, title:$title, position:$position")
+            launchEditWrite(locationId, title, position)
         }
 
         override fun onItemLongClick(locationId: Int, position: Int) {
@@ -217,20 +205,108 @@ class CategoryDetailActivity : AppCompatActivity() {
             }.onFailure { LocalLogger.e(it) }
     }
 
-    private fun onModifiedResult(activityResult: ActivityResult) {
+    private fun onModifiedCategoryEditableResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
-            contents.removeAll {it is CategoryDetailAdapter.Content}
+            contents.removeAll { it is CategoryDetailAdapter.Content }
             loadContents()
             viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { launchModifiedHome() }
         }
     }
 
+    private fun launchWrite() {
+        val intent = Intent(this, WriteActivity::class.java)
+            .putExtra("categoryId", categoryId)
+        addWriteLauncher.launch(intent)
+    }
+
+    // location이 added
     private fun onWriteResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
-            contents.removeAll {it is CategoryDetailAdapter.Content}
-            loadContents()
+            val locationId = activityResult.data?.getIntExtra("locationId", -1)
+            if (contents.size == 1) {
+                LocalLogger.v("current contents size: ${contents.size}")
+                loadContents()
+            } else if (contents.size > 2) {
+                LocalLogger.v("current contents size: ${contents.size}")
+                addLocation(locationId!!)
+            }
+
+
+//            contents.removeAll { it is CategoryDetailAdapter.Content }
+//            loadContents()
+            // 왜 removeAll? itemChange만 position에 해주면 되는 거 아님?
+//            if (contents.size == 1) {
+//                // add date divider
+//                // add summary
+//                // notify inserted(content.size)
+//            } else {
+//                // notify inserted(2)
+//            }
+
+
+
             viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { launchModifiedHome() }
         }
+    }
+
+    private fun addLocation(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@CategoryDetailActivity)
+        runCatching { LocationIO.getById(locationId) }
+            .onSuccess {
+                locations.add(it)
+                friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
+                tagInfo[it.id] = TagIO.listByLocationId(it.id)
+                withContext(Dispatchers.Main) { adapter.notifyItemInserted(contents.size - locations.size) }
+            }.onFailure { LocalLogger.e(it) }
+    }
+
+    private fun launchEditWrite(locationId: Int, title: String, position: Int) {
+        val intent = Intent(this, WriteDetailActivity::class.java)
+            .putExtra("locationId", locationId)
+            .putExtra("position", position)
+            .putExtra("title", title)
+        editWriteLauncher.launch(intent)
+    }
+
+    private fun onEditWriteResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
+            val locationId = activityResult.data?.getIntExtra("locationId", -1)
+            val categoryId = activityResult.data?.getIntExtra("categoryId", -1)
+            val position = activityResult.data?.getIntExtra("position", -1)
+            var locationIdx = -1
+            for (item in locations.withIndex()) {
+                if (item.value.id == locationId) {
+                    locationIdx = item.index
+                }
+            }
+            patchLocation(locationId!!, position!!, locationIdx, categoryId!!)
+        }
+    }
+
+    private fun patchLocation(locationId: Int, position: Int, locationIdx: Int, categoryId: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@CategoryDetailActivity)
+        runCatching { LocationIO.getById(locationId) }
+            .onSuccess {
+                locations[locationIdx] = it
+                friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
+                tagInfo[it.id] = TagIO.listByLocationId(it.id)
+                contents[position] = CategoryDetailAdapter.DetailContent(it, tagInfo[it.id].orEmpty(), friendInfo[it.id].orEmpty())
+                withContext(Dispatchers.Main) {
+                    adapter.notifyItemChanged(position)
+                    if (categoryId != it.categoryId) {
+                        viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { launchModifiedHome() }
+                    }
+                }
+            }.onFailure { LocalLogger.e(it)}
+    }
+
+    private fun launchEditedHome() {
+        Intent()
+            .putExtra("isEdited", true)
+            .putExtra("categoryId", categoryId)
+            .putExtra("position", position)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 
     private fun launchModifiedHome() {

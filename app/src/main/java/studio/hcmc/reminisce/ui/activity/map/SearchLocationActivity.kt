@@ -106,9 +106,9 @@ class SearchLocationActivity : AppCompatActivity() {
                 CoroutineScope(Dispatchers.IO).launch {
                     LocalLogger.v("now : ${onTransformAddressByMois(placeId)}")
                     if (categoryId == -1) {
-                        launchWrite(placeId, onTransformAddressByMois(placeId))
+                        moveToWrite(placeId, onTransformAddressByMois(placeId))
                     } else {
-                        fromWriteLauncher(placeId, onTransformAddressByMois(placeId))
+                        launchWrite(placeId, onTransformAddressByMois(placeId))
                     }
                 }
             } catch (e: Throwable) {
@@ -170,7 +170,7 @@ class SearchLocationActivity : AppCompatActivity() {
         }
     }
 
-    private fun launchWrite(placeId: String, roadAddress: String) {
+    private fun moveToWrite(placeId: String, roadAddress: String) {
         Intent(this, WriteActivity::class.java).apply {
             putExtra("place", placeInfo[placeId]!!.placeName)
             putExtra("roadAddress", roadAddress)
@@ -181,7 +181,7 @@ class SearchLocationActivity : AppCompatActivity() {
         }
     }
 
-    private fun fromWriteLauncher(placeId: String, roadAddress: String) {
+    private fun launchWrite(placeId: String, roadAddress: String) {
         Intent().apply {
             putExtra("place", placeInfo[placeId]!!.placeName)
             putExtra("roadAddress", roadAddress)
