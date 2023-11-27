@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
@@ -68,29 +67,29 @@ class FriendTagDetailActivity : AppCompatActivity() {
         loadContents()
     }
 
-    private suspend fun testLoad1() = coroutineScope {
-        val user = UserExtension.getUser(this@FriendTagDetailActivity)
-        // friend -> locations -> tags & friends => async
-        val friendDeferred = async { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
-        friend = friendDeferred.await()
-
-        val locationsDeferred = async { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId) }
-//        locations = locationsDeferred.await()
-        locations.addAll(locationsDeferred.await())
-
-        for (location in locations) {
-            val tagsDeferred = async { TagIO.listByLocationId(location.id) }
-            val friendsDeferred = async { FriendIO.listByUserIdAndLocationId(user.id, location.id) }
-            tagInfo[location.id] = tagsDeferred.await()
-            friendInfo[location.id] = friendsDeferred.await()
-        }
-    }
+//    private suspend fun testLoad1() = coroutineScope {
+//        val user = UserExtension.getUser(this@FriendTagDetailActivity)
+//        // friend -> locations -> tags & friends => async
+//        val friendDeferred = async { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
+//        friend = friendDeferred.await()
+//
+//        val locationsDeferred = async { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId, Int.MAX_VALUE) }
+////        locations = locationsDeferred.await()
+//        locations.addAll(locationsDeferred.await())
+//
+//        for (location in locations) {
+//            val tagsDeferred = async { TagIO.listByLocationId(location.id) }
+//            val friendsDeferred = async { FriendIO.listByUserIdAndLocationId(user.id, location.id) }
+//            tagInfo[location.id] = tagsDeferred.await()
+//            friendInfo[location.id] = friendsDeferred.await()
+//        }
+//    }
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val result = runCatching {
             val user = UserExtension.getUser(this@FriendTagDetailActivity)
             val friendDeferred = async { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
             friend = friendDeferred.await()
-            val locationsDeferred = async { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId) }
+            val locationsDeferred = async { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId, Int.MAX_VALUE) }
             for (vo in locationsDeferred.await()) {
                 locations.add(vo)
             }

@@ -58,9 +58,9 @@ class InternalDetailActivity : AppCompatActivity() {
         val user = UserExtension.getUser(this@InternalDetailActivity)
         val result = runCatching {
             val locationDeferredWrapper = if (flag) {
-                async { LocationIO.beachListByUserId(user.id) }
+                async { LocationIO.beachListByUserId(user.id, Int.MAX_VALUE) }
             } else {
-                async { LocationIO.serviceAreaListByUserId(user.id) }
+                async { LocationIO.serviceAreaListByUserId(user.id, Int.MAX_VALUE) }
             }
 
             val locationDeferred = locationDeferredWrapper.await()

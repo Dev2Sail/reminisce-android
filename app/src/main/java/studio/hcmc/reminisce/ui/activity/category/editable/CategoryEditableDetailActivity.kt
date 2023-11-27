@@ -56,7 +56,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@CategoryEditableDetailActivity)
-        val result = runCatching { LocationIO.listByCategoryId(categoryId) }
+        val result = runCatching { LocationIO.listByCategoryId(categoryId, Int.MAX_VALUE) }
             .onSuccess {
                 locations = it
                 for (location in it) {

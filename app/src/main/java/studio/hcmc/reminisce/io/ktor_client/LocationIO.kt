@@ -28,7 +28,7 @@ object LocationIO {
     }
 
     // location에 저장된 categoryId 수정
-    suspend fun patchCategoryId(locationId: Int, categoryId: Int) {
+    suspend fun patch(locationId: Int, categoryId: Int) {
         httpClient
             .patch("/location/${locationId}") { parameter("categoryId", categoryId) }
             .bodyAsText()
@@ -47,73 +47,75 @@ object LocationIO {
             .body()
     }
 
-    // userId로 저장된 모든 location list
-    suspend fun listByUserId(userId: Int): List<LocationVO> {
+    suspend fun listByUserId(userId: Int, lastId: Int): List<LocationVO> {
         return httpClient
-            .get("/location/list/all") { parameter("userId", userId) }
-            .body()
+            .get("/location/list/all") {
+                parameter("userId", userId)
+                parameter("lastId", lastId)
+            }.body()
     }
 
-    // userId의 category별로 저장된 location list
-    suspend fun listByCategoryId(categoryId: Int): List<LocationVO> {
+    suspend fun listByCategoryId(categoryId: Int, lastId: Int): List<LocationVO> {
         return httpClient
-            .get("/location/list") { parameter("categoryId", categoryId) }
-            .body()
+            .get("/location/list") {
+                parameter("categoryId", categoryId)
+                parameter("lastId", lastId)
+            }.body()
     }
 
-    suspend fun listByTagId(tagId: Int): List<LocationVO> {
+    suspend fun listByTagId(tagId: Int, lastId: Int): List<LocationVO> {
         return httpClient
-            .get("/location/list") { parameter("tagId", tagId) }
-            .body()
+            .get("/location/list") {
+                parameter("tagId", tagId)
+                parameter("lastId", lastId)
+            }.body()
     }
 
     // userId로 등록된 location 중 opponentId가 등록된 location list
-    suspend fun listByUserIdAndOpponentId(userId: Int, opponentId: Int): List<LocationVO> {
+    suspend fun listByUserIdAndOpponentId(userId: Int, opponentId: Int, lastId: Int): List<LocationVO> {
         return httpClient
             .get("/location/friend/list") {
                 parameter("userId", userId)
                 parameter("opponentId", opponentId)
-            }.body()
-    }
-
-    // userId로 등록된 location 중 tagId가 등록된 location list
-    suspend fun listByUserIdAndTagId(userId: Int, tagId: Int): List<LocationVO> {
-        return httpClient
-            .get("/location/tag/list") {
-                parameter("userId", userId)
-                parameter("tagId", tagId)
+                parameter("lastId", lastId)
             }.body()
     }
 
     // userId에 저장된 location 중 동일 title로 저장된 location list
-    suspend fun listByUserIdAndTitle(userId: Int, title: String): List<LocationVO> {
+    suspend fun listByUserIdAndTitle(userId: Int, title: String, lastId: Int): List<LocationVO> {
         return httpClient
             .get("/location/list") {
                 parameter("userId", userId)
                 parameter("title", title)
+                parameter("lastId", lastId)
             }.body()
     }
 
     // userId에 저장된 location 중 '해수욕장'이 포함된 location list
-    suspend fun beachListByUserId(userId: Int): List<LocationVO> {
+    suspend fun beachListByUserId(userId: Int, lastId: Int): List<LocationVO> {
         return httpClient
-            .get("/location/list/beach") { parameter("userId", userId) }
-            .body()
+            .get("/location/list/beach") {
+                parameter("userId", userId)
+                parameter("lastId", lastId)
+            }.body()
     }
 
     // userId에 저장된 location 중 '휴게소'가 포함된 location list
-    suspend fun serviceAreaListByUserId(userId: Int): List<LocationVO> {
+    suspend fun serviceAreaListByUserId(userId: Int, lastId: Int): List<LocationVO> {
         return httpClient
-            .get("/location/list/service") { parameter("userId", userId) }
-            .body()
+            .get("/location/list/service") {
+                parameter("userId", userId)
+                parameter("lastId", lastId)
+            }.body()
     }
 
     // userId에 저장된 location 중 visitedAt 기준 1년 전 오늘 저장된 location list
-    suspend fun yearAgoTodayByUserIdAndDate(userId: Int, date: String): List<LocationVO> {
+    suspend fun yearAgoTodayByUserIdAndDate(userId: Int, date: String, lastId: Int): List<LocationVO> {
         return httpClient
             .get("/location/list/today") {
                 parameter("userId", userId)
                 parameter("date", date)
+                parameter("lastId", lastId)
             }.body()
     }
 }

@@ -55,7 +55,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@TagEditableDetailActivity)
-        val result = runCatching { LocationIO.listByTagId(tagId) }
+        val result = runCatching { LocationIO.listByTagId(tagId, Int.MAX_VALUE) }
             .onSuccess { it ->
                 locations = it
                 it.forEach {

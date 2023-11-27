@@ -8,7 +8,6 @@ import androidx.core.view.isVisible
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
@@ -51,38 +50,38 @@ class ReportActivity : AppCompatActivity() {
         runCatching { FriendIO.mostStoredInLocationByUserId(user.id) }
     }
 
-    private suspend fun test1() = coroutineScope {
-        val user = UserExtension.getUser(this@ReportActivity)
-        // 개별적이니까 바로 await?
-        friends = async { FriendIO.mostStoredInLocationByUserId(user.id) }.await()
-        serviceAreas = async { LocationIO.serviceAreaListByUserId(user.id) }.await()
-        beachList = async { LocationIO.beachListByUserId(user.id) }.await()
-        val today = Date(System.currentTimeMillis()).toString()
-        val aYearAgoToday = buildString {
-            append(today.substring(0, 3))
-            append(today[3].digitToInt() - 1)
-            append(today.substring(4, 10))
-        }
-        val yearAgoDeferred = async { LocationIO.yearAgoTodayByUserIdAndDate(user.id, aYearAgoToday) }.await()
-        for (vo in yearAgoDeferred) {
-            yearAgoToday.add(vo)
-        }
-    }
+//    private suspend fun test1() = coroutineScope {
+//        val user = UserExtension.getUser(this@ReportActivity)
+//        // 개별적이니까 바로 await?
+//        friends = async { FriendIO.mostStoredInLocationByUserId(user.id) }.await()
+//        serviceAreas = async { LocationIO.serviceAreaListByUserId(user.id, Int.MAX_VALUE) }.await()
+//        beachList = async { LocationIO.beachListByUserId(user.id, Int.MAX_VALUE) }.await()
+//        val today = Date(System.currentTimeMillis()).toString()
+//        val aYearAgoToday = buildString {
+//            append(today.substring(0, 3))
+//            append(today[3].digitToInt() - 1)
+//            append(today.substring(4, 10))
+//        }
+//        val yearAgoDeferred = async { LocationIO.yearAgoTodayByUserIdAndDate(user.id, aYearAgoToday) }.await()
+//        for (vo in yearAgoDeferred) {
+//            yearAgoToday.add(vo)
+//        }
+//    }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val result = runCatching {
             val user = UserExtension.getUser(this@ReportActivity)
             // 개별적이니까 바로 await?
             friends = async { FriendIO.mostStoredInLocationByUserId(user.id) }.await()
-            serviceAreas = async { LocationIO.serviceAreaListByUserId(user.id) }.await()
-            beachList = async { LocationIO.beachListByUserId(user.id) }.await()
+            serviceAreas = async { LocationIO.serviceAreaListByUserId(user.id, Int.MAX_VALUE) }.await()
+            beachList = async { LocationIO.beachListByUserId(user.id, Int.MAX_VALUE) }.await()
             val today = Date(System.currentTimeMillis()).toString()
             val aYearAgoToday = buildString {
                 append(today.substring(0, 3))
                 append(today[3].digitToInt() - 1)
                 append(today.substring(4, 10))
             }
-            val yearAgoDeferred = async { LocationIO.yearAgoTodayByUserIdAndDate(user.id, aYearAgoToday) }.await()
+            val yearAgoDeferred = async { LocationIO.yearAgoTodayByUserIdAndDate(user.id, aYearAgoToday, Int.MAX_VALUE) }.await()
             if (yearAgoDeferred.isNotEmpty()) {
                 for (item in yearAgoDeferred) {
                     yearAgoToday.add(item)

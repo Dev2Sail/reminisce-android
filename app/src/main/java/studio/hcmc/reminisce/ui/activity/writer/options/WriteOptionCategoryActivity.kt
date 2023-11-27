@@ -83,7 +83,7 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
     }
 
     private fun patchCategory(categoryId: Int, title: String) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { LocationIO.patchCategoryId(locationId, categoryId) }
+        runCatching { LocationIO.patch(locationId, categoryId) }
             .onSuccess { launchOptions(title) }
             .onFailure { LocalLogger.e(it) }
     }

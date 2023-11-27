@@ -57,7 +57,7 @@ class TagDetailActivity : AppCompatActivity() {
 
     private fun prepareTag() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@TagDetailActivity)
-        runCatching { TagIO.getByUserIdAndTagId(user.id, tagId) }
+        runCatching { TagIO.getById(tagId) }
             .onSuccess {
                 tag = it
                 loadContents()
@@ -66,7 +66,7 @@ class TagDetailActivity : AppCompatActivity() {
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@TagDetailActivity)
-        val result = runCatching { LocationIO.listByTagId(tag.id) }
+        val result = runCatching { LocationIO.listByTagId(tag.id, Int.MAX_VALUE) }
             .onSuccess {
                 for (vo in it) {
                     locations.add(vo)

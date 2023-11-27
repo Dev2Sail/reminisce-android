@@ -55,10 +55,11 @@ object FriendIO {
     }
 
     // userId에 등록된 모든 FriendVO List
-    suspend fun listByUserId(userId: Int, nullableState: Boolean): List<FriendVO> {
+    suspend fun listByUserId(userId: Int, lastId: Int, nullableState: Boolean): List<FriendVO> {
         return httpClient
             .get("/friend/list/all") {
                 parameter("userId", userId)
+                parameter("lastId", lastId)
                 parameter("nullableState", nullableState)
             }.body()
     }

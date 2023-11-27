@@ -46,7 +46,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
 
     private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@WriteOptionFriendActivity)
-        val result = runCatching { FriendIO.listByUserId(user.id, false) }
+        val result = runCatching { FriendIO.listByUserId(user.id, Int.MAX_VALUE,false) }
             .onSuccess { friends = it }
             .onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {

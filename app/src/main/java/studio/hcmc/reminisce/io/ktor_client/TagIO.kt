@@ -14,9 +14,9 @@ object TagIO {
             .bodyAsText()
     }
 
-    suspend fun getByUserIdAndTagId(userId: Int, tagId: Int): TagVO {
+    suspend fun getById(tagId: Int): TagVO {
         return httpClient
-            .get("/tag/${tagId}") { parameter("userId", userId) }
+            .get("/tag/${tagId}")
             .body()
     }
 

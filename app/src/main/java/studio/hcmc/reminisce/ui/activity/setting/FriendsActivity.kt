@@ -22,8 +22,9 @@ import studio.hcmc.reminisce.vo.user.UserVO
 class FriendsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityFriendsBinding
     private lateinit var adapter: FriendsAdapter
-    private lateinit var friends: List<FriendVO>
+//    private lateinit var friends: List<FriendVO>
 
+    private val friends = ArrayList<FriendVO>()
     private val users = HashMap<Int /* userId */, UserVO>()
     private var contents = ArrayList<FriendsAdapter.Content>()
 
@@ -41,19 +42,28 @@ class FriendsActivity : AppCompatActivity() {
         viewBinding.friendsAppbar.appbarActionButton1.isVisible = false
         viewBinding.friendsAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.friendsSearch.setOnClickListener { launchSearchFriend() }
-        onLoadContents()
+        loadContents()
     }
 
-    private fun onLoadContents() = CoroutineScope(Dispatchers.IO).launch {
+    private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendsActivity)
-        val result = runCatching { FriendIO.listByUserId(user.id, false) }
+        val result = runCatching { FriendIO.listByUserId(user.id, Int.MAX_VALUE,false) }
             .onSuccess {
-                friends = it
+                for (vo in it) {
+                    friends.add(vo)
+                }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
+            friends.sortedBy { it.nickname }
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         }
+    }
+
+    private fun loadMoreContents() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@FriendsActivity)
+        val lastId = friends.sortedByDescending { it.opponentId }[0].opponentId
+
     }
 
     private fun prepareContents() {

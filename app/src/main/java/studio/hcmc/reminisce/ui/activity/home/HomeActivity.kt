@@ -74,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
             listOf(
                 launch { categories.addAll(CategoryIO.listByUserId(user.id).sortedBy { it.sortOrder }) },
                 launch { tags.addAll(TagIO.listByUserId(user.id).sortedByDescending { it.id }) },
-                launch { friends.addAll(FriendIO.distinctListByUserId(user.id)) }
+                launch { friends.addAll(FriendIO.distinctListByUserId(user.id).sortedBy { it.nickname }) }
 //                launch { LocationFriendIO.listByUserId(user.id).mapTo(friendTagOpponentIds) { it.opponentId } }
             ).joinAll()
 

@@ -48,7 +48,7 @@ class PlaceActivity : AppCompatActivity() {
 
     private fun loadLocations(value: String) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@PlaceActivity)
-        val result = runCatching { LocationIO.listByUserIdAndTitle(user.id, value) }
+        val result = runCatching { LocationIO.listByUserIdAndTitle(user.id, value, Int.MAX_VALUE) }
             .onSuccess { it ->
                 locations = it
                 for (vo in it) {

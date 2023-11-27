@@ -36,6 +36,12 @@ class CategoryDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCategoryDetailBinding
     private lateinit var adapter: CategoryDetailAdapter
     private lateinit var category: CategoryVO
+    /*
+    lateinit 확인
+    private lateinit var x: Call<T>
+
+    if (this::x.isInitialized) { x.cancel() }
+     */
 
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val position by lazy { intent.getIntExtra("position", -1) }
@@ -44,7 +50,9 @@ class CategoryDetailActivity : AppCompatActivity() {
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<CategoryDetailAdapter.Content>()
-    private val visitInfo = HashMap<Int /* locationId */, Count>()
+//    private var hasNextContents = true
+    private var nextContentsSize = 0
+
     private val categoryEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedCategoryEditableResult)
     private val editWriteLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onEditWriteResult)
     private val addWriteLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onWriteResult)
@@ -66,12 +74,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         viewBinding.categoryDetailAppbar.appbarTitle.text = getText(R.string.header_view_holder_title)
         viewBinding.categoryDetailAppbar.appbarActionButton1.isVisible = false
         viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.categoryDetailAddButton.setOnClickListener {
-            launchWrite()
-//            val intent = Intent(this, WriteActivity::class.java)
-//                .putExtra("categoryId", category.id)
-//            writeLauncher.launch(intent)
-        }
+        viewBinding.categoryDetailAddButton.setOnClickListener { launchWrite() }
         loadContents()
     }
 
@@ -80,9 +83,9 @@ class CategoryDetailActivity : AppCompatActivity() {
         category = CategoryIO.getById(categoryId)
         val fetch: suspend () -> List<LocationVO>
         if (category.title == "Default") {
-            fetch = { LocationIO.listByUserId(user.id) }
+            fetch = { LocationIO.listByUserId(user.id, Int.MAX_VALUE) }
         } else {
-            fetch = { LocationIO.listByCategoryId(categoryId) }
+            fetch = { LocationIO.listByCategoryId(categoryId, Int.MAX_VALUE) }
         }
 
         val result = runCatching { fetch() }
@@ -94,22 +97,80 @@ class CategoryDetailActivity : AppCompatActivity() {
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
+            locations.sortedByDescending { it.id }
+            LocalLogger.v("sortedByDescending locations first id : ${locations[0].id}")
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else { onError() }
+    }
+
+    // moreLoadContents는 async 로 해야 할 듯
+    private fun moreLoadContents(lastId: Int, state: Boolean) = CoroutineScope(Dispatchers.IO).launch {
+//        val lastId = locations[0].id
+        val user = UserExtension.getUser(this@CategoryDetailActivity)
+        val fetch: suspend () -> List<LocationVO>
+        if (category.title == "Default") {
+            fetch = { LocationIO.listByUserId(user.id, lastId) }
+        } else {
+            fetch = { LocationIO.listByCategoryId(category.id, lastId) }
+        }
+        val tempLocations = ArrayList<LocationVO>()
+        val tempFriends = HashMap<Int, List<FriendVO>>()
+        val tempTags = HashMap<Int, List<TagVO>>()
+        val tempContents = ArrayList<CategoryDetailAdapter.Content>()
+        val result = runCatching { fetch() }
+            .onSuccess {
+                for (vo in it) {
+                    tempLocations.add(vo)
+                    tempFriends[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
+                    tempTags[vo.id] = TagIO.listByLocationId(vo.id)
+                }
+            }.onFailure { LocalLogger.e(it) }
+        if (result.isSuccess) {
+            nextContentsSize = tempLocations.size
+            for ((date, locations) in tempLocations.groupBy { it.createdAt.toString().substring(0, 7) }.entries) {
+                val (year, month) = date.split("-")
+                tempContents.add(CategoryDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
+                for (location in locations.sortedByDescending { it.id }) {
+                    tempContents.add(CategoryDetailAdapter.DetailContent(
+                        location,
+                        tempTags[location.id].orEmpty(),
+                        tempFriends[location.id].orEmpty()
+                    ))
+                }
+            }
+        }
+        val preContentsSize = contents.size
+        if (result.isSuccess && state) {
+            locations.addAll(tempLocations)
+            friendInfo.putAll(tempFriends)
+            tagInfo.putAll(tempTags)
+            contents.addAll(tempContents)
+            tempLocations.clear()
+            tempFriends.clear()
+            tempTags.clear()
+            tempContents.clear()
+            withContext(Dispatchers.Main) { adapter.notifyItemRangeInserted(preContentsSize, contents.size - preContentsSize)}
+        }
     }
 
     private fun onError() {
         CommonError.onMessageDialog(this@CategoryDetailActivity,  getString(R.string.dialog_error_common_list_body))
     }
 
-    // TODO 지역별 방문 횟수
-    private fun prepareVisitInfo() {
-        for (location in locations) {
-            val city = location.roadAddress.split(" ")[0]
-            val province = location.roadAddress.split(" ")[1]
-        }
-    }
+    /*
+
+    loadContent() 할 때 moreLoadContents()도 불러와놓고 contents 추가할 준비해둠 -> hasNextContents
+    recyclerView 바닥 쳤을 때 hasNextContents true이면 contents에 bottomProgress add && bottomProgress visible true
+        -> contents 마지막이 bottom 이면? || bottom이 visible true이면?
+        -> 2초 안에 moreLoadContents()에서 준비해둔 contents를 기존 contents에 addAll
+        ->
+    2초 후 remove bottomProgress -> contents.removeAT(contents.size -1)
+    기존 + 새롭게 추가된 contents 로 onContentsReady, adapter에 notify insert range
+
+    moreLoadContents()가 10개 미만이면 hasNextContents false이고 bottomProgress visible false, contents에 bottom not add
+
+     */
 
     private fun prepareContents() {
         contents.add(CategoryDetailAdapter.HeaderContent(category.title))
@@ -129,6 +190,23 @@ class CategoryDetailActivity : AppCompatActivity() {
     }
 
     private val adapterDelegate = object : CategoryDetailAdapter.Delegate {
+        override fun hasMoreContents(): Boolean {
+            // true이면 bottomProgress isVisible true
+            if (nextContentsSize < 10) {
+                return false
+            }
+
+            return true
+        }
+
+        override fun getMoreContents() {
+            if (hasMoreContents()) {
+                val lastId = locations[locations.size - 1].id
+                LocalLogger.v("locations last id :$lastId")
+                moreLoadContents(lastId, true)
+            }
+        }
+
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }
@@ -223,17 +301,17 @@ class CategoryDetailActivity : AppCompatActivity() {
     private fun onWriteResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
             val locationId = activityResult.data?.getIntExtra("locationId", -1)
-            if (contents.size == 1) {
-                LocalLogger.v("current contents size: ${contents.size}")
-                loadContents()
-            } else if (contents.size > 2) {
-                LocalLogger.v("current contents size: ${contents.size}")
-                addLocation(locationId!!)
-            }
+//            if (contents.size == 1) {
+//                LocalLogger.v("current contents size: ${contents.size}")
+//                loadContents()
+//            } else if (contents.size > 2) {
+//                LocalLogger.v("current contents size: ${contents.size}")
+//                addLocation(locationId!!)
+//            }
 
 
-//            contents.removeAll { it is CategoryDetailAdapter.Content }
-//            loadContents()
+            contents.removeAll { it is CategoryDetailAdapter.Content }
+            loadContents()
             // 왜 removeAll? itemChange만 position에 해주면 되는 거 아님?
 //            if (contents.size == 1) {
 //                // add date divider

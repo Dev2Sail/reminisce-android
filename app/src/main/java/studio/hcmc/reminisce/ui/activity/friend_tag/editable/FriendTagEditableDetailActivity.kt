@@ -52,7 +52,7 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@FriendTagEditableDetailActivity)
-        val result = runCatching { LocationIO.listByUserIdAndOpponentId(user.id, opponentId) }
+        val result = runCatching { LocationIO.listByUserIdAndOpponentId(user.id, opponentId, Int.MAX_VALUE) }
             .onSuccess {it ->
                 locations = it
                 it.forEach {

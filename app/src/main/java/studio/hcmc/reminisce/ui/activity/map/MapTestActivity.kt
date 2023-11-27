@@ -67,7 +67,7 @@ class MapTestActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun preparePlace() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@MapTestActivity)
-        val result = runCatching { LocationIO.listByUserId(user.id) }
+        val result = runCatching { LocationIO.listByUserId(user.id, Int.MAX_VALUE) }
             .onSuccess { it -> it.forEach {
                 if (it.markerEmoji.isNullOrEmpty()) {
                     if (!markerInfo.containsKey(it.title)) {
