@@ -6,7 +6,7 @@ import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.DialogDeleteHomeCategoryBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
-class SummaryDeleteDialog(
+class ItemDeleteDialog(
     context: Context,
     delegate: Delegate,
     locationId: Int,

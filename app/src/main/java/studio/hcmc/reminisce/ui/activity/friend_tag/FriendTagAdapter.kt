@@ -13,7 +13,7 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 class FriendTagAdapter(
     private val adapterDelegate: Delegate,
     private val headerDelegate: FriendTagHeaderViewHolder.Delegate,
-    private val summaryDelegate: FriendTagSummaryViewHolder.Delegate
+    private val summaryDelegate: FriendTagItemViewHolder.Delegate
 
 ): Adapter<ViewHolder>() {
     interface Delegate: SingleTypeAdapterDelegate<Content>
@@ -31,7 +31,7 @@ class FriendTagAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {
         0 -> FriendTagHeaderViewHolder(parent, headerDelegate)
         1 -> FriendTagDateViewHolder(parent)
-        2 -> FriendTagSummaryViewHolder(parent, summaryDelegate)
+        2 -> FriendTagItemViewHolder(parent, summaryDelegate)
         else -> unknownViewType(viewType)
     }
 
@@ -40,7 +40,7 @@ class FriendTagAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when (holder) {
         is FriendTagHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position) as HeaderContent)
         is FriendTagDateViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
-        is FriendTagSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
+        is FriendTagItemViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
         else -> unknownViewHolder(holder, position)
     }
 

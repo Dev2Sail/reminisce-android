@@ -118,4 +118,10 @@ object LocationIO {
                 parameter("lastId", lastId)
             }.body()
     }
+
+    suspend fun allByUserId(userId: Int): List<LocationVO> {
+        return httpClient
+            .get("/map") { parameter("userId", userId) }
+            .body()
+    }
 }

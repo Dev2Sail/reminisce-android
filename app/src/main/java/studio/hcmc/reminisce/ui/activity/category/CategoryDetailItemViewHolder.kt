@@ -11,7 +11,7 @@ import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class CategoryDetailSummaryViewHolder(
+class CategoryDetailItemViewHolder(
     private val viewBinding: CardSummaryBinding,
     private val delegate: Delegate
 ) : ViewHolder(viewBinding.root) {

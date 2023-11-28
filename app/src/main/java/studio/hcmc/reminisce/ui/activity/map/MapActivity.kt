@@ -85,7 +85,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun preparePlace() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@MapActivity)
-        val result = runCatching { LocationIO.listByUserId(user.id, Int.MAX_VALUE) }
+        val result = runCatching { LocationIO.allByUserId(user.id) }
             .onSuccess { it -> it.forEach {
                 if (it.markerEmoji.isNullOrEmpty()) {
                     // customMarker 우선순위가 더 높음

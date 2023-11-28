@@ -149,4 +149,6 @@ class FriendsActivity : AppCompatActivity() {
             startActivity(this)
         }
     }
+
+    // friendAdd에서 activityResult 받아오기
 }

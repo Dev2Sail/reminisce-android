@@ -3,6 +3,8 @@ package studio.hcmc.reminisce.ui.activity.category
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -52,6 +54,7 @@ class CategoryDetailActivity : AppCompatActivity() {
     private val contents = ArrayList<CategoryDetailAdapter.Content>()
 //    private var hasNextContents = true
     private var nextContentsSize = 0
+    private var preContentsSize = 0
 
     private val categoryEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedCategoryEditableResult)
     private val editWriteLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onEditWriteResult)
@@ -90,69 +93,62 @@ class CategoryDetailActivity : AppCompatActivity() {
 
         val result = runCatching { fetch() }
             .onSuccess {
-                for (vo in it) {
+                for (vo in it.sortedByDescending { it.id }) {
                     locations.add(vo)
                     tagInfo[vo.id] = TagIO.listByLocationId(vo.id)
                     friendInfo[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
-            locations.sortedByDescending { it.id }
             LocalLogger.v("sortedByDescending locations first id : ${locations[0].id}")
             prepareContents()
+            preContentsSize = contents.size
             withContext(Dispatchers.Main) { onContentsReady() }
         } else { onError() }
     }
 
-    // moreLoadContents는 async 로 해야 할 듯
-    private fun moreLoadContents(lastId: Int, state: Boolean) = CoroutineScope(Dispatchers.IO).launch {
-//        val lastId = locations[0].id
+    private fun prepareMoreContents() {
+        val lastId = locations[locations.size - 1].id
+        testMoreContents(lastId)
+    }
+
+    private fun testMoreContents(lastId: Int) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@CategoryDetailActivity)
+        val tempLocations = ArrayList<LocationVO>()
         val fetch: suspend () -> List<LocationVO>
         if (category.title == "Default") {
             fetch = { LocationIO.listByUserId(user.id, lastId) }
         } else {
             fetch = { LocationIO.listByCategoryId(category.id, lastId) }
         }
-        val tempLocations = ArrayList<LocationVO>()
-        val tempFriends = HashMap<Int, List<FriendVO>>()
-        val tempTags = HashMap<Int, List<TagVO>>()
-        val tempContents = ArrayList<CategoryDetailAdapter.Content>()
         val result = runCatching { fetch() }
             .onSuccess {
-                for (vo in it) {
+                for (vo in it.sortedByDescending { it.id }) {
                     tempLocations.add(vo)
-                    tempFriends[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
-                    tempTags[vo.id] = TagIO.listByLocationId(vo.id)
+                    locations.add(vo)
+                    friendInfo[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
+                    tagInfo[vo.id] = TagIO.listByLocationId(vo.id)
                 }
+                nextContentsSize = it.size
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
-            nextContentsSize = tempLocations.size
             for ((date, locations) in tempLocations.groupBy { it.createdAt.toString().substring(0, 7) }.entries) {
                 val (year, month) = date.split("-")
-                tempContents.add(CategoryDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
-                for (location in locations.sortedByDescending { it.id }) {
-                    tempContents.add(CategoryDetailAdapter.DetailContent(
-                        location,
-                        tempTags[location.id].orEmpty(),
-                        tempFriends[location.id].orEmpty()
-                    ))
+                contents.add(CategoryDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
+                for (location in locations) {
+                    contents.add(CategoryDetailAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
                 }
             }
-        }
-        val preContentsSize = contents.size
-        if (result.isSuccess && state) {
-            locations.addAll(tempLocations)
-            friendInfo.putAll(tempFriends)
-            tagInfo.putAll(tempTags)
-            contents.addAll(tempContents)
+            withContext(Dispatchers.Main) {
+                adapter.notifyItemRangeInserted(preContentsSize, nextContentsSize)
+            }
             tempLocations.clear()
-            tempFriends.clear()
-            tempTags.clear()
-            tempContents.clear()
-            withContext(Dispatchers.Main) { adapter.notifyItemRangeInserted(preContentsSize, contents.size - preContentsSize)}
+            preContentsSize += nextContentsSize
+
         }
     }
+
+    // moreLoadContents는 async 로 해야 할 듯
 
     private fun onError() {
         CommonError.onMessageDialog(this@CategoryDetailActivity,  getString(R.string.dialog_error_common_list_body))
@@ -185,29 +181,40 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.categoryDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = CategoryDetailAdapter(adapterDelegate, headerDelegate, summaryDelegate)
+        adapter = CategoryDetailAdapter(adapterDelegate, headerDelegate, itemDelegate)
         viewBinding.categoryDetailItems.adapter = adapter
     }
 
     private val adapterDelegate = object : CategoryDetailAdapter.Delegate {
+//        override fun getMoreContents() {
+//            if (hasMoreContents()) {
+//                val lastId = locations[locations.size - 1].id
+//                LocalLogger.v("locations last id :$lastId")
+////                moreLoadContents(lastId, true)
+//            }
+//        }
+
+        override fun getMoreContents() {
+            nextContentsSize = 0
+            prepareMoreContents()
+        }
         override fun hasMoreContents(): Boolean {
             // true이면 bottomProgress isVisible true
+            val handler = Handler(Looper.getMainLooper())
+
             if (nextContentsSize < 10) {
                 return false
             }
 
-            return true
+//            return true
+            return handler.postDelayed({ true }, 3000)
         }
 
-        override fun getMoreContents() {
-            if (hasMoreContents()) {
-                val lastId = locations[locations.size - 1].id
-                LocalLogger.v("locations last id :$lastId")
-                moreLoadContents(lastId, true)
-            }
+//        override fun getItemCount() = contents.size
+        override fun getItemCount(): Int {
+            LocalLogger.v("now contents Size:${contents.size}")
+            return contents.size
         }
-
-        override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }
 
@@ -247,18 +254,18 @@ class CategoryDetailActivity : AppCompatActivity() {
         }
     }
 
-    private val summaryDelegate= object : CategoryDetailSummaryViewHolder.Delegate {
+    private val itemDelegate= object : CategoryDetailItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String, position: Int) {
             LocalLogger.v("summary click : locationId:$locationId, title:$title, position:$position")
             launchEditWrite(locationId, title, position)
         }
 
         override fun onItemLongClick(locationId: Int, position: Int) {
-            SummaryDeleteDialog(this@CategoryDetailActivity, deleteDialogDelegate, locationId, position)
+            ItemDeleteDialog(this@CategoryDetailActivity, deleteDialogDelegate, locationId, position)
         }
     }
 
-    private val deleteDialogDelegate = object : SummaryDeleteDialog.Delegate {
+    private val deleteDialogDelegate = object : ItemDeleteDialog.Delegate {
         override fun onClick(locationId: Int, position: Int) {
             var locationIdx = -1
             for (item in locations.withIndex()) {

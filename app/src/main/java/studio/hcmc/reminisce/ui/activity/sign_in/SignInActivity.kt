@@ -17,7 +17,6 @@ import studio.hcmc.reminisce.databinding.ActivitySignInBinding
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.home.HomeActivity
-import studio.hcmc.reminisce.ui.activity.launcher.LauncherActivity
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.string
 
@@ -34,28 +33,37 @@ class SignInActivity : AppCompatActivity() {
     private fun initView() {
         viewBinding.signInAppbar.appbarTitle.text = getText(R.string.sign_in_login)
         viewBinding.signInAppbar.appbarActionButton1.isVisible = false
-        viewBinding.signInAppbar.appbarBack.setOnClickListener { launchLauncher() }
+        viewBinding.signInAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.signInEmail.editText!!.addTextChangedListener { setNextEnabledState() }
         viewBinding.signInPassword.editText!!.addTextChangedListener { setNextEnabledState() }
         viewBinding.signInNext.setOnClickListener {
-            val email = viewBinding.signInEmail.string
-            val plainPassword = viewBinding.signInPassword.string
-            signIn(email, plainPassword)
+            onSignIn(viewBinding.signInEmail.string, viewBinding.signInPassword.string)
+//            prepareSignIn(viewBinding.signInEmail.string, viewBinding.signInPassword.string)
         }
     }
 
-    private fun signIn(email: String, password: String) = CoroutineScope(Dispatchers.IO).launch {
-        runCatching { UserIO.login(UserAuthVO(email, password)) }
+    private fun prepareSignIn(email: String, plainPassword: String) {
+//        val dto = UserDTO.Post().apply {
+//            this.email = email
+//            this.password = plainPassword.sha512
+//        }
+
+    }
+
+    private fun onSignIn(email: String, plainPassword: String) = CoroutineScope(Dispatchers.IO).launch {
+        val auth = UserAuthVO(email, plainPassword)
+        runCatching { UserIO.login(auth) }
             .onSuccess {
-                UserAuthVO(email, password).save(this@SignInActivity)
-                Intent(this@SignInActivity, HomeActivity::class.java).apply {
-                    startActivity(this)
-                    finish()
-                }
+                patchUserAuthVO(it.email, it.password)
+                moveToHome()
             }.onFailure {
                 withContext(Dispatchers.Main) { SignInErrorDialog(this@SignInActivity) }
                 LocalLogger.e(it)
             }
+    }
+
+    private suspend fun patchUserAuthVO(email: String, password: String) {
+        UserAuthVO(email, password).save(this)
     }
 
     private fun setNextEnabledState() {
@@ -65,8 +73,8 @@ class SignInActivity : AppCompatActivity() {
         viewBinding.signInNext.isEnabled = checkedState && (inputtedPassword.isNotEmpty() && inputtedPassword.length >= 5)
     }
 
-    private fun launchLauncher() {
-        Intent(this, LauncherActivity::class.java).apply {
+    private fun moveToHome() {
+        Intent(this, HomeActivity::class.java).apply {
             startActivity(this)
             finish()
         }

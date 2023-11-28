@@ -13,7 +13,7 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 class TagDetailAdapter(
     private val adapterDelegate: Delegate,
     private val headerDelegate: TagDetailHeaderViewHolder.Delegate,
-    private val summaryDelegate: TagDetailSummaryViewHolder.Delegate
+    private val summaryDelegate: TagDetailItemViewHolder.Delegate
 ): Adapter<ViewHolder>() {
     interface Delegate: SingleTypeAdapterDelegate<Content>
 
@@ -30,7 +30,7 @@ class TagDetailAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
         0 -> TagDetailHeaderViewHolder(parent, headerDelegate)
         1 -> TagDateViewHolder(parent)
-        2 -> TagDetailSummaryViewHolder(parent, summaryDelegate)
+        2 -> TagDetailItemViewHolder(parent, summaryDelegate)
         else -> unknownViewType(viewType)
     }
 
@@ -39,7 +39,7 @@ class TagDetailAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when (holder) {
         is TagDetailHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position) as HeaderContent)
         is TagDateViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
-        is TagDetailSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
+        is TagDetailItemViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
         else -> unknownViewHolder(holder, position)
     }
 

@@ -18,10 +18,10 @@
         android:theme="@style/Theme.Reminisce"
         tools:targetApi="29">
         <activity
-            android:name=".ui.activity.writer.edit.EditWriteActivity"
+            android:name=".ui.activity.report.YearAgoTodayActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.report.ServiceAreaDetailActivity"
+            android:name=".ui.activity.writer.edit.EditWriteActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.report.InternalDetailActivity"
@@ -121,5 +121,4 @@
             android:name=".ui.activity.MainActivity"
             android:exported="false" />
     </application>
-
 </manifest>

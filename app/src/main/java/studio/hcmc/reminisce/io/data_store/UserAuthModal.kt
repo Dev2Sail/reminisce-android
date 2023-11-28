@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import studio.hcmc.reminisce.util.LocalLogger
 
 private const val DATA_STORE = "userAuthInstance"
 private val Context.datastore by preferencesDataStore(DATA_STORE)
@@ -26,15 +25,14 @@ data class UserAuthVO(
         }
     }
 
-    suspend fun patch(context: Context) {
-
+    suspend fun patchPasswordKey(context: Context, nextPassword: String) {
+        context.datastore.edit {
+            it[passwordKey] = nextPassword
+        }
     }
 
     suspend fun delete(context: Context) {
-        context.datastore.edit {
-            it.clear()
-            LocalLogger.v("${it[emailKey]} // ${it[passwordKey]}")
-        }
+        context.datastore.edit { it.clear() }
     }
 }
 

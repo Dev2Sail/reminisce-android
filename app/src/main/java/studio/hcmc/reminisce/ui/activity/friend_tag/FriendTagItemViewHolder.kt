@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.report
+package studio.hcmc.reminisce.ui.activity.friend_tag
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,13 +11,13 @@ import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class InternalSummaryViewHolder(
+class FriendTagItemViewHolder(
     private val viewBinding: CardSummaryBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(locationId: Int, title: String, position: Int)
-//        fun onItemLongClick(locationId: Int, position: Int)
+        fun onItemClick(locationId: Int, title: String)
+        fun onItemLongClick(locationId: Int, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -25,17 +25,17 @@ class InternalSummaryViewHolder(
         delegate = delegate
     )
 
-    fun bind(content: InternalDetailAdapter.DetailContent) {
+    fun bind(content: FriendTagAdapter.DetailContent) {
         val (location, tags, friends) = content
         prepareLocation(location)
         tags?.let { prepareTags(it) }
-        friends?.let { prepareFriends(it) }
-        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title, bindingAdapterPosition) }
-//        viewBinding.root.setOnLongClickListener {
-//            delegate.onItemLongClick(location.id, bindingAdapterPosition)
-//
-//            false
-//        }
+        prepareFriends(friends)
+        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title) }
+        viewBinding.root.setOnLongClickListener {
+            delegate.onItemLongClick(location.id, bindingAdapterPosition)
+
+            false
+        }
     }
 
     private fun prepareLocation(location: LocationVO) {

@@ -19,7 +19,7 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.ui.activity.category.SummaryDeleteDialog
+import studio.hcmc.reminisce.ui.activity.category.ItemDeleteDialog
 import studio.hcmc.reminisce.ui.activity.friend_tag.editable.FriendTagEditableDetailActivity
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
@@ -123,7 +123,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
 
     private fun onContentsReady() {
         viewBinding.friendTagDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = FriendTagAdapter(adapterDelegate, headerDelegate, summaryDelegate)
+        adapter = FriendTagAdapter(adapterDelegate, headerDelegate, itemDelegate)
         viewBinding.friendTagDetailItems.adapter = adapter
     }
 
@@ -134,30 +134,23 @@ class FriendTagDetailActivity : AppCompatActivity() {
 
     private val headerDelegate = object : FriendTagHeaderViewHolder.Delegate {
         override fun onEditClick() {
-            val intent = Intent(this@FriendTagDetailActivity, FriendTagEditableDetailActivity::class.java)
-                .putExtra("opponentId", friend.opponentId)
-                .putExtra("nickname", friend.nickname)
-            friendTagEditableLauncher.launch(intent)
+            launchFriendEditableDetail(friend.opponentId, friend.nickname!!)
         }
     }
 
-    private val summaryDelegate = object : FriendTagSummaryViewHolder.Delegate {
+    private val itemDelegate = object : FriendTagItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String) {
             // TODO intent result
             // 편집 시 원래 저장돼있던 내용 고대로 들어가야지
-            Intent(this@FriendTagDetailActivity, WriteDetailActivity::class.java).apply {
-                putExtra("locationId", locationId)
-                putExtra("title", title)
-                startActivity(this)
-            }
+            moveToWriteDetail(locationId, title)
         }
 
         override fun onItemLongClick(locationId: Int, position: Int) {
-            SummaryDeleteDialog(this@FriendTagDetailActivity, deleteDialogDelegate, locationId, position)
+            ItemDeleteDialog(this@FriendTagDetailActivity, deleteDialogDelegate, locationId, position)
         }
     }
 
-    private val deleteDialogDelegate = object : SummaryDeleteDialog.Delegate {
+    private val deleteDialogDelegate = object : ItemDeleteDialog.Delegate {
         override fun onClick(locationId: Int, position: Int) {
             LocalLogger.v("locationId:$locationId, position:$position")
             var locationIdx = -1
@@ -181,6 +174,13 @@ class FriendTagDetailActivity : AppCompatActivity() {
             }.onFailure { LocalLogger.e(it) }
     }
 
+    private fun launchFriendEditableDetail(opponentId: Int, nickname: String) {
+        val intent = Intent(this@FriendTagDetailActivity, FriendTagEditableDetailActivity::class.java)
+            .putExtra("opponentId", opponentId)
+            .putExtra("nickname", nickname)
+        friendTagEditableLauncher.launch(intent)
+    }
+
     private fun launchModifiedHome() {
         Intent().putExtra("isModified", true).setActivity(this, Activity.RESULT_OK)
         finish()
@@ -190,6 +190,14 @@ class FriendTagDetailActivity : AppCompatActivity() {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             contents.removeAll { it is FriendTagAdapter.Content }
             loadContents()
+        }
+    }
+
+    private fun moveToWriteDetail(locationId: Int, title: String) {
+        Intent(this, WriteDetailActivity::class.java).apply {
+            putExtra("locationId", locationId)
+            putExtra("title", title)
+            startActivity(this)
         }
     }
 }

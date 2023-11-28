@@ -94,7 +94,7 @@ class WriteOptionsActivity : AppCompatActivity() {
     }
 
 
-    private fun launchWriteDetail() {
+    private fun toWriteDetail() {
         Intent()
             .putExtra("isAdded", true)
             .putExtra("locationId", locationId)
@@ -102,7 +102,7 @@ class WriteOptionsActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun launchWriteDetailByEdit() {
+    private fun toWriteDetailByEdit() {
         Intent()
             .putExtra("isModified", true)
             .putExtra("locationId", locationId)
@@ -113,9 +113,9 @@ class WriteOptionsActivity : AppCompatActivity() {
 
     private fun divideLaunch() {
         if (position == -1) {
-            launchWriteDetail()
+            toWriteDetail()
         } else {
-            launchWriteDetailByEdit()
+            toWriteDetailByEdit()
         }
     }
 

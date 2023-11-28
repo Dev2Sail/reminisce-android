@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.tag.editable
+package studio.hcmc.reminisce.ui.activity.category.editable
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,7 +11,7 @@ import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class SummaryViewHolder(
+class ItemViewHolder(
     private val viewBinding: CardCheckableSummaryBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
@@ -19,15 +19,15 @@ class SummaryViewHolder(
         fun onItemClick(locationId: Int): Boolean
     }
 
-    constructor(parent: ViewGroup, delegate: Delegate): this(
+    constructor(parent: ViewGroup, delegate: Delegate ): this(
         viewBinding = CardCheckableSummaryBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         delegate = delegate
     )
 
-    fun bind(content: TagEditableAdapter.DetailContent) {
+    fun bind(content: CategoryEditableDetailAdapter.DetailContent) {
         val (location, tags, friends) = content
         prepareLocation(location)
-        prepareTags(tags)
+        tags?.let { prepareTags(it) }
         friends?.let { prepareFriends(it) }
         viewBinding.cardCheckableSummaryCheckbox.setOnClickListener { delegate.onItemClick(location.id) }
         viewBinding.cardCheckableSummaryContainer.setOnClickListener {

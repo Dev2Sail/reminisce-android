@@ -27,7 +27,7 @@ class ReportActivity : AppCompatActivity() {
     private lateinit var serviceAreas: List<LocationVO>
     private lateinit var beachList: List<LocationVO>
 
-    private val yearAgoToday = ArrayList<LocationVO>()
+    private var todayFlag = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,9 +83,7 @@ class ReportActivity : AppCompatActivity() {
             }
             val yearAgoDeferred = async { LocationIO.yearAgoTodayByUserIdAndDate(user.id, aYearAgoToday, Int.MAX_VALUE) }.await()
             if (yearAgoDeferred.isNotEmpty()) {
-                for (item in yearAgoDeferred) {
-                    yearAgoToday.add(item)
-                }
+                todayFlag = true
             }
         }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
@@ -98,23 +96,11 @@ class ReportActivity : AppCompatActivity() {
         val serviceAreaCnt = serviceAreas.distinctBy { it.title }.size
         // 해수욕장 : https://www.data.go.kr/data/15058519/openapi.do
         viewBinding.reportOceanBody.text = getString(R.string.report_ocean_body, beachCnt)
-        viewBinding.reportOceanContainer.setOnClickListener {
-            Intent(this, InternalDetailActivity::class.java).apply {
-                putExtra("beach", true)
-                putExtra("serviceArea", false)
-                startActivity(this)
-            }
-        }
+        viewBinding.reportOceanContainer.setOnClickListener { moveToInternalDetail(true, serviceArea = false) }
 
         // 휴게소 : https://www.data.go.kr/data/15025446/standard.do#tab_layer_grid
         viewBinding.reportServiceAreaBody.text = getString(R.string.report_service_area_body, serviceAreaCnt)
-        viewBinding.reportServiceAreaContainer.setOnClickListener {
-            Intent(this, InternalDetailActivity::class.java).apply {
-                putExtra("beach", false)
-                putExtra("serviceArea", true)
-                startActivity(this)
-            }
-        }
+        viewBinding.reportServiceAreaContainer.setOnClickListener { moveToInternalDetail(beach = false, serviceArea = true) }
 
         val friendText = friends.joinToString { it.nickname!! }
         if (friendText.isEmpty()) {
@@ -133,13 +119,29 @@ class ReportActivity : AppCompatActivity() {
             append(today[3].digitToInt() - 1)
             append(today.substring(4, 10))
         }
-        if (yearAgoToday.isEmpty()) {
-            viewBinding.reportTodayContainer.isGone = true
-            viewBinding.reportCategoryYearAgo.isGone = true
-        } else {
+        if (todayFlag) {
             viewBinding.reportTodayContainer.isVisible = true
             viewBinding.reportCategoryYearAgo.isVisible = true
             viewBinding.reportTodayBody.text = aYearAgoToday
+            viewBinding.reportTodayContainer.setOnClickListener { moveToYearAgoTodayDetail(aYearAgoToday) }
+        } else {
+            viewBinding.reportTodayContainer.isGone = true
+            viewBinding.reportCategoryYearAgo.isGone = true
+        }
+    }
+
+    private fun moveToInternalDetail(beach: Boolean, serviceArea: Boolean) {
+        Intent(this, InternalDetailActivity::class.java).apply {
+            putExtra("beach", beach)
+            putExtra("serviceArea", serviceArea)
+            startActivity(this)
+        }
+    }
+
+    private fun moveToYearAgoTodayDetail(date: String) {
+        Intent(this, YearAgoTodayActivity::class.java).apply {
+            putExtra("date", date)
+            startActivity(this)
         }
     }
 }

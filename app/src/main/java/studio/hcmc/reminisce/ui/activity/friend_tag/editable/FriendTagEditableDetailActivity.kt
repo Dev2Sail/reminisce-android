@@ -85,7 +85,7 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
         override fun getItem(position: Int) = contents[position]
     }
 
-    private val summaryDelegate = object : SummaryViewHolder.Delegate {
+    private val summaryDelegate = object : ItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int): Boolean {
             if (!selectedIds.add(locationId)) {
                 selectedIds.remove(locationId)
@@ -99,9 +99,12 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
 
     private fun patchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { locationIds.forEach { LocationIO.delete(it) } }
-            .onSuccess {
-                Intent().putExtra("isModified", true).setActivity(this@FriendTagEditableDetailActivity, Activity.RESULT_OK)
-                finish()
-            }.onFailure { LocalLogger.e(it) }
+            .onSuccess { toFriendTagDetail() }
+            .onFailure { LocalLogger.e(it) }
+    }
+
+    private fun toFriendTagDetail() {
+        Intent().putExtra("isModified", true).setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 }

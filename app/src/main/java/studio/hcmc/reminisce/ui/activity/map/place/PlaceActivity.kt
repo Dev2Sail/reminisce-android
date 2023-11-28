@@ -84,7 +84,7 @@ class PlaceActivity : AppCompatActivity() {
         override fun getItem(position: Int) = contents[position]
     }
 
-    private val summaryDelegate = object : PlaceSummaryViewHolder.Delegate {
+    private val summaryDelegate = object : PlaceItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String) {
             Intent(this@PlaceActivity, WriteDetailActivity::class.java).apply {
                 putExtra("locationId", locationId)

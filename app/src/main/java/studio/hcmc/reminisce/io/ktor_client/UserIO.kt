@@ -34,6 +34,17 @@ object UserIO {
         return user
     }
 
+
+//    suspend fun login(dto: UserDTO.Post): UserVO {
+//
+//    val user = httpClient
+//        .post("/user/signIn") { setBody(Gson().toJsonTree(dto)) }
+//        .body<UserVO>()
+//
+//    return user
+//    }
+
+
     suspend fun patch(id: Int, dto: UserDTO.Patch) {
         httpClient
             .patch("/user/${id}") { setBody(Gson().toJsonTree(dto)) }

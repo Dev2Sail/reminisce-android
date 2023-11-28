@@ -99,19 +99,23 @@ class InternalDetailActivity : AppCompatActivity() {
         override fun getItem(position: Int) = contents[position]
     }
 
-    private val summaryDelegate = object : InternalSummaryViewHolder.Delegate {
+    private val summaryDelegate = object : InternalItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String, position: Int) {
-            Intent(this@InternalDetailActivity, WriteDetailActivity::class.java).apply {
-                putExtra("locationId", locationId)
-                putExtra("title", title)
-                putExtra("position", position)
-                startActivity(this)
-            }
+            moveToWriteDetail(locationId, title, position)
         }
 
 //        override fun onItemLongClick(locationId: Int, position: Int) {
 //            SummaryDeleteDialog(this@BeachDetailActivity, deleteDialogDelegate, locationId, position)
 //        }
+    }
+
+    private fun moveToWriteDetail(locationId: Int, title: String, position: Int) {
+        Intent(this@InternalDetailActivity, WriteDetailActivity::class.java).apply {
+            putExtra("locationId", locationId)
+            putExtra("title", title)
+            putExtra("position", position)
+            startActivity(this)
+        }
     }
 
     private fun onSummaryModifiedResult(activityResult: ActivityResult) {

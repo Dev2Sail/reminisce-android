@@ -30,58 +30,53 @@ class SettingActivity : AppCompatActivity() {
     private fun initView() {
         val menuId = intent.getIntExtra("menuId", -1)
         navigationController(viewBinding.settingNavView, menuId)
-
         viewBinding.settingHeader.commonHeaderTitle.text = getString(R.string.nav_main_setting)
         viewBinding.settingHeader.commonHeaderAction1.isVisible = false
-        viewBinding.settingAccountIcon.setOnClickListener { launchAccountSetting() }
-        viewBinding.settingFriendIcon.setOnClickListener { launchFriendSetting() }
+        viewBinding.settingAccountIcon.setOnClickListener { moveToAccountSetting() }
+        viewBinding.settingFriendIcon.setOnClickListener { moveToFriendSetting() }
         viewBinding.settingSignOutIcon.setOnClickListener { SignOutDialog(this@SettingActivity, signOutDelegate) }
     }
 
     private val signOutDelegate = object : SignOutDialog.Delegate {
-        override fun onDoneClick() {
-            signOut()
-        }
-    }
-
-    private fun prepareSignOut() {
-
-
-    }
-
-    private fun signOut() = CoroutineScope(Dispatchers.IO).launch {
-        // 1104 UserExtension. user 정보 삭제 안 됨
-        val user = UserExtension.getUser(this@SettingActivity)
-        runCatching { UserAuthVO(user.email, user.password).delete(this@SettingActivity) }
-            .onSuccess {
-                onSignOut()
-                LocalLogger.v("result : ${UserExtension.getUserOrNull()?.id}")
-            }
-            .onFailure {
-                withContext(Dispatchers.Main) { onErrorSignOut() }
-                LocalLogger.e(it)
-            }
+        override fun onDoneClick() { onSignOut() }
     }
 
     private fun onSignOut() = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(this@SettingActivity)
+        runCatching { removeUserAuthVO(user.email, user.password) }
+            .onSuccess { moveToLauncher() }
+            .onFailure {
+                LocalLogger.e(it)
+                withContext(Dispatchers.Main) { onErrorSignOut() }
+            }
+    }
+
+    private suspend fun removeUserAuthVO(email: String, password: String) {
+        UserAuthVO(email, password).delete(this)
+        LocalLogger.v("userAuth: ${UserAuthVO.emailKey}, ${UserAuthVO.passwordKey}, " +
+                "\n${UserExtension.getUserOrNull()?.id} | ${UserExtension.getUserOrNull()?.email} | ${UserExtension.getUserOrNull()?.password}")
+    }
+
+    private fun moveToLauncher() {
         Intent(this@SettingActivity, LauncherActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(this)
             finish()
         }
     }
 
     private fun onErrorSignOut() {
-        Toast.makeText(this@SettingActivity, "로그아웃에 실패했어요", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.setting_sign_out_error), Toast.LENGTH_SHORT).show()
     }
 
-    private fun launchAccountSetting() {
+    private fun moveToAccountSetting() {
         Intent(this, AccountSettingActivity::class.java).apply {
             putExtra("menuId", viewBinding.settingNavView.navItems.selectedItemId)
             startActivity(this)
         }
     }
 
-    private fun launchFriendSetting() {
+    private fun moveToFriendSetting() {
         Intent(this, FriendsActivity::class.java).apply {
             putExtra("menuId", viewBinding.settingNavView.navItems.selectedItemId)
             startActivity(this)

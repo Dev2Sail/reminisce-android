@@ -41,7 +41,6 @@ class TagEditableDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityTagEditableDetailBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
         initView()
     }
 
@@ -93,7 +92,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
         override fun getItem(position: Int) = contents[position]
     }
 
-    private val summaryDelegate = object : SummaryViewHolder.Delegate {
+    private val summaryDelegate = object : ItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int): Boolean {
             if (!selectedIds.add(locationId)) {
                 selectedIds.remove(locationId)
@@ -107,9 +106,12 @@ class TagEditableDetailActivity : AppCompatActivity() {
 
     private fun patchContents(locationIds: HashSet<Int>) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { locationIds.forEach { LocationIO.delete(it) } }
-            .onSuccess {
-                Intent().putExtra("isModified", true).setActivity(this@TagEditableDetailActivity, Activity.RESULT_OK)
-                finish()
-            }.onFailure { LocalLogger.e(it) }
+            .onSuccess { toTagDetail() }
+            .onFailure { LocalLogger.e(it) }
+    }
+
+    private fun toTagDetail() {
+        Intent().putExtra("isModified", true).setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 }

@@ -156,11 +156,11 @@ class WriteActivity : AppCompatActivity() {
     private fun onOptionsResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
             val locationId = activityResult.data?.getIntExtra("locationId", -1)
-            launchCategoryDetail(locationId!!)
+            toCategoryDetail(locationId!!)
         }
     }
 
-    private fun launchCategoryDetail(locationId: Int) {
+    private fun toCategoryDetail(locationId: Int) {
         Intent()
             .putExtra("isAdded", true)
             .putExtra("locationId", locationId)

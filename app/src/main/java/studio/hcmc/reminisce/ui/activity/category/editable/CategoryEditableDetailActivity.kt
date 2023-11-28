@@ -95,7 +95,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         override fun getItem(position: Int) = contents[position]
     }
 
-    private val summaryDelegate = object : SummaryViewHolder.Delegate {
+    private val summaryDelegate = object : ItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int): Boolean {
             if (!selectedIds.add(locationId)) {
                 selectedIds.remove(locationId)
@@ -112,11 +112,11 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
 
     private fun patchContents(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.delete(locationId) }
-            .onSuccess { launchCategoryEditableDetail() }
+            .onSuccess { toCategoryEditableDetail() }
             .onFailure { LocalLogger.e(it) }
     }
 
-    private fun launchCategoryEditableDetail() {
+    private fun toCategoryEditableDetail() {
         Intent().putExtra("isModified", true).setActivity(this@CategoryEditableDetailActivity, Activity.RESULT_OK)
         finish()
     }

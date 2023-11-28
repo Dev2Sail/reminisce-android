@@ -20,7 +20,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:orientation="vertical"
         android:paddingBottom="@dimen/basic_padding_bottom"
         app:layout_constraintBottom_toTopOf="@id/friends_nav_view"
         app:layout_constraintEnd_toEndOf="parent"

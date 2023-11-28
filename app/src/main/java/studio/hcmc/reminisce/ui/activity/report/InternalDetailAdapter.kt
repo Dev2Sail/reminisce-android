@@ -12,7 +12,7 @@ import studio.hcmc.reminisce.vo.tag.TagVO
 
 class InternalDetailAdapter(
     private val adapterDelegate: Delegate,
-    private val summaryDelegate: InternalSummaryViewHolder.Delegate
+    private val summaryDelegate: InternalItemViewHolder.Delegate
 
 ): Adapter<ViewHolder>() {
     interface Delegate: SingleTypeAdapterDelegate<Content>
@@ -26,16 +26,16 @@ class InternalDetailAdapter(
     ): Content
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {
-        0 -> InternalDateDividerViewHolder(parent)
-        1 ->  InternalSummaryViewHolder(parent, summaryDelegate)
+        0 -> InternalDateViewHolder(parent)
+        1 ->  InternalItemViewHolder(parent, summaryDelegate)
         else -> unknownViewType(viewType)
     }
 
     override fun getItemCount() = adapterDelegate.getItemCount()
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when(holder) {
-        is InternalDateDividerViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
-        is InternalSummaryViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
+        is InternalDateViewHolder -> holder.bind(adapterDelegate.getItem(position) as DateContent)
+        is InternalItemViewHolder -> holder.bind(adapterDelegate.getItem(position) as DetailContent)
         else -> unknownViewHolder(holder, position)
     }
 

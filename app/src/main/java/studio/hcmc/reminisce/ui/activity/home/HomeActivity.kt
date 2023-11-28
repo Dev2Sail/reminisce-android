@@ -166,10 +166,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val categoryDelegate = object : CategoryViewHolder.Delegate {
         override fun onItemClick(categoryId: Int, position: Int) {
-            val intent = Intent(this@HomeActivity, CategoryDetailActivity::class.java)
-                .putExtra("categoryId", categoryId)
-                .putExtra("position", position)
-            categoryDetailLauncher.launch(intent)
+            launchCategoryDetail(categoryId, position)
         }
 
         override fun onItemLongClick(categoryId: Int, position: Int) {
@@ -197,9 +194,7 @@ class HomeActivity : AppCompatActivity() {
     /* TAG */
     private val tagDelegate = object : TagViewHolder.Delegate {
         override fun onItemClick(tagId: Int) {
-            val intent = Intent(this@HomeActivity, TagDetailActivity::class.java)
-                .putExtra("tagId", tagId)
-            tagDetailLauncher.launch(intent)
+            launchTag(tagId)
         }
 
         override fun onItemLongClick(tagId: Int, tagIdx: Int, position: Int) {
@@ -225,10 +220,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val friendTagDelegate = object : FriendTagViewHolder.Delegate {
         override fun onItemClick(opponentId: Int, nickname: String) {
-            val intent = Intent(this@HomeActivity, FriendTagDetailActivity::class.java)
-                .putExtra("opponentId", opponentId)
-                .putExtra("nickname", nickname)
-            friendDetailLauncher.launch(intent)
+            launchFriendTagDetail(opponentId, nickname)
         }
 
         override fun onItemLongClick(opponentId: Int, friendIdx: Int, position: Int) {
@@ -251,8 +243,6 @@ class HomeActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) { adapter.notifyItemChanged(position) }
             }.onFailure { LocalLogger.e(it) }
     }
-
-
 
     private fun onCategoryEditResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isEdited", false) == true) {
@@ -321,5 +311,25 @@ class HomeActivity : AppCompatActivity() {
                 contents[1] = HomeAdapter.CategoryContent(first, count)
                 withContext(Dispatchers.Main) { adapter.notifyItemChanged(1) }
             }.onFailure { LocalLogger.e(it) }
+    }
+
+    private fun launchCategoryDetail(categoryId: Int, position: Int) {
+        val intent = Intent(this, CategoryDetailActivity::class.java)
+            .putExtra("categoryId", categoryId)
+            .putExtra("position", position)
+        categoryDetailLauncher.launch(intent)
+    }
+
+    private fun launchFriendTagDetail(opponentId: Int, nickname: String) {
+        val intent = Intent(this, FriendTagDetailActivity::class.java)
+            .putExtra("opponentId", opponentId)
+            .putExtra("nickname", nickname)
+        friendDetailLauncher.launch(intent)
+    }
+
+    private fun launchTag(tagId: Int) {
+        val intent = Intent(this, TagDetailActivity::class.java)
+            .putExtra("tagId", tagId)
+        tagDetailLauncher.launch(intent)
     }
 }

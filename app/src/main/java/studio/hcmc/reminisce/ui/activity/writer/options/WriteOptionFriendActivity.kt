@@ -99,11 +99,11 @@ class WriteOptionFriendActivity : AppCompatActivity() {
         }
         LocalLogger.v("body ${body.joinToString { it }}")
         runCatching { LocationFriendIO.post(dto) }
-            .onSuccess { launchOptions(body.joinToString { it }) }
+            .onSuccess { toOptions(body.joinToString { it }) }
             .onFailure { LocalLogger.e(it) }
     }
 
-    private fun launchOptions(body: String) {
+    private fun toOptions(body: String) {
         Intent()
             .putExtra("isAdded", true)
             .putExtra("body", body)

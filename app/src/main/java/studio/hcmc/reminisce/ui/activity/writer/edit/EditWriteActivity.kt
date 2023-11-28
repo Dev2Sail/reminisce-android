@@ -169,7 +169,7 @@ class EditWriteActivity : AppCompatActivity() {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             val locationId = activityResult.data?.getIntExtra("locationId", -1)
             val position = activityResult.data?.getIntExtra("position", -1)
-            launchModifiedWriteDetail(locationId!!, position!!)
+            toWriteDetail(locationId!!, position!!)
         }
     }
 
@@ -181,7 +181,7 @@ class EditWriteActivity : AppCompatActivity() {
 //        finish()
 //    }
 
-    private fun launchModifiedWriteDetail(locationId: Int, position: Int) {
+    private fun toWriteDetail(locationId: Int, position: Int) {
         Intent()
             .putExtra("isModified", true)
             .putExtra("locationId", locationId)

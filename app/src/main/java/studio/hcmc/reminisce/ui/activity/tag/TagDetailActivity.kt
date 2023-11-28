@@ -18,7 +18,7 @@ import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
-import studio.hcmc.reminisce.ui.activity.category.SummaryDeleteDialog
+import studio.hcmc.reminisce.ui.activity.category.ItemDeleteDialog
 import studio.hcmc.reminisce.ui.activity.tag.editable.TagEditableDetailActivity
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
@@ -56,7 +56,6 @@ class TagDetailActivity : AppCompatActivity() {
     }
 
     private fun prepareTag() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@TagDetailActivity)
         runCatching { TagIO.getById(tagId) }
             .onSuccess {
                 tag = it
@@ -111,29 +110,19 @@ class TagDetailActivity : AppCompatActivity() {
     }
 
     private val headerDelegate = object : TagDetailHeaderViewHolder.Delegate {
-        override fun onEditClick() {
-            val intent = Intent(this@TagDetailActivity, TagEditableDetailActivity::class.java)
-                .putExtra("tagId", tag.id)
-                .putExtra("tagBody", tag.body)
-            tagEditableLauncher.launch(intent)
-        }
+        override fun onEditClick() { launchTagEditableDetail(tag.id, tag.body) }
     }
 
-    private val summaryDelegate = object : TagDetailSummaryViewHolder.Delegate {
+    private val summaryDelegate = object : TagDetailItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String) {
-            Intent(this@TagDetailActivity, WriteDetailActivity::class.java).apply {
-                putExtra("locationId", locationId)
-                putExtra("title", title)
-                startActivity(this)
-            }
+            moveToWriteDetail(locationId, title)
         }
-
         override fun onItemLongClick(locationId: Int, position: Int) {
-            SummaryDeleteDialog(this@TagDetailActivity, deleteDialogDelegate, locationId, position)
+            ItemDeleteDialog(this@TagDetailActivity, deleteDialogDelegate, locationId, position)
         }
     }
 
-    private val deleteDialogDelegate = object : SummaryDeleteDialog.Delegate {
+    private val deleteDialogDelegate = object : ItemDeleteDialog.Delegate {
         override fun onClick(locationId: Int, position: Int) {
             LocalLogger.v("locationId:$locationId, position:$position")
             var locationIdx = -1
@@ -162,10 +151,25 @@ class TagDetailActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun launchTagEditableDetail(tagId: Int, body: String) {
+        val intent = Intent(this, TagEditableDetailActivity::class.java)
+            .putExtra("tagId", tagId)
+            .putExtra("tagBody", body)
+        tagEditableLauncher.launch(intent)
+    }
+
     private fun onModifiedResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             contents.removeAll { it is TagDetailAdapter.Content }
             loadContents()
+        }
+    }
+
+    private fun moveToWriteDetail(locationId: Int, title: String) {
+        Intent(this, WriteDetailActivity::class.java).apply {
+            putExtra("locationId", locationId)
+            putExtra("title", title)
+            startActivity(this)
         }
     }
 }

@@ -114,7 +114,7 @@ class WriteDetailActivity : AppCompatActivity() {
         } else { onError() }
     }
 
-    private fun launchAddedCategoryDetail() {
+    private fun toAddedCategoryDetail() {
         Intent()
             .putExtra("isAdded", true)
             .putExtra("locationId", location.id)
@@ -125,7 +125,7 @@ class WriteDetailActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun launchModifiedCategoryDetail(position: Int) {
+    private fun toModifiedCategoryDetail(position: Int) {
         Intent()
             .putExtra("isModified", true)
             .putExtra("locationId", location.id)
@@ -154,14 +154,14 @@ class WriteDetailActivity : AppCompatActivity() {
             val locationId = intent.getIntExtra("locationId", -1)
             contents.removeAll { it is WriteDetailAdapter.Content }
             patchContent(locationId!!)
-            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { launchAddedCategoryDetail() }
+            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { toAddedCategoryDetail() }
         }
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             val position = activityResult.data?.getIntExtra("position", -1)
             val locationId = activityResult.data?.getIntExtra("locationId", -1)
             contents.removeAll { it is WriteDetailAdapter.Content }
             patchContent(locationId!!)
-            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { launchModifiedCategoryDetail(position!!) }
+            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { toModifiedCategoryDetail(position!!) }
         }
     }
 
@@ -171,14 +171,14 @@ class WriteDetailActivity : AppCompatActivity() {
             val locationId = intent.getIntExtra("locationId", -1)
             contents.removeAll { it is WriteDetailAdapter.Content }
             patchContent(locationId!!)
-            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { launchAddedCategoryDetail() }
+            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { toAddedCategoryDetail() }
         }
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             val position = activityResult.data?.getIntExtra("position", -1)
             val locationId = activityResult.data?.getIntExtra("locationId", -1)
             contents.removeAll { it is WriteDetailAdapter.Content }
             patchContent(locationId!!)
-            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { launchModifiedCategoryDetail(position!!) }
+            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { toModifiedCategoryDetail(position!!) }
         }
     }
 }

@@ -44,7 +44,8 @@
     <string name="setting_account_detail_password_title">비밀번호 설정</string>
     <string name="setting_account_detail_password_placeholder_text">5자 이상 입력해 주세요.</string>
     <string name="setting_account_service_withdraw">서비스 탈퇴하기</string>
-    <string name="setting_signout_body">오늘추억에서 로그아웃 할까요?</string>
+    <string name="setting_sign_out_body">오늘추억에서 로그아웃 할까요?</string>
+    <string name="setting_sign_out_error">로그아웃에 실패했어요.</string>
 
 
     <string name="add_friend_title">친구 검색</string>

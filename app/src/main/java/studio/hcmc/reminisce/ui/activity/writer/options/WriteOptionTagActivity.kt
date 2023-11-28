@@ -109,11 +109,11 @@ class WriteOptionTagActivity : AppCompatActivity() {
         val user  = UserExtension.getUser(this@WriteOptionTagActivity)
         val dto = preparePostTags(user.id)
         runCatching { LocationTagIO.post(locationId, dto) }
-            .onSuccess { launchOptions() }
+            .onSuccess { toOptions() }
             .onFailure { LocalLogger.e(it) }
     }
 
-    private fun launchOptions() {
+    private fun toOptions() {
         Intent()
             .putExtra("isAdded", true)
             .putExtra("body", postTags.joinToString { it })

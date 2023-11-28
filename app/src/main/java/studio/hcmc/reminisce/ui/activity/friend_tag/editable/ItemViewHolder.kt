@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.friend_tag
+package studio.hcmc.reminisce.ui.activity.friend_tag.editable
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,80 +6,77 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
-import studio.hcmc.reminisce.databinding.CardSummaryBinding
+import studio.hcmc.reminisce.databinding.CardCheckableSummaryBinding
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
 
-class FriendTagSummaryViewHolder(
-    private val viewBinding: CardSummaryBinding,
+class ItemViewHolder(
+    private val viewBinding: CardCheckableSummaryBinding,
     private val delegate: Delegate
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(locationId: Int, title: String)
-        fun onItemLongClick(locationId: Int, position: Int)
+        fun onItemClick(locationId: Int): Boolean
     }
 
-    constructor(parent: ViewGroup, delegate: Delegate): this(
-        viewBinding = CardSummaryBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+    constructor(parent: ViewGroup, delegate: Delegate): this (
+        viewBinding = CardCheckableSummaryBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         delegate = delegate
     )
 
-    fun bind(content: FriendTagAdapter.DetailContent) {
+    fun bind(content: FriendTagEditableAdapter.DetailContent) {
         val (location, tags, friends) = content
         prepareLocation(location)
         tags?.let { prepareTags(it) }
         prepareFriends(friends)
-        viewBinding.root.setOnClickListener { delegate.onItemClick(location.id, location.title) }
-        viewBinding.root.setOnLongClickListener {
-            delegate.onItemLongClick(location.id, bindingAdapterPosition)
-
-            false
+        viewBinding.cardCheckableSummaryCheckbox.setOnClickListener { delegate.onItemClick(location.id) }
+        viewBinding.cardCheckableSummaryContainer.setOnClickListener {
+            viewBinding.cardCheckableSummaryCheckbox.isChecked = delegate.onItemClick(location.id)
         }
     }
 
     private fun prepareLocation(location: LocationVO) {
-        viewBinding.cardSummaryTitle.text = location.title
-        viewBinding.cardSummaryVisitedCount.root.isGone = true
+        viewBinding.cardCheckableSummaryTitle.text = location.title
         val (year, month, day) = location.visitedAt.split("-")
-        viewBinding.cardSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
+        viewBinding.cardCheckableSummaryVisitedAt.layoutSummaryItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
+        viewBinding.cardCheckableSummaryVisitedCount.root.isGone = true
 
         if (location.roadAddress.isNotEmpty()) {
-            viewBinding.cardSummaryAddress.apply {
+            viewBinding.cardCheckableSummaryAddress.apply {
                 root.isVisible = true
                 layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
                 layoutSummaryItemBody.text = location.roadAddress
             }
-        } else { viewBinding.cardSummaryAddress.root.isGone = true }
+        } else { viewBinding.cardCheckableSummaryAddress.root.isGone = true }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
-            viewBinding.cardSummaryMarkerEmoji.apply {
+            viewBinding.cardCheckableSummaryMarkerEmoji.apply {
                 root.isVisible = true
                 layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
                 layoutSummaryItemBody.text = location.markerEmoji
             }
-        } else { viewBinding.cardSummaryMarkerEmoji.root.isGone = true }
+        } else { viewBinding.cardCheckableSummaryMarkerEmoji.root.isGone = true }
     }
 
     private fun prepareTags(tags: List<TagVO>) {
-        val tagTest = tags.withIndex().joinToString { it.value.body }
-        if (tagTest.isNotEmpty()) {
-            viewBinding.cardSummaryTags.apply {
+        val tagText = tags.withIndex().joinToString { it.value.body }
+        if (tagText.isNotEmpty()) {
+            viewBinding.cardCheckableSummaryTags.apply {
                 root.isVisible = true
                 layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
-                layoutSummaryItemBody.text = tagTest
+                layoutSummaryItemBody.text = tagText
             }
-        } else { viewBinding.cardSummaryTags.root.isGone = true }
+        } else { viewBinding.cardCheckableSummaryTags.root.isGone = true }
     }
 
     private fun prepareFriends(friends: List<FriendVO>) {
         val friendText = friends.joinToString { it.nickname!! }
         if (friendText.isNotEmpty()) {
-            viewBinding.cardSummaryFriends.apply {
+            viewBinding.cardCheckableSummaryFriends.apply {
                 root.isVisible = true
                 layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
                 layoutSummaryItemBody.text = friendText
             }
-        } else { viewBinding.cardSummaryFriends.root.isGone = true }
+        } else { viewBinding.cardCheckableSummaryFriends.root.isGone = true }
     }
 }

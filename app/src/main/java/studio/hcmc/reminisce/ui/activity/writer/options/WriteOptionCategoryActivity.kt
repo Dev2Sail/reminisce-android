@@ -46,9 +46,8 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
     private fun prepareCategories() = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@WriteOptionCategoryActivity)
         val result = runCatching { CategoryIO.listByUserId(user.id) }
-            .onSuccess {
-                categories = it.sortedBy(CategoryVO::sortOrder)
-            }.onFailure { LocalLogger.e(it) }
+            .onSuccess { categories = it.sortedBy(CategoryVO::sortOrder) }
+            .onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
@@ -84,11 +83,11 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
 
     private fun patchCategory(categoryId: Int, title: String) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.patch(locationId, categoryId) }
-            .onSuccess { launchOptions(title) }
+            .onSuccess { toOptions(title) }
             .onFailure { LocalLogger.e(it) }
     }
 
-    private fun launchOptions(title: String) {
+    private fun toOptions(title: String) {
         Intent()
             .putExtra("isAdded", true)
             .putExtra("title", title)
