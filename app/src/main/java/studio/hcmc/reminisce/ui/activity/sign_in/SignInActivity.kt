@@ -2,18 +2,17 @@ package studio.hcmc.reminisce.ui.activity.sign_in
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivitySignInBinding
+import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.activity.home.HomeActivity
@@ -38,23 +37,15 @@ class SignInActivity : AppCompatActivity() {
         viewBinding.signInPassword.editText!!.addTextChangedListener { setNextEnabledState() }
         viewBinding.signInNext.setOnClickListener {
             onSignIn(viewBinding.signInEmail.string, viewBinding.signInPassword.string)
-//            prepareSignIn(viewBinding.signInEmail.string, viewBinding.signInPassword.string)
         }
-    }
-
-    private fun prepareSignIn(email: String, plainPassword: String) {
-//        val dto = UserDTO.Post().apply {
-//            this.email = email
-//            this.password = plainPassword.sha512
-//        }
-
     }
 
     private fun onSignIn(email: String, plainPassword: String) = CoroutineScope(Dispatchers.IO).launch {
         val auth = UserAuthVO(email, plainPassword)
         runCatching { UserIO.login(auth) }
             .onSuccess {
-                patchUserAuthVO(it.email, it.password)
+                patchUserAuthVO(email, plainPassword)
+                UserExtension.setUser(it)
                 moveToHome()
             }.onFailure {
                 withContext(Dispatchers.Main) { SignInErrorDialog(this@SignInActivity) }
@@ -62,14 +53,14 @@ class SignInActivity : AppCompatActivity() {
             }
     }
 
-    private suspend fun patchUserAuthVO(email: String, password: String) {
-        UserAuthVO(email, password).save(this)
+    private suspend fun patchUserAuthVO(email: String, plainPassword: String) {
+        UserAuthVO(email, plainPassword).save(this)
     }
 
     private fun setNextEnabledState() {
         val inputtedEmail = viewBinding.signInEmail.string
-        val checkedState = Patterns.EMAIL_ADDRESS.matcher(inputtedEmail).matches()
         val inputtedPassword = viewBinding.signInPassword.string
+        val checkedState = Patterns.EMAIL_ADDRESS.matcher(inputtedEmail).matches()
         viewBinding.signInNext.isEnabled = checkedState && (inputtedPassword.isNotEmpty() && inputtedPassword.length >= 5)
     }
 
@@ -78,9 +69,5 @@ class SignInActivity : AppCompatActivity() {
             startActivity(this)
             finish()
         }
-    }
-
-    private fun exceptionHandler(): CoroutineExceptionHandler = CoroutineExceptionHandler {_, exception ->
-        Log.v("handle", "exception handled: $exception")
     }
 }

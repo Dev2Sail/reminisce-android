@@ -53,8 +53,7 @@ class SettingActivity : AppCompatActivity() {
 
     private suspend fun removeUserAuthVO(email: String, password: String) {
         UserAuthVO(email, password).delete(this)
-        LocalLogger.v("userAuth: ${UserAuthVO.emailKey}, ${UserAuthVO.passwordKey}, " +
-                "\n${UserExtension.getUserOrNull()?.id} | ${UserExtension.getUserOrNull()?.email} | ${UserExtension.getUserOrNull()?.password}")
+        UserExtension.setUser(null)
     }
 
     private fun moveToLauncher() {

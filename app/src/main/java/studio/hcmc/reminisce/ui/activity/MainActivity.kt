@@ -14,17 +14,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityGreetingBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        viewBinding.greetingSignUpBtn.setOnClickListener { launchSignUp() }
-        viewBinding.greetingSignInBtn.setOnClickListener { launchSignIn() }
+        initView()
     }
 
-    private fun launchSignUp() {
+    private fun initView() {
+        viewBinding.greetingSignUpBtn.setOnClickListener { moveToSignUp() }
+        viewBinding.greetingSignInBtn.setOnClickListener { moveToSignIn() }
+    }
+
+    private fun moveToSignUp() {
         Intent(this, SignUpActivity::class.java).apply {
             startActivity(this)
         }
     }
 
-    private fun launchSignIn() {
+    private fun moveToSignIn() {
         Intent(this, SignInActivity::class.java).apply {
             startActivity(this)
         }

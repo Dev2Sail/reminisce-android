@@ -25,12 +25,6 @@ data class UserAuthVO(
         }
     }
 
-    suspend fun patchPasswordKey(context: Context, nextPassword: String) {
-        context.datastore.edit {
-            it[passwordKey] = nextPassword
-        }
-    }
-
     suspend fun delete(context: Context) {
         context.datastore.edit { it.clear() }
     }

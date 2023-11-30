@@ -1,7 +1,5 @@
 package studio.hcmc.reminisce.ui.activity.setting
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -17,12 +15,12 @@ import studio.hcmc.reminisce.io.data_store.UserAuthVO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
-import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.util.string
 import studio.hcmc.reminisce.util.text
 
 class AccountSettingEditPasswordActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingAccountEditPasswordBinding
+    private val context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +38,6 @@ class AccountSettingEditPasswordActivity : AppCompatActivity() {
         appBar.appbarActionButton1.isEnabled = false
         appBar.appbarActionButton1.setOnClickListener {
             if (inputField.string.length >= 5) {
-//                patchPassword(inputField.string)
                 preparePatch(inputField.string)
             }
         }
@@ -50,32 +47,31 @@ class AccountSettingEditPasswordActivity : AppCompatActivity() {
     }
 
     private fun preparePatch(input: String) {
-        val sha512Password = input.sha512
         val dto = UserDTO.Patch().apply {
-            this.password = sha512Password
+            this.password = input.sha512
         }
         patchPassword(dto, input)
     }
 
     private fun patchPassword(dto: UserDTO.Patch, plainPassword: String) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@AccountSettingEditPasswordActivity)
+        val user = UserExtension.getUser(context)
         runCatching { UserIO.patch(user.id, dto) }
             .onSuccess {
-//                UserAuthVO(user.email, editedPassword).save(this@AccountSettingEditPasswordActivity)
                 patchUserAuthVO(user.email, plainPassword)
-                toAccountSetting()
+                val user = UserIO.getById(user.id)
+                UserExtension.setUser(user)
+                moveToAccountSetting()
             }.onFailure {
-                CommonError.onDialog(this@AccountSettingEditPasswordActivity)
+                CommonError.onDialog(context)
                 LocalLogger.e(it)
             }
     }
 
-    private suspend fun patchUserAuthVO(email: String, password: String) {
-        UserAuthVO(email, password).save(this)
+    private suspend fun patchUserAuthVO(email: String, nextPassword: String) {
+        UserAuthVO(email, nextPassword).save(this)
     }
 
-    private fun toAccountSetting() {
-        Intent().putExtra("isEdited", true).setActivity(this, Activity.RESULT_OK)
+    private fun moveToAccountSetting() {
         finish()
     }
 }

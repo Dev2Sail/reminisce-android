@@ -19,13 +19,13 @@ private val ErrorHandler = createClientPlugin("ErrorHandler", {}) {
     }
 }
 
+
+
 val httpClient = HttpClient(CIO) {
     defaultRequest {
 //        url.host = "10.37.129.2"
         url.host = "192.168.1.110"
-
         url.port = 8080
-
         header("Content-type", "application/json")
     }
     expectSuccess = true

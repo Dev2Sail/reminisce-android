@@ -26,7 +26,6 @@ class AccountSettingActivity : AppCompatActivity() {
     private lateinit var user: UserVO
 
     private val editNicknameLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onEditNicknameResult)
-    private val editPasswordLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onEditPasswordResult)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +43,7 @@ class AccountSettingActivity : AppCompatActivity() {
         viewBinding.settingAccountEmailBody.text = user.email
         viewBinding.settingAccountNicknameBody.text = user.nickname
         viewBinding.settingAccountNicknameIcon.setOnClickListener { launchEditNickname() }
-        viewBinding.settingAccountPasswordIcon.setOnClickListener { launchEditPassword() }
+        viewBinding.settingAccountPasswordIcon.setOnClickListener { moveToEditPassword() }
         viewBinding.settingAccountWithdraw.setOnClickListener { WithdrawDialog(this, withdrawDelegate) }
     }
 
@@ -58,11 +57,8 @@ class AccountSettingActivity : AppCompatActivity() {
         }
     }
 
-    // TODO withdraw 제대로 작동함?
     private val withdrawDelegate = object : WithdrawDialog.Delegate {
-        override fun onDoneClick() {
-            onWithdrawn()
-        }
+        override fun onDoneClick() { onWithdrawn() }
     }
 
     private fun onWithdrawn() = CoroutineScope(Dispatchers.IO).launch {
@@ -79,13 +75,10 @@ class AccountSettingActivity : AppCompatActivity() {
 
     private suspend fun removeUserAuthVO(email: String, password: String) {
         UserAuthVO(email, password).delete(this)
-        LocalLogger.v("userAuth: ${UserAuthVO.emailKey}, ${UserAuthVO.passwordKey}, " +
-                "\n${UserExtension.getUserOrNull()?.id} | ${UserExtension.getUserOrNull()?.email} | ${UserExtension.getUserOrNull()?.password}")
+        UserExtension.setUser(null)
     }
 
     private fun moveToLauncher() {
-        //TODO launcher에서 activityResult
-        // accountSetting까지 얼마나 activity가 쌓여있을지 모름
         Intent(this, LauncherActivity::class.java).apply {
             // Intent.FLAG_ACTIVITY_NO_HISTORY -> 해당 Activity는 task stack에 쌓이지 않음
             // Intent.FLAG_ACTIVITY_CLEAR_TASK -> Intent.ACTIVITY_NEW_TASK와 함께 사용, task 내 다른 activity 모두 삭제
@@ -108,14 +101,9 @@ class AccountSettingActivity : AppCompatActivity() {
         }
     }
 
-    private fun launchEditPassword() {
-        val intent = Intent(this, AccountSettingEditPasswordActivity::class.java)
-        editPasswordLauncher.launch(intent)
-    }
-
-    private fun onEditPasswordResult(activityResult: ActivityResult) {
-        if (activityResult.data?.getBooleanExtra("isEdited", false) == true) {
-
+    private fun moveToEditPassword() {
+        Intent(this, AccountSettingEditPasswordActivity::class.java).apply {
+            startActivity(this)
         }
     }
 }

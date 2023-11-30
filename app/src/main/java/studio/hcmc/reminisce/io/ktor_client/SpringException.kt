@@ -9,3 +9,5 @@ open class SpringException(
     val error: String?,
     val path: String?
 ): IOException()
+
+

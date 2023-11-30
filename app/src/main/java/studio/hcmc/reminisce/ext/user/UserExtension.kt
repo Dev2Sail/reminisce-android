@@ -6,16 +6,14 @@ import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.vo.user.UserVO
 
 object UserExtension {
-    private lateinit var _user: UserVO
+    private var _user: UserVO? = null
 
     fun getUserOrThrow(): UserVO {
-        return _user
+        return _user!!
     }
 
     suspend fun getUser(context: Context): UserVO {
-        if (this::_user.isInitialized) {
-            return _user
-        }
+        _user?.let { return it }
 
         val auth = UserAuthVO(context) ?: throw IllegalStateException("Cannot sign in without auth.")
         val user = UserIO.login(auth)
@@ -25,14 +23,10 @@ object UserExtension {
     }
 
     fun getUserOrNull(): UserVO? {
-        if (this::_user.isInitialized) {
-            return _user
-        } else {
-            return null
-        }
+        return _user
     }
 
-    fun setUser(user: UserVO) {
+    fun setUser(user: UserVO?) {
         _user = user
     }
 }

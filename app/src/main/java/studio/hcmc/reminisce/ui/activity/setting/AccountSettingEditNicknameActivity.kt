@@ -24,6 +24,7 @@ import studio.hcmc.reminisce.vo.user.UserVO
 class AccountSettingEditNicknameActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingAccountEditNicknameBinding
     private lateinit var user: UserVO
+    private val context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,38 +46,40 @@ class AccountSettingEditNicknameActivity : AppCompatActivity() {
             }
         }
         inputField.placeholderText = user.nickname
-//        inputField.hint = user.nickname
         inputField.editText!!.addTextChangedListener {
             appBar.appbarActionButton1.isEnabled = inputField.text.isNotEmpty() && inputField.string.length <= 20
         }
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.IO).launch {
-        val userInfo = UserExtension.getUser(this@AccountSettingEditNicknameActivity)
+        val userInfo = UserExtension.getUser(context)
         val result = runCatching { UserIO.getById(userInfo.id) }
             .onSuccess { user = it }
             .onFailure {
                 LocalLogger.e(it)
-                CommonError.onDialog(this@AccountSettingEditNicknameActivity)
+                CommonError.onDialog(context)
             }
         if (result.isSuccess) {
             withContext(Dispatchers.Main) { initView() }
         }
     }
 
-    private fun preparePatch(nickname: String) {
+    private fun preparePatch(input: String) {
         val dto = UserDTO.Patch().apply {
-            this.nickname = nickname
+            this.nickname = input
         }
         patchNickname(dto)
     }
 
     private fun patchNickname(dto: UserDTO.Patch) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@AccountSettingEditNicknameActivity)
+        val user = UserExtension.getUser(context)
         runCatching { UserIO.patch(user.id, dto) }
-            .onSuccess { toAccountSetting(dto.nickname) }
-            .onFailure {
-                CommonError.onDialog(this@AccountSettingEditNicknameActivity)
+            .onSuccess {
+                val refresh = UserIO.getById(user.id)
+                UserExtension.setUser(refresh)
+                toAccountSetting(dto.nickname)
+            }.onFailure {
+                CommonError.onDialog(context)
                 LocalLogger.e(it)
             }
     }
