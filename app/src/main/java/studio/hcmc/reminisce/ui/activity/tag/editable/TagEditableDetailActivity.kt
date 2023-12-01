@@ -27,13 +27,13 @@ class TagEditableDetailActivity : AppCompatActivity() {
     private lateinit var adapter: TagEditableAdapter
     private lateinit var locations: List<LocationVO>
 
+    private val context = this
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
     private val body by lazy { intent.getStringExtra("tagBody") }
 
     //friend nullable
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
-
     private val contents = ArrayList<TagEditableAdapter.Content>()
     private val selectedIds = HashSet<Int /* locationId */>()
 
@@ -53,7 +53,7 @@ class TagEditableDetailActivity : AppCompatActivity() {
     }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@TagEditableDetailActivity)
+        val user = UserExtension.getUser(context)
         val result = runCatching { LocationIO.listByTagId(tagId, Int.MAX_VALUE) }
             .onSuccess { it ->
                 locations = it
@@ -66,9 +66,11 @@ class TagEditableDetailActivity : AppCompatActivity() {
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
-        } else {
-            CommonError.onMessageDialog(this@TagEditableDetailActivity, getString(R.string.dialog_error_common_list_body))
-        }
+        } else { onError() }
+    }
+
+    private fun onError() {
+        CommonError.onMessageDialog(this, getString(R.string.dialog_error_common_list_body))
     }
 
     private fun prepareContents() {

@@ -22,11 +22,11 @@ class WriteSelectEmojiDialog(
         viewBinding.dialogSelectEmojiField.editText!!.addTextChangedListener {
             viewBinding.dialogSelectSave.isEnabled = viewBinding.dialogSelectEmojiField.string.isEmoji()
         }
-        viewBinding.dialogSelectCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogSelectSave.setOnClickListener {
             delegate.onSaveClick(viewBinding.dialogSelectEmojiField.string)
             dialog.dismiss()
         }
+        viewBinding.dialogSelectCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 }

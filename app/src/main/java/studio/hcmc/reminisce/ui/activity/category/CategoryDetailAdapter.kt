@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import studio.hcmc.reminisce.ui.activity.common.BottomProgressViewHolder
 import studio.hcmc.reminisce.ui.view.SingleTypeAdapterDelegate
 import studio.hcmc.reminisce.ui.view.unknownViewHolder
 import studio.hcmc.reminisce.ui.view.unknownViewType
@@ -29,6 +30,8 @@ class CategoryDetailAdapter(
         val tags: List<TagVO>? = null,
         val friends: List<FriendVO>? = null
     ): Content
+
+    object ProgressContent : Content
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -61,8 +64,7 @@ class CategoryDetailAdapter(
         else -> unknownViewType(viewType)
     }
 
-    override fun getItemCount() = adapterDelegate.getItemCount() + 3
-    // header(1) + summary(10) date (?) 계산 어케 하냐 와 이거 사고네
+    override fun getItemCount() = adapterDelegate.getItemCount()
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = when(holder) {
         is CategoryDetailHeaderViewHolder -> holder.bind(adapterDelegate.getItem(position) as HeaderContent)
@@ -72,16 +74,10 @@ class CategoryDetailAdapter(
         else -> unknownViewHolder(holder, position)
     }
 
-//    override fun getItemViewType(position: Int) = when(adapterDelegate.getItem(position)) {
-//        is HeaderContent -> 0
-//        is DateContent -> 1
-//        is DetailContent -> 2
-//    }
-    override fun getItemViewType(position: Int) = when(position) {
-        0 -> 0
-        1 -> 1
-        itemCount -> 3
-        else -> 2
-
+    override fun getItemViewType(position: Int) = when (adapterDelegate.getItem(position)) {
+        is HeaderContent -> 0
+        is DateContent -> 1
+        is DetailContent -> 2
+        is ProgressContent -> 3
     }
 }

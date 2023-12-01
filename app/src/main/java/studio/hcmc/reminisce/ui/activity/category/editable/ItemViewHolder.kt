@@ -27,9 +27,15 @@ class ItemViewHolder(
     fun bind(content: CategoryEditableDetailAdapter.DetailContent) {
         val (location, tags, friends) = content
         prepareLocation(location)
-        tags?.let { prepareTags(it) }
-        friends?.let { prepareFriends(it) }
-        viewBinding.cardCheckableSummaryCheckbox.setOnClickListener { delegate.onItemClick(location.id) }
+        if (tags != null) {
+            prepareTags(tags)
+        }
+        if (friends != null) {
+            prepareFriends(friends)
+        }
+        viewBinding.cardCheckableSummaryCheckbox.setOnClickListener {
+            delegate.onItemClick(location.id)
+        }
         viewBinding.cardCheckableSummaryContainer.setOnClickListener {
             viewBinding.cardCheckableSummaryCheckbox.isChecked = delegate.onItemClick(location.id)
         }
@@ -42,41 +48,33 @@ class ItemViewHolder(
         viewBinding.cardCheckableSummaryVisitedCount.root.isGone = true
 
         if (location.roadAddress.isNotEmpty()) {
-            viewBinding.cardCheckableSummaryAddress.apply {
-                root.isVisible = true
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-                layoutSummaryItemBody.text = location.roadAddress
-            }
+            viewBinding.cardCheckableSummaryAddress.root.isVisible = true
+            viewBinding.cardCheckableSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+            viewBinding.cardCheckableSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
         } else { viewBinding.cardCheckableSummaryAddress.root.isGone = true }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
-            viewBinding.cardCheckableSummaryMarkerEmoji.apply {
-                root.isVisible = true
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
-                layoutSummaryItemBody.text = location.markerEmoji
-            }
+            viewBinding.cardCheckableSummaryMarkerEmoji.root.isVisible = true
+            viewBinding.cardCheckableSummaryMarkerEmoji.layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
+            viewBinding.cardCheckableSummaryMarkerEmoji.layoutSummaryItemBody.text = location.markerEmoji
         } else { viewBinding.cardCheckableSummaryMarkerEmoji.root.isGone = true }
     }
 
     private fun prepareTags(tags: List<TagVO>) {
         val tagText = tags.withIndex().joinToString { it.value.body }
         if (tagText.isNotEmpty()) {
-            viewBinding.cardCheckableSummaryTags.apply {
-                root.isVisible = true
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
-                layoutSummaryItemBody.text = tagText
-            }
+            viewBinding.cardCheckableSummaryTags.root.isVisible = true
+            viewBinding.cardCheckableSummaryTags.layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
+            viewBinding.cardCheckableSummaryTags.layoutSummaryItemBody.text = tagText
         } else { viewBinding.cardCheckableSummaryTags.root.isGone = true }
     }
 
     private fun prepareFriends(friends: List<FriendVO>) {
         val friendText = friends.joinToString { it.nickname!! }
         if (friendText.isNotEmpty()) {
-            viewBinding.cardCheckableSummaryFriends.apply {
-                root.isVisible = true
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
-                layoutSummaryItemBody.text = friendText
-            }
+            viewBinding.cardCheckableSummaryFriends.root.isVisible = true
+            viewBinding.cardCheckableSummaryFriends.layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
+            viewBinding.cardCheckableSummaryFriends.layoutSummaryItemBody.text = friendText
         } else { viewBinding.cardCheckableSummaryFriends.root.isGone = true }
     }
 }

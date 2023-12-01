@@ -5,9 +5,7 @@ import android.view.LayoutInflater
 import studio.hcmc.reminisce.databinding.DialogSignInErrorBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
-class SignInErrorDialog(
-    activity: Activity
-) {
+class SignInErrorDialog(activity: Activity) {
     init {
         val viewBinding = DialogSignInErrorBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)

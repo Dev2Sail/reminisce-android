@@ -161,11 +161,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val detailDialogDelegate = object : MarkerDetailDialog.Delegate {
         override fun onClick(placeName: String) {
-            launchPlace(placeName)
+            moveToPlace(placeName)
         }
     }
 
-    private fun launchPlace(value: String) {
+    private fun moveToPlace(value: String) {
         Intent(this, PlaceActivity::class.java).apply {
             putExtra("location", value)
             startActivity(this)
@@ -188,16 +188,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun initView() {
         val menuId = intent.getIntExtra("menuId", -1)
         navigationController(viewBinding.mapNavView, menuId)
-
-        viewBinding.mapHeaderSearchField.setOnClickListener {
-            Intent(this@MapActivity, SearchLocationActivity::class.java).apply {
-                startActivity(this)
-            }
-        }
+        viewBinding.mapHeaderSearchField.setOnClickListener {moveToSearchLocation() }
         // TODO permission check
 //        ContextCompat.checkSelfPermission(
 //            this, android.Manifest.permission.
 //        )
+    }
+
+    private fun moveToSearchLocation() {
+        Intent(this@MapActivity, SearchLocationActivity::class.java).apply {
+            startActivity(this)
+        }
     }
 
     override fun onStart() {

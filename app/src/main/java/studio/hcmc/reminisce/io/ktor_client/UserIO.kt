@@ -8,11 +8,11 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import studio.hcmc.kotlin.crypto.sha512
 import studio.hcmc.reminisce.dto.user.UserDTO
 import studio.hcmc.reminisce.io.data_store.UserAuthVO
-import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.user.UserVO
 
@@ -28,7 +28,6 @@ object UserIO {
             email = dto.email
             password = dto.password.sha512
         }
-        LocalLogger.v("sending info: ${loginDto.email}, ${loginDto.password}")
         return httpClient
             .post("/user/signIn") { setBody(Gson().toJsonTree(loginDto)) }
             .body()
@@ -58,16 +57,7 @@ object UserIO {
             .body()
     }
 
-    suspend fun testEmail(email: String): CategoryVO {
-        val get = httpClient.post("/user") { parameter("email", email) }
-        val response = get.call.body<SpringException>()
-        LocalLogger.v("call body springException -> $response")
-        val s = get.call.response.status.value
-        val ss = get.call.response.status.description
-        LocalLogger.v("call response status value: $s || call response status descriptions: $ss")
-
-        return httpClient
-            .post("/user") { parameter("email", email) }
-            .body()
+    suspend fun statusByEmail(email: String): HttpResponse {
+        return httpClient.get("/user") { parameter("email", email) }.body()
     }
 }

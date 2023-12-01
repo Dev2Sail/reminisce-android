@@ -19,6 +19,7 @@ import studio.hcmc.reminisce.util.navigationController
 
 class SettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingBinding
+    private val context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,7 @@ class SettingActivity : AppCompatActivity() {
         viewBinding.settingHeader.commonHeaderAction1.isVisible = false
         viewBinding.settingAccountIcon.setOnClickListener { moveToAccountSetting() }
         viewBinding.settingFriendIcon.setOnClickListener { moveToFriendSetting() }
-        viewBinding.settingSignOutIcon.setOnClickListener { SignOutDialog(this@SettingActivity, signOutDelegate) }
+        viewBinding.settingSignOutIcon.setOnClickListener { SignOutDialog(context, signOutDelegate) }
     }
 
     private val signOutDelegate = object : SignOutDialog.Delegate {
@@ -42,7 +43,7 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun onSignOut() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@SettingActivity)
+        val user = UserExtension.getUser(context)
         runCatching { removeUserAuthVO(user.email, user.password) }
             .onSuccess { moveToLauncher() }
             .onFailure {

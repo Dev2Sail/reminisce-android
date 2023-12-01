@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.android.material.chip.Chip
 import studio.hcmc.reminisce.databinding.CardHomeTagBinding
 import studio.hcmc.reminisce.databinding.ChipTagBinding
+import studio.hcmc.reminisce.vo.tag.TagVO
 
 class TagViewHolder(
     private val viewBinding: CardHomeTagBinding,
@@ -13,7 +15,7 @@ class TagViewHolder(
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(tagId: Int)
-        fun onItemLongClick(tagId: Int, tagIdx: Int, position: Int)
+        fun onItemLongClick(tagId: Int, tagIndex: Int, position: Int)
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -25,25 +27,28 @@ class TagViewHolder(
         val tags = content.tags
         if (!tags.isNullOrEmpty()) {
             viewBinding.homeTagChips.removeAllViews()
-            for (tag in tags.withIndex()) {
-                viewBinding.homeTagChips.addView(LayoutInflater.from(viewBinding.root.context)
-                    .let { ChipTagBinding.inflate(it, viewBinding.homeTagChips, false) }
-                    .root
-                    .apply {
-                        text = tag.value.body
-                        isCheckable = false
-                        isSelected = true
-                        setOnClickListener { delegate.onItemClick(tag.value.id) }
-                        setOnLongClickListener {
-                            delegate.onItemLongClick(tag.value.id, tag.index, bindingAdapterPosition)
-
-                            false
-                        }
-                    }
-                )
+            for ((index, tag) in tags.withIndex()) {
+                val chip = prepareChip(index, tag)
+                viewBinding.homeTagChips.addView(chip)
             }
-        } else {
-            viewBinding.root.isGone = true
+        } else { viewBinding.root.isGone = true }
+    }
+
+    private fun prepareChip(index: Int, tag: TagVO): Chip {
+        val inflater = LayoutInflater.from(viewBinding.root.context)
+        val chipToAttach = ChipTagBinding.inflate(inflater, viewBinding.homeTagChips, false).root
+        chipToAttach.text = tag.body
+        chipToAttach.isCheckable = false
+        chipToAttach.isSelected = true
+        chipToAttach.setOnClickListener {
+            delegate.onItemClick(tag.id)
         }
+        chipToAttach.setOnLongClickListener {
+            delegate.onItemLongClick(tag.id, index, bindingAdapterPosition)
+
+            false
+        }
+
+        return chipToAttach
     }
 }

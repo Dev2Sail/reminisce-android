@@ -119,9 +119,6 @@ class WriteDetailActivity : AppCompatActivity() {
             .putExtra("isAdded", true)
             .putExtra("locationId", location.id)
             .setActivity(this, Activity.RESULT_OK)
-//            .putExtra("locationId", location.id)
-//            .putExtra("categoryId", location.categoryId)
-//            .setActivity(this, Activity.RESULT_OK)
         finish()
     }
 

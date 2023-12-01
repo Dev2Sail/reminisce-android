@@ -26,10 +26,10 @@ class WriteActivity : AppCompatActivity() {
 
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private var defaultCategoryId = -1
+    private val writeOptions = HashMap<String, Any?>()
+
     private val searchLocationLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onSearchLocationResult)
     private val writeOptionsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onOptionsResult)
-
-    private val writeOptions = HashMap<String, Any?>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +49,8 @@ class WriteActivity : AppCompatActivity() {
     }
 
     private fun onValidate() {
-        writeOptions["visitedAt"] ?: Toast.makeText(this, getString(R.string.error_visited_at_miss), Toast.LENGTH_SHORT).show()
-        writeOptions["place"] ?: Toast.makeText(this, getString(R.string.error_location_miss), Toast.LENGTH_SHORT).show()
+        writeOptions["visitedAt"] ?: alertVisitedAt()
+        writeOptions["place"] ?: alertPlace()
         if (writeOptions["place"] != null && writeOptions["visitedAt"] != null) {
             writeOptions["body"] = viewBinding.writeTextContainer.string
             preparePostContents()
@@ -99,9 +99,7 @@ class WriteActivity : AppCompatActivity() {
     }
 
     private val stopDialogDelegate = object : StopWritingDialog.Delegate {
-        override fun onClick() {
-            finish()
-        }
+        override fun onClick() { finish() }
     }
 
     private val visitedAtDelegate = object : WriteSelectVisitedAtDialog.Delegate {
@@ -134,6 +132,12 @@ class WriteActivity : AppCompatActivity() {
         writeOptionsLauncher.launch(intent)
     }
 
+    private fun onOptionsResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
+            toCategoryDetail()
+        }
+    }
+
     private fun onSearchLocationResult(activityResult: ActivityResult) {
         if (activityResult.resultCode == Activity.RESULT_OK) {
             val place = activityResult.data?.getStringExtra("place")
@@ -153,18 +157,16 @@ class WriteActivity : AppCompatActivity() {
         }
     }
 
-    private fun onOptionsResult(activityResult: ActivityResult) {
-        if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
-            val locationId = activityResult.data?.getIntExtra("locationId", -1)
-            toCategoryDetail(locationId!!)
-        }
+    private fun toCategoryDetail() {
+        Intent().putExtra("isAdded", true).setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 
-    private fun toCategoryDetail(locationId: Int) {
-        Intent()
-            .putExtra("isAdded", true)
-            .putExtra("locationId", locationId)
-            .setActivity(this, Activity.RESULT_OK)
-        finish()
+    private fun alertVisitedAt() {
+        Toast.makeText(this, getString(R.string.error_visited_at_miss), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun alertPlace() {
+        Toast.makeText(this, getString(R.string.error_location_miss), Toast.LENGTH_SHORT).show()
     }
 }

@@ -1,4 +1,4 @@
-package studio.hcmc.reminisce.ui.activity.category
+package studio.hcmc.reminisce.ui.activity.common
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

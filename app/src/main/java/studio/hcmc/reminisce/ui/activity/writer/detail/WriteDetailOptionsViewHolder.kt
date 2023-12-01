@@ -7,6 +7,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardWriteDetailOptionsBinding
+import studio.hcmc.reminisce.vo.friend.FriendVO
+import studio.hcmc.reminisce.vo.tag.TagVO
 
 class WriteDetailOptionsViewHolder(
     private val viewBinding: CardWriteDetailOptionsBinding,
@@ -17,11 +19,17 @@ class WriteDetailOptionsViewHolder(
 
     fun  bind(content: WriteDetailAdapter.OptionsContent) {
         val (category, tags, friends) = content
-        viewBinding.cardWriteDetailOptionsCategory.apply {
-            writeDetailItemIcon.setImageResource(R.drawable.round_folder_16)
-            writeDetailItemBody.text = category.title
+        viewBinding.cardWriteDetailOptionsCategory.writeDetailItemIcon.setImageResource(R.drawable.round_folder_16)
+        viewBinding.cardWriteDetailOptionsCategory.writeDetailItemBody.text = category.title
+        if (tags != null) {
+            prepareTag(tags)
         }
+        if (friends != null) {
+            prepareFriendTag(friends)
+        }
+    }
 
+    private fun prepareTag(tags: List<TagVO>) {
         val tagText = tags?.withIndex()?.joinToString { it.value.body }
         if (!tags.isNullOrEmpty()) {
             viewBinding.cardWriteDetailOptionsTags.root.isVisible = true
@@ -30,7 +38,9 @@ class WriteDetailOptionsViewHolder(
         } else {
             viewBinding.cardWriteDetailOptionsTags.root.isGone = true
         }
+    }
 
+    private fun prepareFriendTag(friends: List<FriendVO>) {
         val friendText = friends?.joinToString { it.nickname!! }
         if (!friends.isNullOrEmpty()) {
             viewBinding.cardWriteDetailOptionsFriends.root.isVisible = true

@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.android.material.chip.Chip
 import studio.hcmc.reminisce.databinding.CardHomeTagFriendBinding
 import studio.hcmc.reminisce.databinding.ChipTagBinding
+import studio.hcmc.reminisce.vo.friend.FriendVO
 
 class FriendTagViewHolder(
     private val viewBinding: CardHomeTagFriendBinding,
@@ -25,28 +27,28 @@ class FriendTagViewHolder(
         val friends = content.friends
         if (!friends.isNullOrEmpty()) {
             viewBinding.homePersonTagChips.removeAllViews()
-            for (friend in friends.withIndex()) {
-                val vo = friend.value
-                viewBinding.homePersonTagChips.addView(LayoutInflater.from(viewBinding.root.context)
-                    .let { ChipTagBinding.inflate(it, viewBinding.homePersonTagChips, false) }
-                    .root
-                    .apply {
-                        text = vo.nickname
-                        isCheckable = false
-                        isSelected = true
-                        setOnClickListener {
-                            delegate.onItemClick(vo.opponentId, vo.nickname!!)
-                        }
-                        setOnLongClickListener {
-                            delegate.onItemLongClick(friend.value.opponentId, friend.index, bindingAdapterPosition)
-
-                            false
-                        }
-                    }
-                )
+            for ((index, friend) in friends.withIndex()) {
+                val chip = prepareChip(index, friend)
+                viewBinding.homePersonTagChips.addView(chip)
             }
-        } else {
-            viewBinding.root.isGone = true
+        } else { viewBinding.root.isGone = true }
+    }
+
+    private fun prepareChip(index: Int, friend: FriendVO): Chip {
+        val inflater = LayoutInflater.from(viewBinding.root.context)
+        val chipToAttach = ChipTagBinding.inflate(inflater, viewBinding.homePersonTagChips, false).root
+        chipToAttach.text = friend.nickname
+        chipToAttach.isCheckable = false
+        chipToAttach.isSelected = true
+        chipToAttach.setOnClickListener {
+            delegate.onItemClick(friend.opponentId, friend.nickname!!)
         }
+        chipToAttach.setOnLongClickListener {
+            delegate.onItemLongClick(friend.opponentId, index, bindingAdapterPosition)
+
+            false
+        }
+
+        return chipToAttach
     }
 }

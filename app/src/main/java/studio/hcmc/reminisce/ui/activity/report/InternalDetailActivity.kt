@@ -2,7 +2,6 @@ package studio.hcmc.reminisce.ui.activity.report
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -83,7 +82,11 @@ class InternalDetailActivity : AppCompatActivity() {
             val (year, month) = date.split("-")
             contents.add(InternalDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
             for (location in locations.sortedByDescending { it.id }) {
-                contents.add(InternalDetailAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
+                contents.add(InternalDetailAdapter.DetailContent(
+                    location,
+                    tagInfo[location.id].orEmpty(),
+                    friendInfo[location.id].orEmpty()
+                ))
             }
         }
     }
@@ -117,53 +120,4 @@ class InternalDetailActivity : AppCompatActivity() {
             startActivity(this)
         }
     }
-
-    private fun onSummaryModifiedResult(activityResult: ActivityResult) {
-        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
-
-        }
-    }
-
-//    private suspend fun onPatchSummary(locationId: Int, position: Int) {
-//        val user = UserExtension.getUser(this)
-//        LocationIO.getById(locationId)
-//    }
-
-
-
-            /*
-            private fun onPatchCategory(categoryId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@HomeActivity)
-        runCatching { CategoryIO.getById(categoryId) }
-            .onSuccess {
-                val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, categoryId).get("count").asInt
-                contents[position] = HomeAdapter.CategoryContent(it, count)
-                withContext(Dispatchers.Main) { adapter.notifyItemChanged(position) }
-            }.onFailure { LocalLogger.e(it) }
-    }
-             */
-
 }
-//    private val deleteDialogDelegate = object : SummaryDeleteDialog.Delegate {
-//        override fun onClick(locationId: Int, position: Int) {
-//            LocalLogger.v("locationId:$locationId, position:$position")
-//            var locationIdx = -1
-//            for (item in locations.withIndex()) {
-//                if (item.value.id == locationId) {
-//                    locationIdx = item.index
-//                }
-//            }
-//            deleteContent(locationId, position, locationIdx)
-//        }
-//    }
-
-//    // 삭제하면 HomeActivity에 어케 전달할 건데
-//    private fun deleteContent(locationId: Int, position: Int, locationIdx: Int) = CoroutineScope(Dispatchers.IO).launch {
-//        runCatching { LocationIO.delete(locationId) }
-//            .onSuccess {
-//                locations.removeAt(locationIdx)
-//                tagInfo.remove(locationId)
-//                friendInfo.remove(locationId)
-//                withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position) }
-//            }.onFailure { LocalLogger.e(it) }
-//    }

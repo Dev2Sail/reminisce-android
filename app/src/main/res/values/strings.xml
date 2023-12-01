@@ -50,8 +50,12 @@
 
     <string name="add_friend_title">친구 검색</string>
     <string name="add_friend_placeholder_text">오늘추억 사용자 이메일을 검색해 보세요</string>
-    <string name="add_friend_helper_text">내 이메일 : dev2sail@google.com</string>
+    <string name="add_friend_helper_text">내 이메일 : %s</string>
+    <string name="add_friend_question">%s님을 친구로 등록할까요?</string>
     <string name="setting_friend">친구 관리</string>
+    <string name="add_friend_error">친구 등록에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="add_friend_conflict">이미 등록된 친구예요.</string>
+    <string name="add_friend_bad_request">자신은 친구로 등록할 수 없어요.</string>
     <string name="setting_signout">로그아웃</string>
 
     <string name="setting_activity_header">Setting</string>
@@ -100,7 +104,7 @@
     <string name="dialog_select_emoji_placeholder_text">지도에 표시될 이모지</string>
     <string name="dialog_select_visited_at_title">방문일 선택</string>
 
-    <string name="dialog_update_friend_nickname">닉네임 설정</string>
+    <string name="dialog_update_friend_nickname">닉네임 편집</string>
     <string name="dialog_update_friend_nickname_placeholder_text">original friend nickname</string>
     <string name="dialog_update_friend_nickname_helper_text">friend email</string>
 

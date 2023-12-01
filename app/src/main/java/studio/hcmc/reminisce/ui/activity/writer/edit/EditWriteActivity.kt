@@ -162,10 +162,6 @@ class EditWriteActivity : AppCompatActivity() {
     }
 
     private fun onWriteOptionsResult(activityResult: ActivityResult) {
-//        if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
-//            val locationId = activityResult.data?.getIntExtra("locationId", -1)
-//            launchAddedWriteDetail(locationId!!)
-//        }
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             val locationId = activityResult.data?.getIntExtra("locationId", -1)
             val position = activityResult.data?.getIntExtra("position", -1)

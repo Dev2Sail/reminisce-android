@@ -24,6 +24,7 @@ import studio.hcmc.reminisce.vo.user.UserVO
 class AccountSettingActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingAccountBinding
     private lateinit var user: UserVO
+    private val context = this
 
     private val editNicknameLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onEditNicknameResult)
 
@@ -48,7 +49,7 @@ class AccountSettingActivity : AppCompatActivity() {
     }
 
     private fun prepareUser() = CoroutineScope(Dispatchers.IO).launch {
-        val userInfo = UserExtension.getUser(this@AccountSettingActivity)
+        val userInfo = UserExtension.getUser(context)
         val result = runCatching { UserIO.getById(userInfo.id) }
             .onSuccess { user = it }
             .onFailure { LocalLogger.e(it) }
@@ -62,14 +63,14 @@ class AccountSettingActivity : AppCompatActivity() {
     }
 
     private fun onWithdrawn() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@AccountSettingActivity)
+        val user = UserExtension.getUser(context)
         runCatching { UserIO.delete(user.id) }
             .onSuccess {
                 removeUserAuthVO(user.email, user.password)
                 moveToLauncher()
             }.onFailure {
                 LocalLogger.e(it)
-                CommonError.onDialog(this@AccountSettingActivity)
+                CommonError.onDialog(context)
             }
     }
 

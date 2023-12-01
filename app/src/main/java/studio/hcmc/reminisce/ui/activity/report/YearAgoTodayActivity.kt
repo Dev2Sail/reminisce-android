@@ -49,9 +49,9 @@ class YearAgoTodayActivity : AppCompatActivity() {
     private fun loadContents(date: String) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@YearAgoTodayActivity)
         val result = runCatching {
-            val locationDeferredWrapper = async { LocationIO.yearAgoTodayByUserIdAndDate(user.id, date, Int.MAX_VALUE) }
-            val locationDeferred = locationDeferredWrapper.await()
-            for (location in locationDeferred) {
+            val locationDeferred = async { LocationIO.yearAgoTodayByUserIdAndDate(user.id, date, Int.MAX_VALUE) }
+            val locationResult = locationDeferred.await()
+            for (location in locationResult) {
                 locations.add(location)
                 val tagsDeferred = async { TagIO.listByLocationId(location.id) }
                 val friendsDeferred = async { FriendIO.listByUserIdAndLocationId(user.id, location.id) }
@@ -70,7 +70,11 @@ class YearAgoTodayActivity : AppCompatActivity() {
             val (year, month) = date.split("-")
             contents.add(YearAgoTodayAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
             for (location in locations.sortedByDescending { it.id }) {
-                contents.add(YearAgoTodayAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
+                contents.add(YearAgoTodayAdapter.DetailContent(
+                    location,
+                    tagInfo[location.id].orEmpty(),
+                    friendInfo[location.id].orEmpty()
+                ))
             }
         }
     }

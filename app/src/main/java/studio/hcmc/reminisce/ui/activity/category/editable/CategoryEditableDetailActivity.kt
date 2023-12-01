@@ -7,7 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityCategoryEditableDetailBinding
@@ -21,18 +24,25 @@ import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
+import studio.hcmc.reminisce.vo.user.UserVO
 
 class CategoryEditableDetailActivity : AppCompatActivity() {
     lateinit var viewBinding: ActivityCategoryEditableDetailBinding
     private lateinit var adapter: CategoryEditableDetailAdapter
-    private lateinit var locations: List<LocationVO>
+//    private lateinit var locations: List<LocationVO>
+    private lateinit var user: UserVO
 
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
     private val title by lazy { intent.getStringExtra("categoryTitle") }
 
+    private val locations = ArrayList<LocationVO>()
+    private val context = this
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<CategoryEditableDetailAdapter.Content>()
+    private val mutex = Mutex()
+    private var hasMoreContents = true
+    private var lastLoadedAt = 0L
     private val selectedIds = HashSet<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,46 +61,102 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
         viewBinding.categoryEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.categoryEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
         viewBinding.categoryEditableDetailAppbar.appbarActionButton1.setOnClickListener { preparePatch(selectedIds) }
-        loadContents()
-    }
-
-    private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@CategoryEditableDetailActivity)
-        val result = runCatching { LocationIO.listByCategoryId(categoryId, Int.MAX_VALUE) }
-            .onSuccess {
-                locations = it
-                for (location in it) {
-                    tagInfo[location.id] = TagIO.listByLocationId(location.id)
-                    friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
-                }
-            }.onFailure { LocalLogger.e(it) }
-        if (result.isSuccess) {
-            prepareContents()
-            withContext(Dispatchers.Main) { onContentsReady() }
-        } else { onError() }
-    }
-
-    private fun prepareContents() {
-        for (location in locations.sortedByDescending { it.id }) {
-            contents.add(CategoryEditableDetailAdapter.DetailContent(
-                location,
-                tagInfo[location.id].orEmpty(),
-                friendInfo[location.id].orEmpty()
-            ))
+        viewBinding.categoryEditableDetailItems.layoutManager = LinearLayoutManager(this)
+//        loadContents2()
+        CoroutineScope(Dispatchers.IO).launch {
+            loadContents()
         }
     }
 
-    private fun onContentsReady() {
-        viewBinding.categoryEditableDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = CategoryEditableDetailAdapter(adapterDelegate, summaryDelegate)
-        viewBinding.categoryEditableDetailItems.adapter = adapter
+    private suspend fun prepareUser(): UserVO {
+        if (!this::user.isInitialized) {
+            user = UserExtension.getUser(context)
+        }
+
+        return user
+    }
+
+    private suspend fun loadContents() = mutex.withLock {
+        val user = prepareUser()
+        val lastId = locations.lastOrNull()?.id ?: Int.MAX_VALUE
+        val delay = System.currentTimeMillis() - lastLoadedAt - 2000
+        if (delay < 0) {
+            delay(-delay)
+        }
+
+        if (!hasMoreContents) {
+            return
+        }
+
+        try {
+            val fetched = LocationIO.listByCategoryId(categoryId, lastId)
+//            locations = fetched.sortedByDescending { it.id }
+            for (location in fetched) {
+                locations.add(location)
+                tagInfo[location.id] = TagIO.listByLocationId(location.id)
+                friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
+            }
+
+            hasMoreContents = fetched.size >= 10
+            val preSize = contents.size
+            val size = prepareContents(fetched)
+            withContext(Dispatchers.Main) { onContentsReady(preSize, size) }
+            lastLoadedAt = System.currentTimeMillis()
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+            withContext(Dispatchers.Main) { onError() }
+        }
+    }
+
+    // 해결 안 됨
+    private fun prepareContents(fetched: List<LocationVO>): Int {
+        if (contents.lastOrNull() is CategoryEditableDetailAdapter.ProgressContent) {
+            contents.removeLast()
+        }
+        var size = 0
+        addDetailContents(fetched)
+        size += fetched.size
+
+        if (hasMoreContents) {
+            contents.add(CategoryEditableDetailAdapter.ProgressContent)
+        }
+
+        return size
+    }
+
+    private fun addDetailContents(locations: List<LocationVO>) {
+        for (location in locations) {
+            val content = CategoryEditableDetailAdapter.DetailContent(
+                location = location,
+                tags = tagInfo[location.id].orEmpty(),
+                friends = friendInfo[location.id].orEmpty()
+            )
+
+            contents.add(content)
+        }
+    }
+
+    private fun onContentsReady(preSize: Int, size: Int) {
+        if (!this::adapter.isInitialized) {
+            adapter = CategoryEditableDetailAdapter(adapterDelegate, summaryDelegate)
+            viewBinding.categoryEditableDetailItems.adapter = adapter
+            return
+        }
+
+        adapter.notifyItemRangeInserted(preSize, size)
     }
 
     private fun onError() {
-        CommonError.onMessageDialog(this@CategoryEditableDetailActivity, getString(R.string.dialog_error_common_list_body))
+        CommonError.onMessageDialog(context, getString(R.string.dialog_error_common_list_body))
     }
 
     private val adapterDelegate = object : CategoryEditableDetailAdapter.Delegate {
+        override fun hasMoreContents() = hasMoreContents
+        override fun getMoreContents() {
+            CoroutineScope(Dispatchers.IO).launch {
+                loadContents()
+            }
+        }
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }
@@ -117,7 +183,7 @@ class CategoryEditableDetailActivity : AppCompatActivity() {
     }
 
     private fun toCategoryEditableDetail() {
-        Intent().putExtra("isModified", true).setActivity(this@CategoryEditableDetailActivity, Activity.RESULT_OK)
+        Intent().putExtra("isModified", true).setActivity(this, Activity.RESULT_OK)
         finish()
     }
 }

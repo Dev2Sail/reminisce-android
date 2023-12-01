@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.CardWriteDetailContentBinding
+import studio.hcmc.reminisce.vo.location.LocationVO
 
 class WriteDetailContentViewHolder(
     private val viewBinding: CardWriteDetailContentBinding
@@ -17,12 +18,14 @@ class WriteDetailContentViewHolder(
 
     fun bind(content: WriteDetailAdapter.DetailContent) {
         val location = content.location
+        prepareLocation(location)
+    }
+
+    private fun prepareLocation(location: LocationVO) {
         val (year, month, day) = location.visitedAt.split("-")
-        viewBinding.apply {
-            cardWriteDetailContentVisitedAt.writeDetailItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
-            cardWriteDetailContentLocation.writeDetailItemBody.text = location.roadAddress
-            cardWriteDetailContentLocation.writeDetailItemIcon.setImageResource(R.drawable.round_location_on_16)
-        }
+        viewBinding.cardWriteDetailContentVisitedAt.writeDetailItemBody.text = viewBinding.root.context.getString(R.string.card_visited_at, year, month.trim('0'), day.trim('0'))
+        viewBinding.cardWriteDetailContentLocation.writeDetailItemBody.text = location.roadAddress
+        viewBinding.cardWriteDetailContentLocation.writeDetailItemIcon.setImageResource(R.drawable.round_location_on_16)
 
         if (!location.markerEmoji.isNullOrEmpty()) {
             viewBinding.cardWriteDetailContentMarkerEmoji.root.isVisible = true

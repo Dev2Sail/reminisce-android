@@ -45,41 +45,33 @@ class TagDetailItemViewHolder(
         viewBinding.cardSummaryVisitedCount.root.isGone = true
 
         if (location.roadAddress.isNotEmpty()) {
-            viewBinding.cardSummaryAddress.apply {
-                root.isVisible = true
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
-                layoutSummaryItemBody.text = location.roadAddress
-            }
+            viewBinding.cardSummaryAddress.root.isVisible = true
+            viewBinding.cardSummaryAddress.layoutSummaryItemIcon.setImageResource(R.drawable.round_location_on_12)
+            viewBinding.cardSummaryAddress.layoutSummaryItemBody.text = location.roadAddress
         } else { viewBinding.cardSummaryAddress.root.isGone = true }
 
         if (!location.markerEmoji.isNullOrEmpty()) {
-            viewBinding.cardSummaryMarkerEmoji.apply {
-                root.isVisible = true
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
-                layoutSummaryItemBody.text = location.markerEmoji
-            }
+            viewBinding.cardSummaryMarkerEmoji.root.isVisible = true
+            viewBinding.cardSummaryMarkerEmoji.layoutSummaryItemIcon.setImageResource(R.drawable.round_add_reaction_12)
+            viewBinding.cardSummaryMarkerEmoji.layoutSummaryItemBody.text = location.markerEmoji
         } else { viewBinding.cardSummaryMarkerEmoji.root.isGone = true }
     }
 
     private fun prepareTags(tags: List<TagVO>) {
         val tagTest = tags.withIndex().joinToString { it.value.body }
         if (tagTest.isNotEmpty()) {
-            viewBinding.cardSummaryTags.apply {
-                root.isVisible = true
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
-                layoutSummaryItemBody.text = tagTest
-            }
+            viewBinding.cardSummaryTags.root.isVisible = true
+            viewBinding.cardSummaryTags.layoutSummaryItemIcon.setImageResource(R.drawable.round_tag_12)
+            viewBinding.cardSummaryTags.layoutSummaryItemBody.text = tagTest
         } else { viewBinding.cardSummaryTags.root.isGone = true }
     }
 
     private fun prepareFriends(friends: List<FriendVO>) {
         val friendText = friends.joinToString { it.nickname!! }
         if (friendText.isNotEmpty()) {
-            viewBinding.cardSummaryFriends.apply {
-                root.isVisible = true
-                layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
-                layoutSummaryItemBody.text = friendText
-            }
+            viewBinding.cardSummaryFriends.root.isVisible = true
+            viewBinding.cardSummaryFriends.layoutSummaryItemIcon.setImageResource(R.drawable.round_group_12)
+            viewBinding.cardSummaryFriends.layoutSummaryItemBody.text = friendText
         } else { viewBinding.cardSummaryFriends.root.isGone = true }
     }
 }

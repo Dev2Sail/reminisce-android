@@ -23,6 +23,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteSelectFriendBinding
     private lateinit var friends: List<FriendVO>
 
+    private val context = this
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
 
     private val selectedFriendIds = HashSet<Int>()
@@ -45,7 +46,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     }
 
     private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@WriteOptionFriendActivity)
+        val user = UserExtension.getUser(context)
         val result = runCatching { FriendIO.listByUserId(user.id, Int.MAX_VALUE,false) }
             .onSuccess { friends = it }
             .onFailure { LocalLogger.e(it) }
@@ -56,7 +57,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     }
 
     private fun prepareSavedFriends() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@WriteOptionFriendActivity)
+        val user = UserExtension.getUser(context)
         runCatching { FriendIO.listByUserIdAndLocationId(user.id, locationId) }
             .onSuccess {
                 for (vo in it) {
@@ -81,8 +82,8 @@ class WriteOptionFriendActivity : AppCompatActivity() {
             preparePostIds.add(id)
         }
         val dto = LocationFriendDTO.Post().apply {
-            this.locationId = this@WriteOptionFriendActivity.locationId
-            this.opponentIds = this@WriteOptionFriendActivity.preparePostIds
+            this.locationId = context.locationId
+            this.opponentIds = context.preparePostIds
         }
         return dto
     }

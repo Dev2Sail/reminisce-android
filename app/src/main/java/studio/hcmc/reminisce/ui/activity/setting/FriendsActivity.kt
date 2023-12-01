@@ -2,6 +2,8 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +16,7 @@ import studio.hcmc.reminisce.databinding.ActivityFriendsBinding
 import studio.hcmc.reminisce.dto.friend.FriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
+import studio.hcmc.reminisce.io.ktor_client.UserIO
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
 import studio.hcmc.reminisce.vo.friend.FriendVO
@@ -22,11 +25,13 @@ import studio.hcmc.reminisce.vo.user.UserVO
 class FriendsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityFriendsBinding
     private lateinit var adapter: FriendsAdapter
-//    private lateinit var friends: List<FriendVO>
 
+    private val context = this
     private val friends = ArrayList<FriendVO>()
     private val users = HashMap<Int /* userId */, UserVO>()
     private var contents = ArrayList<FriendsAdapter.Content>()
+
+    private val addFriendLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onAddFriendResult)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,36 +46,33 @@ class FriendsActivity : AppCompatActivity() {
         viewBinding.friendsAppbar.appbarTitle.text = getText(R.string.setting_friend)
         viewBinding.friendsAppbar.appbarActionButton1.isVisible = false
         viewBinding.friendsAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.friendsSearch.setOnClickListener { launchSearchFriend() }
+        viewBinding.friendsSearch.setOnClickListener { launchAddFriend() }
         loadContents()
     }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@FriendsActivity)
-        val result = runCatching { FriendIO.listByUserId(user.id, Int.MAX_VALUE,false) }
-            .onSuccess {
-                for (vo in it) {
-                    friends.add(vo)
+        val user = UserExtension.getUser(context)
+        val result = runCatching { FriendIO.listByUserId(user.id, Int.MAX_VALUE, false) }
+            .onSuccess { it ->
+                for (friend in it.sortedBy { it.nickname }) {
+                    friends.add(friend)
+                    users[friend.opponentId] = UserIO.getById(friend.opponentId)
                 }
             }.onFailure { LocalLogger.e(it) }
         if (result.isSuccess) {
-            friends.sortedBy { it.nickname }
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         }
     }
 
     private fun loadMoreContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@FriendsActivity)
+        val user = UserExtension.getUser(context)
         val lastId = friends.sortedByDescending { it.opponentId }[0].opponentId
 
     }
 
     private fun prepareContents() {
         friends.forEach { contents.add(FriendsAdapter.DetailContent(it)) }
-//        for (vo in friends) {
-//            contents.add(FriendsAdapter.DetailContent(vo))
-//        }
     }
 
     private fun onContentsReady() {
@@ -86,13 +88,13 @@ class FriendsActivity : AppCompatActivity() {
 
     private val itemDelegate = object : FriendsItemViewHolder.Delegate {
         // to EditFriendDialog
-        override fun onItemClick(opponentId: Int, nickname: String?, position: Int) {
-            EditFriendDialog(this@FriendsActivity, opponentId, nickname, position, editDialogDelegate)
+        override fun onItemClick(friend: FriendVO, position: Int) {
+            EditFriendDialog(context, friend, position, editDialogDelegate)
         }
 
         // to DeleteFriendDialog
         override fun onItemLongClick(opponentId: Int, position: Int) {
-            DeleteFriendDialog(this@FriendsActivity, opponentId, position, deleteDialogDelegate)
+            DeleteFriendDialog(context, opponentId, position, deleteDialogDelegate)
         }
     }
 
@@ -102,53 +104,69 @@ class FriendsActivity : AppCompatActivity() {
             return users[userId]!!
         }
 
-        // need opponentId, nickname?
         override fun onEditClick(opponentId: Int, body: String?, position: Int) {
-            val dto = FriendDTO.Put().apply {
-                this.opponentId = opponentId
-                this.nickname = body
-            }
-
-            onPatchContent(dto, position)
+            preparePatch(opponentId, body, position)
         }
     }
 
-    // FriendIo.put : userId, FriendDto.Put
-    private fun onPatchContent(dto: FriendDTO.Put, position: Int) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@FriendsActivity)
+    private fun preparePatch(opponentId: Int, body: String?, position: Int) {
+        val dto = FriendDTO.Put().apply {
+            this.opponentId = opponentId
+            this.nickname = body
+        }
+        onPatchFriend(dto, position)
+    }
+
+    private fun onPatchFriend(dto: FriendDTO.Put, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(context)
         runCatching { FriendIO.put(user.id, dto) }
             .onSuccess {
-                val fetch = FriendIO.getByUserIdAndOpponentId(user.id, dto.opponentId)
-                withContext(Dispatchers.Main) {
-                    contents[position] = FriendsAdapter.DetailContent(fetch)
-                    adapter.notifyItemChanged(position)
-                }
+                val patch = FriendIO.getByUserIdAndOpponentId(user.id, dto.opponentId)
+                LocalLogger.v("patch result: ${patch.opponentId}, ${patch.nickname}")
+                friends[position] = patch
+                contents[position] = FriendsAdapter.DetailContent(patch)
+                withContext(Dispatchers.Main) { adapter.notifyItemChanged(position) }
             }.onFailure { LocalLogger.e(it) }
     }
 
     // delete dialog
     private val deleteDialogDelegate = object : DeleteFriendDialog.Delegate {
         override fun onDeleteClick(opponentId: Int, position: Int) {
-            onDeleteContent(opponentId, position)
+            onDeleteFriend(opponentId, position)
         }
     }
 
-    private fun onDeleteContent(opponentId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@FriendsActivity)
+    private fun onDeleteFriend(opponentId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(context)
         runCatching { FriendIO.delete(user.id, opponentId) }
             .onSuccess {
-                withContext(Dispatchers.Main) {
-                    contents.removeAt(position)
-                    adapter.notifyItemRemoved(position)
-                }
+                contents.removeAt(position)
+                users.remove(opponentId)
+                friends.removeAt(position)
+                withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position) }
             }.onFailure { LocalLogger.e(it) }
     }
 
-    private fun launchSearchFriend() {
-        Intent(this, AddFriendActivity::class.java).apply {
-            startActivity(this)
+    private fun launchAddFriend() {
+        val intent = Intent(this, AddFriendActivity::class.java)
+        addFriendLauncher.launch(intent)
+    }
+
+    private fun onAddFriendResult(activityResult: ActivityResult) {
+        if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
+            val opponentId = activityResult.data?.getIntExtra("opponentId", -1)
+            onAddContent(opponentId!!)
         }
     }
 
-    // friendAdd에서 activityResult 받아오기
+    private fun onAddContent(opponentId: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(context)
+        runCatching { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
+            .onSuccess {
+                friends.add(it)
+                users[it.opponentId] = UserIO.getById(it.opponentId)
+                contents.add(FriendsAdapter.DetailContent(it))
+                withContext(Dispatchers.Main) { adapter.notifyItemInserted(friends.size) }
+            }.onFailure { LocalLogger.e(it) }
+    }
 }

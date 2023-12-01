@@ -30,6 +30,7 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
     private val opponentId by lazy { intent.getIntExtra("opponentId", -1) }
     private val nickname by lazy { intent.getStringExtra("nickname") }
 
+    private val context = this
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<FriendTagEditableAdapter.Content>()
@@ -51,7 +52,7 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
     }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@FriendTagEditableDetailActivity)
+        val user = UserExtension.getUser(context)
         val result = runCatching { LocationIO.listByUserIdAndOpponentId(user.id, opponentId, Int.MAX_VALUE) }
             .onSuccess {it ->
                 locations = it
@@ -63,14 +64,20 @@ class FriendTagEditableDetailActivity : AppCompatActivity() {
         if (result.isSuccess) {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
-        } else {
-            CommonError.onMessageDialog(this@FriendTagEditableDetailActivity, getString(R.string.dialog_error_common_list_body))
-        }
+        } else { onError() }
+    }
+
+    private fun onError() {
+        CommonError.onMessageDialog(this, getString(R.string.dialog_error_common_list_body))
     }
 
     private fun prepareContents() {
         for (location in locations.sortedByDescending { it.id }) {
-            contents.add(FriendTagEditableAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
+            contents.add(FriendTagEditableAdapter.DetailContent(
+                location,
+                tagInfo[location.id].orEmpty(),
+                friendInfo[location.id].orEmpty()
+            ))
         }
     }
 

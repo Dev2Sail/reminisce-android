@@ -22,13 +22,11 @@ class CategoryViewHolder(
 
     fun bind(content: HomeAdapter.CategoryContent) {
         val (category, count) = content
-
         viewBinding.homeCategoryTitle.text = when (category.title) {
             "Default" -> viewBinding.root.context.getText(R.string.category_view_holder_title)
             "new" -> viewBinding.root.context.getText(R.string.add_category_body)
             else -> category.title
         }
-
         viewBinding.homeCategoryBody.text = count.toString()
         viewBinding.homeCategoryAction1.setOnClickListener {
             delegate.onItemClick(category.id, bindingAdapterPosition)

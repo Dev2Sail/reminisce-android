@@ -12,6 +12,7 @@ class WriteOptionCategoryAdapter(
     interface Delegate: SingleTypeAdapterDelegate<Content>
     sealed interface Content
     data class DetailContent(val categoryVO: CategoryVO): Content
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = WriteOptionCategoryItemViewHolder(parent, itemDelegate)
     override fun getItemCount() = adapterDelegate.getItemCount()
     override fun onBindViewHolder(holder: WriteOptionCategoryItemViewHolder, position: Int) = holder.bind(adapterDelegate.getItem(position) as DetailContent)

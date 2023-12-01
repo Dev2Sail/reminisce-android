@@ -8,9 +8,3 @@ package studio.hcmc.reminisce
 // card_summary -> 모든 summary 통일
 // card_checkable_summary -> 모든 activity 편집 화면에서 사용
 // layout_summary_item -> 모든 summary 내 아이템
-
-
-/*
-이전에 쓰던 seed : <color name="seed">#FFD52E</color>
-textField 레퍼런스는 activity_friend_add를 볼
- */

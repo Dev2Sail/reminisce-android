@@ -85,8 +85,12 @@ class WriteOptionTagActivity : AppCompatActivity() {
                 }
             }.onFailure {
                 LocalLogger.e(it)
-                CommonError.onMessageDialog(this@WriteOptionTagActivity, getString(R.string.dialog_error_tag_load))
+                onError()
             }
+    }
+
+    private fun onError() {
+        CommonError.onMessageDialog(this, getString(R.string.dialog_error_tag_load))
     }
 
     private fun preparePostTags(userId: Int): TagDTO.Post {

@@ -21,7 +21,6 @@ import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.ui.activity.category.CategoryDetailActivity
 import studio.hcmc.reminisce.ui.activity.friend_tag.FriendTagDetailActivity
-import studio.hcmc.reminisce.ui.activity.map.MapTestActivity
 import studio.hcmc.reminisce.ui.activity.tag.TagDetailActivity
 import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
@@ -34,6 +33,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var adapter: HomeAdapter
 
+    private val context = this
     private var defaultCategoryId = -1
     private val categories = ArrayList<CategoryVO>()
     private val countByCategoryId = HashMap<Int /* categoryId */, Int /* countById */>()
@@ -52,25 +52,15 @@ class HomeActivity : AppCompatActivity() {
         initView()
     }
 
-    private fun test() {
-        viewBinding.homeTest.setOnClickListener {
-            Intent(this, MapTestActivity::class.java).apply {
-                startActivity(this)
-
-            }
-        }
-    }
-
     private fun initView() {
         val menuId = intent.getIntExtra("menuId", -1)
         navigationController(viewBinding.homeNavView, menuId)
-        CoroutineScope(Dispatchers.IO).launch { patchContents() }
-        test()
+        CoroutineScope(Dispatchers.IO).launch { fetchContents() }
     }
 
-    private suspend fun patchContents() = coroutineScope {
+    private suspend fun fetchContents() = coroutineScope {
         val result = runCatching {
-            val user = UserExtension.getUser(this@HomeActivity)
+            val user = UserExtension.getUser(context)
             listOf(
                 launch { categories.addAll(CategoryIO.listByUserId(user.id).sortedBy { it.sortOrder }) },
                 launch { tags.addAll(TagIO.listByUserId(user.id).sortedByDescending { it.id }) },
@@ -99,7 +89,7 @@ class HomeActivity : AppCompatActivity() {
             prepareContents()
             withContext(Dispatchers.Main) { onContentsReady() }
         } else {
-            withContext(Dispatchers.Main) { CommonError.onDialog(this@HomeActivity) }
+            withContext(Dispatchers.Main) { CommonError.onDialog(context) }
         }
     }
 
@@ -128,23 +118,19 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val headerDelegate = object : HeaderViewHolder.Delegate {
-        override fun onClick() {
-            AddCategoryDialog(this@HomeActivity, addDialogDelegate)
-        }
+        override fun onClick() { AddCategoryDialog(context, addDialogDelegate) }
     }
 
     /* Add Category */
     private val addDialogDelegate = object : AddCategoryDialog.Delegate {
-        override fun onSaveClick(body: String?) {
-            onAddContent(body ?: "new")
-        }
+        override fun onSaveClick(body: String?) { onAddContent(body ?: "new") }
     }
 
     private fun onAddContent(body: String) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@HomeActivity)
         val dto = CategoryDTO.Post().apply {
-            userId = user.id
-            title = body
+            this.userId = user.id
+            this.title = body
         }
         runCatching { CategoryIO.post(dto) }
             .onSuccess { it ->
@@ -161,7 +147,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun onError() {
-        CommonError.onMessageDialog(this@HomeActivity, getString(R.string.dialog_error_add_folder))
+        CommonError.onMessageDialog(this, getString(R.string.dialog_error_add_folder))
     }
 
     private val categoryDelegate = object : CategoryViewHolder.Delegate {
@@ -170,15 +156,13 @@ class HomeActivity : AppCompatActivity() {
         }
 
         override fun onItemLongClick(categoryId: Int, position: Int) {
-            DeleteCategoryDialog(this@HomeActivity, categoryId, position, deleteDialogDelegate)
+            DeleteCategoryDialog(context, categoryId, position, deleteDialogDelegate)
         }
     }
 
     /* Delete Category */
     private val deleteDialogDelegate = object : DeleteCategoryDialog.Delegate {
-        override fun onDeleteClick(categoryId: Int, position: Int) {
-            onDeleteContent(categoryId, position)
-        }
+        override fun onDeleteClick(categoryId: Int, position: Int) { onDeleteContent(categoryId, position) }
     }
 
     private fun onDeleteContent(categoryId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch{
@@ -193,26 +177,23 @@ class HomeActivity : AppCompatActivity() {
 
     /* TAG */
     private val tagDelegate = object : TagViewHolder.Delegate {
-        override fun onItemClick(tagId: Int) {
-            launchTag(tagId)
-        }
-
-        override fun onItemLongClick(tagId: Int, tagIdx: Int, position: Int) {
-            DeleteTagDialog(this@HomeActivity, tagId, tagIdx, position, deleteTagDelegate)
+        override fun onItemClick(tagId: Int) { launchTag(tagId) }
+        override fun onItemLongClick(tagId: Int, tagIndex: Int, position: Int) {
+            DeleteTagDialog(context, tagId, tagIndex, position, deleteTagDelegate)
         }
     }
 
     // tagDelegate.onItemLongClick() -> deleteTagDelegate -> onDeleteTag
     private val deleteTagDelegate = object : DeleteTagDialog.Delegate {
-        override fun onDeleteClick(tagId: Int, tagIdx: Int, position: Int) {
-            onDeleteTag(tagId, tagIdx, position)
+        override fun onDeleteClick(tagId: Int, tagIndex: Int, position: Int) {
+            onDeleteTag(tagId, tagIndex, position)
         }
     }
 
-    private fun onDeleteTag(tagId: Int, tagIdx: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun onDeleteTag(tagId: Int, tagIndex: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { TagIO.delete(tagId) }
             .onSuccess {
-                tags.removeAt(tagIdx)
+                tags.removeAt(tagIndex)
                 contents[position] = HomeAdapter.TagContent(tags)
                 withContext(Dispatchers.Main) { adapter.notifyItemChanged(position) }
             }.onFailure { LocalLogger.e(it) }
@@ -223,25 +204,32 @@ class HomeActivity : AppCompatActivity() {
             launchFriendTagDetail(opponentId, nickname)
         }
 
-        override fun onItemLongClick(opponentId: Int, friendIdx: Int, position: Int) {
-            DeleteFriendTagDialog(this@HomeActivity, opponentId, friendIdx, position, deleteFriendDelegate)
+        override fun onItemLongClick(opponentId: Int, friendIndex: Int, position: Int) {
+            DeleteFriendTagDialog(context, opponentId, friendIndex, position, deleteFriendDelegate)
         }
     }
 
     private val deleteFriendDelegate = object :DeleteFriendTagDialog.Delegate {
-        override fun onDeleteClick(opponentId: Int, friendIdx: Int, position: Int) {
-            onDeleteFriend(opponentId, friendIdx, position)
+        override fun onDeleteClick(opponentId: Int, friendIndex: Int, position: Int) {
+            onDeleteFriend(opponentId, friendIndex, position)
         }
     }
 
-    private fun onDeleteFriend(opponentId: Int, friendIdx: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@HomeActivity)
+    private fun onDeleteFriend(opponentId: Int, friendIndex: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val user = UserExtension.getUser(context)
         runCatching { FriendIO.delete(user.id, opponentId) }
             .onSuccess {
-                friends.removeAt(friendIdx)
+                friends.removeAt(friendIndex)
                 contents[position] = HomeAdapter.FriendContent(friends)
                 withContext(Dispatchers.Main) { adapter.notifyItemChanged(position) }
             }.onFailure { LocalLogger.e(it) }
+    }
+
+    private fun launchCategoryDetail(categoryId: Int, position: Int) {
+        val intent = Intent(this, CategoryDetailActivity::class.java)
+            .putExtra("categoryId", categoryId)
+            .putExtra("position", position)
+        categoryDetailLauncher.launch(intent)
     }
 
     private fun onCategoryEditResult(activityResult: ActivityResult) {
@@ -260,10 +248,23 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun launchFriendTagDetail(opponentId: Int, nickname: String) {
+        val intent = Intent(this, FriendTagDetailActivity::class.java)
+            .putExtra("opponentId", opponentId)
+            .putExtra("nickname", nickname)
+        friendDetailLauncher.launch(intent)
+    }
+
     private fun onFriendModifiedResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             onPatchFriend()
         }
+    }
+
+    private fun launchTag(tagId: Int) {
+        val intent = Intent(this, TagDetailActivity::class.java)
+            .putExtra("tagId", tagId)
+        tagDetailLauncher.launch(intent)
     }
 
     private fun onTagModifiedResult(activityResult: ActivityResult) {
@@ -285,14 +286,12 @@ class HomeActivity : AppCompatActivity() {
         if (result.isSuccess) {
             contents.removeAt(contents.size - 1)
             contents.add(HomeAdapter.FriendContent(friends))
-            withContext(Dispatchers.Main) {
-                adapter.notifyItemChanged(contents.size - 1)
-            }
+            withContext(Dispatchers.Main) { adapter.notifyItemChanged(contents.size - 1) }
         }
     }
 
     private fun onPatchCategory(categoryId: Int, position: Int) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@HomeActivity)
+        val user = UserExtension.getUser(context)
         runCatching { CategoryIO.getById(categoryId) }
             .onSuccess {
                 val count = CategoryIO.getCountByCategoryIdAndUserId(user.id, categoryId).get("count").asInt
@@ -302,7 +301,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun onPatchTotalCount() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@HomeActivity)
+        val user = UserExtension.getUser(context)
         runCatching { CategoryIO.getTotalCountByUserId(user.id) }
             .onSuccess {
                 val count = it.get("totalCount").asInt
@@ -311,25 +310,5 @@ class HomeActivity : AppCompatActivity() {
                 contents[1] = HomeAdapter.CategoryContent(first, count)
                 withContext(Dispatchers.Main) { adapter.notifyItemChanged(1) }
             }.onFailure { LocalLogger.e(it) }
-    }
-
-    private fun launchCategoryDetail(categoryId: Int, position: Int) {
-        val intent = Intent(this, CategoryDetailActivity::class.java)
-            .putExtra("categoryId", categoryId)
-            .putExtra("position", position)
-        categoryDetailLauncher.launch(intent)
-    }
-
-    private fun launchFriendTagDetail(opponentId: Int, nickname: String) {
-        val intent = Intent(this, FriendTagDetailActivity::class.java)
-            .putExtra("opponentId", opponentId)
-            .putExtra("nickname", nickname)
-        friendDetailLauncher.launch(intent)
-    }
-
-    private fun launchTag(tagId: Int) {
-        val intent = Intent(this, TagDetailActivity::class.java)
-            .putExtra("tagId", tagId)
-        tagDetailLauncher.launch(intent)
     }
 }

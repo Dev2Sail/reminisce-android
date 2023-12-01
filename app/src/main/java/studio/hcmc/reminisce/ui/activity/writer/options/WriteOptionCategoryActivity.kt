@@ -26,7 +26,6 @@ class WriteOptionCategoryActivity : AppCompatActivity() {
 
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
     private val categoryId by lazy { intent.getIntExtra("categoryId", -1) }
-
     private val contents = ArrayList<WriteOptionCategoryAdapter.Content>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

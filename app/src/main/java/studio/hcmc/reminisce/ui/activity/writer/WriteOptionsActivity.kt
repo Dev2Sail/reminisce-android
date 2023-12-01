@@ -64,7 +64,7 @@ class WriteOptionsActivity : AppCompatActivity() {
 
     private fun prepareCategory() = CoroutineScope(Dispatchers.IO).launch {
         runCatching { CategoryIO.getById(categoryId) }
-            .onSuccess { title = it.title }
+            .onSuccess { this@WriteOptionsActivity.title = it.title }
             .onFailure { LocalLogger.e(it) }
     }
 
@@ -102,7 +102,7 @@ class WriteOptionsActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun toWriteDetailByEdit() {
+    private fun toModifiedWriteDetail() {
         Intent()
             .putExtra("isModified", true)
             .putExtra("locationId", locationId)
@@ -115,7 +115,7 @@ class WriteOptionsActivity : AppCompatActivity() {
         if (position == -1) {
             toWriteDetail()
         } else {
-            toWriteDetailByEdit()
+            toModifiedWriteDetail()
         }
     }
 

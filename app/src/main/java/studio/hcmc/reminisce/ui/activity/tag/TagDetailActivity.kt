@@ -89,18 +89,18 @@ class TagDetailActivity : AppCompatActivity() {
             val (year, month) = date.split("-")
             contents.add(TagDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
             for (location in locations.sortedByDescending { it.id }) {
-                contents.add(TagDetailAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
+                contents.add(TagDetailAdapter.DetailContent(
+                    location,
+                    tagInfo[location.id].orEmpty(),
+                    friendInfo[location.id].orEmpty()
+                ))
             }
         }
     }
 
     private fun onContentsReady() {
         viewBinding.tagDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = TagDetailAdapter(
-            adapterDelegate,
-            headerDelegate,
-            summaryDelegate
-        )
+        adapter = TagDetailAdapter(adapterDelegate, headerDelegate, summaryDelegate)
         viewBinding.tagDetailItems.adapter = adapter
     }
 
@@ -125,20 +125,20 @@ class TagDetailActivity : AppCompatActivity() {
     private val deleteDialogDelegate = object : ItemDeleteDialog.Delegate {
         override fun onClick(locationId: Int, position: Int) {
             LocalLogger.v("locationId:$locationId, position:$position")
-            var locationIdx = -1
+            var locationIndex = -1
             for (item in locations.withIndex()) {
                 if (item.value.id == locationId) {
-                    locationIdx = item.index
+                    locationIndex = item.index
                 }
             }
-            deleteContent(locationId, position, locationIdx)
+            deleteContent(locationId, position, locationIndex)
         }
     }
 
-    private fun deleteContent(locationId: Int, position: Int, locationIdx: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun deleteContent(locationId: Int, position: Int, locationIndex: Int) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.delete(locationId) }
             .onSuccess {
-                locations.removeAt(locationIdx)
+                locations.removeAt(locationIndex)
                 tagInfo.remove(locationId)
                 friendInfo.remove(locationId)
                 withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position) }

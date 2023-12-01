@@ -18,28 +18,17 @@ class AddCategoryDialog(
     init {
         val viewBinding = DialogAddCategoryBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        viewBinding.apply {
-            dialogAddCategoryField.editText!!.addTextChangedListener {
-                if (dialogAddCategoryField.string.length <= 15) {
-                    dialogAddCategorySave.isEnabled = true
-                }
-                if (dialogAddCategoryField.string.length > 15) {
-                    dialogAddCategorySave.isEnabled = false
-                }
+        viewBinding.dialogAddCategoryField.editText!!.addTextChangedListener {
+            if (viewBinding.dialogAddCategoryField.string.length <= 15) {
+                viewBinding.dialogAddCategorySave.isEnabled = true
+            }
+            if (viewBinding.dialogAddCategoryField.string.length > 15) {
+                viewBinding.dialogAddCategorySave.isEnabled = false
             }
         }
         viewBinding.dialogAddCategorySave.setOnClickListener {
-            val input = viewBinding.dialogAddCategoryField.string
-            when {
-                input.isEmpty() -> {
-                    delegate.onSaveClick(null)
-                    dialog.dismiss()
-                }
-                input.isNotEmpty() -> {
-                    delegate.onSaveClick(input)
-                    dialog.dismiss()
-                }
-            }
+            dialog.dismiss()
+            delegate.onSaveClick(viewBinding.dialogAddCategoryField.string)
         }
         viewBinding.dialogAddCategoryCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()

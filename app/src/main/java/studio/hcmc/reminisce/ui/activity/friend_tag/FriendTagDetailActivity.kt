@@ -10,8 +10,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityFriendTagDetailBinding
@@ -28,21 +30,27 @@ import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
+import studio.hcmc.reminisce.vo.user.UserVO
 
 class FriendTagDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityFriendTagDetailBinding
     private lateinit var adapter: FriendTagAdapter
     private lateinit var friend: FriendVO
+    private lateinit var user: UserVO
 
-    private val friendTagEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
     private val opponentId by lazy { intent.getIntExtra("opponentId", -1) }
     private val nickname by lazy { intent.getStringExtra("nickname") }
 
+    private val context = this
     private val locations = ArrayList<LocationVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<FriendTagAdapter.Content>()
+    private val mutex = Mutex()
+    private var hasMoreContents = true
+    private var lastLoadedAt = 0L
 
+    private val friendTagEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityFriendTagDetailBinding.inflate(layoutInflater)
@@ -54,80 +62,121 @@ class FriendTagDetailActivity : AppCompatActivity() {
         viewBinding.friendTagDetailAppbar.appbarTitle.text = getString(R.string.header_view_holder_title)
         viewBinding.friendTagDetailAppbar.appbarActionButton1.isVisible = false
         viewBinding.friendTagDetailAppbar.appbarBack.setOnClickListener { finish() }
-
-//        try {
-//            if (CoroutineScope(Dispatchers.IO).launch { testLoad1() }.isCompleted) {
-//                prepareContents()
-//                CoroutineScope(Dispatchers.Main).launch{ onContentsReady() }
-//                // ...?
-//            }
-//        } catch (e: Throwable) {
-//            LocalLogger.e(e)
-//        }
-        loadContents()
+        viewBinding.friendTagDetailItems.layoutManager = LinearLayoutManager(this)
+        CoroutineScope(Dispatchers.IO).launch { loadContents() }
     }
 
-//    private suspend fun testLoad1() = coroutineScope {
-//        val user = UserExtension.getUser(this@FriendTagDetailActivity)
-//        // friend -> locations -> tags & friends => async
-//        val friendDeferred = async { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
-//        friend = friendDeferred.await()
-//
-//        val locationsDeferred = async { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId, Int.MAX_VALUE) }
-////        locations = locationsDeferred.await()
-//        locations.addAll(locationsDeferred.await())
-//
-//        for (location in locations) {
-//            val tagsDeferred = async { TagIO.listByLocationId(location.id) }
-//            val friendsDeferred = async { FriendIO.listByUserIdAndLocationId(user.id, location.id) }
-//            tagInfo[location.id] = tagsDeferred.await()
-//            friendInfo[location.id] = friendsDeferred.await()
-//        }
-//    }
-    private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
-        val result = runCatching {
-            val user = UserExtension.getUser(this@FriendTagDetailActivity)
-            val friendDeferred = async { FriendIO.getByUserIdAndOpponentId(user.id, opponentId) }
-            friend = friendDeferred.await()
-            val locationsDeferred = async { LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId, Int.MAX_VALUE) }
-            for (vo in locationsDeferred.await()) {
-                locations.add(vo)
-            }
-            for (location in locations) {
-                val tagsDeferred = async { TagIO.listByLocationId(location.id) }
-                val friendsDeferred = async { FriendIO.listByUserIdAndLocationId(user.id, location.id) }
-                tagInfo[location.id] = tagsDeferred.await()
-                friendInfo[location.id] = friendsDeferred.await()
-            }
-        }.onFailure { LocalLogger.e(it)}
-        if (result.isSuccess) {
-            prepareContents()
-            withContext(Dispatchers.Main) { onContentsReady() }
-        } else { onError() }
+    private suspend fun prepareUser(): UserVO {
+        if (!this::user.isInitialized) {
+            user = UserExtension.getUser(context)
+        }
+
+        return user
     }
 
-    private fun onError() {
-        CommonError.onMessageDialog(this@FriendTagDetailActivity, getString(R.string.dialog_error_common_list_body))
+    private suspend fun prepareFriend(): FriendVO {
+        if (!this::friend.isInitialized) {
+            friend = FriendIO.getByUserIdAndOpponentId(user.id, opponentId)
+        }
+
+        return friend
     }
 
-    private fun prepareContents() {
-        contents.add(FriendTagAdapter.HeaderContent(nickname!!))
-        for ((date, locations) in locations.groupBy { it.createdAt.toString().substring(0, 7) }.entries) {
-            val (year, month) = date.split("-")
-            contents.add(FriendTagAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
-            for (location in locations.sortedByDescending { it.id }) {
-                contents.add(FriendTagAdapter.DetailContent(location, tagInfo[location.id].orEmpty(), friendInfo[location.id].orEmpty()))
+    private suspend fun loadContents() = mutex.withLock {
+        val user = prepareUser()
+        val friend = prepareFriend()
+        val lastId = locations.lastOrNull()?.id ?: Int.MAX_VALUE
+        val delay = System.currentTimeMillis() - lastLoadedAt - 2000
+        if (delay < 0) {
+            delay(-delay)
+        }
+
+        if (!hasMoreContents) {
+            return
+        }
+
+        try {
+            val fetched = LocationIO.listByUserIdAndOpponentId(user.id, friend.opponentId, lastId)
+            for (location in fetched.sortedByDescending { it.id }) {
+                this.locations.add(location)
+                tagInfo[location.id] = TagIO.listByLocationId(location.id)
+                friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
             }
+            hasMoreContents = fetched.size >= 10
+            val preSize = contents.size
+            val size = prepareContents(fetched)
+            withContext(Dispatchers.Main) { onContentsReady(preSize, size) }
+            lastLoadedAt = System.currentTimeMillis()
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+            withContext(Dispatchers.Main) { onError() }
         }
     }
 
-    private fun onContentsReady() {
-        viewBinding.friendTagDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = FriendTagAdapter(adapterDelegate, headerDelegate, itemDelegate)
-        viewBinding.friendTagDetailItems.adapter = adapter
+    private fun onError() {
+        CommonError.onMessageDialog(this, getString(R.string.dialog_error_common_list_body))
+    }
+
+    private fun prepareContents(fetched: List<LocationVO>): Int {
+        if (contents.lastOrNull() is FriendTagAdapter.ProgressContent) {
+            contents.removeLast()
+        }
+
+        if (contents.isEmpty()) {
+            contents.add(FriendTagAdapter.HeaderContent(friend.nickname!!))
+        }
+
+        val group = fetched.groupByTo(HashMap()) { it.createdAt.toString().substring(0, 7) }
+        var size = 0
+        val lastDetailContent = contents.lastOrNull() as? FriendTagAdapter.DetailContent
+        if (lastDetailContent != null) {
+            val list = group.remove(lastDetailContent.location.createdAt.toString().substring(0, 7))
+            if (list != null) {
+                size += list.size
+                addDetailContents(list)
+            }
+        }
+
+        for ((date, locations) in group) {
+            val (year, month) = date.split("-")
+            size++
+            contents.add(FriendTagAdapter.DateContent(getString(R.string.card_date_separator, year, month.removePrefix("0"))))
+            size += locations.size
+            addDetailContents(locations)
+        }
+
+        if (hasMoreContents) {
+            contents.add(FriendTagAdapter.ProgressContent)
+        }
+
+        return size
+    }
+
+    private fun addDetailContents(locations: List<LocationVO>) {
+        for (location in locations) {
+            val content = FriendTagAdapter.DetailContent(
+                location = location,
+                tags = tagInfo[location.id].orEmpty(),
+                friends = friendInfo[location.id].orEmpty()
+            )
+
+            contents.add(content)
+        }
+    }
+
+    private fun onContentsReady(preSize: Int, size: Int) {
+        if (!this::adapter.isInitialized) {
+            adapter = FriendTagAdapter(adapterDelegate, headerDelegate, itemDelegate)
+            viewBinding.friendTagDetailItems.adapter = adapter
+            return
+        }
+
+        adapter.notifyItemRangeInserted(preSize, size)
     }
 
     private val adapterDelegate = object : FriendTagAdapter.Delegate {
+        override fun hasMoreContents() = hasMoreContents
+        override fun getMoreContents() { CoroutineScope(Dispatchers.IO).launch { loadContents() } }
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }
@@ -140,33 +189,25 @@ class FriendTagDetailActivity : AppCompatActivity() {
 
     private val itemDelegate = object : FriendTagItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String) {
-            // TODO intent result
-            // 편집 시 원래 저장돼있던 내용 고대로 들어가야지
             moveToWriteDetail(locationId, title)
         }
 
         override fun onItemLongClick(locationId: Int, position: Int) {
-            ItemDeleteDialog(this@FriendTagDetailActivity, deleteDialogDelegate, locationId, position)
+            ItemDeleteDialog(context, deleteDialogDelegate, locationId, position)
         }
     }
 
     private val deleteDialogDelegate = object : ItemDeleteDialog.Delegate {
         override fun onClick(locationId: Int, position: Int) {
             LocalLogger.v("locationId:$locationId, position:$position")
-            var locationIdx = -1
-            for (item in locations.withIndex()) {
-                if (item.value.id == locationId) {
-                    locationIdx = item.index
-                }
-            }
-            deleteContent(locationId, position, locationIdx)
+            deleteContent(locationId, position, findIndexInList(locationId, locations))
         }
     }
 
-    private fun deleteContent(locationId: Int, position: Int, locationIdx: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun deleteContent(locationId: Int, position: Int, locationIndex: Int) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.delete(locationId) }
             .onSuccess {
-                locations.removeAt(locationIdx)
+                locations.removeAt(locationIndex)
                 tagInfo.remove(locationId)
                 friendInfo.remove(locationId)
                 withContext(Dispatchers.Main) { adapter.notifyItemRemoved(position) }
@@ -175,7 +216,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
     }
 
     private fun launchFriendEditableDetail(opponentId: Int, nickname: String) {
-        val intent = Intent(this@FriendTagDetailActivity, FriendTagEditableDetailActivity::class.java)
+        val intent = Intent(context, FriendTagEditableDetailActivity::class.java)
             .putExtra("opponentId", opponentId)
             .putExtra("nickname", nickname)
         friendTagEditableLauncher.launch(intent)
@@ -188,8 +229,8 @@ class FriendTagDetailActivity : AppCompatActivity() {
 
     private fun onModifiedResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
-            contents.removeAll { it is FriendTagAdapter.Content }
-            loadContents()
+            contents.clear()
+            CoroutineScope(Dispatchers.IO).launch { loadContents() }
         }
     }
 
@@ -199,5 +240,16 @@ class FriendTagDetailActivity : AppCompatActivity() {
             putExtra("title", title)
             startActivity(this)
         }
+    }
+
+    private fun findIndexInList(target: Int, list: ArrayList<LocationVO>): Int {
+        var index = -1
+        for (vo in list.withIndex()) {
+            if (vo.value.id == target) {
+                index = vo.index
+            }
+        }
+
+        return index
     }
 }

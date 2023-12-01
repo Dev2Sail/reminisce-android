@@ -2,6 +2,7 @@ package studio.hcmc.reminisce.ui.activity.setting
 
 import android.app.Activity
 import android.view.LayoutInflater
+import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.DialogAddFriendBinding
 import studio.hcmc.reminisce.ui.view.BottomSheetDialog
 
@@ -17,15 +18,12 @@ class AddFriendDialog(
     init {
         val viewBinding = DialogAddFriendBinding.inflate(LayoutInflater.from(activity))
         val dialog = BottomSheetDialog(activity, viewBinding)
-        val builder = StringBuilder()
-        builder.append(nickname)
-        builder.append("님을 친구로 등록할까요?")
-        viewBinding.dialogAddFriendBody.text = builder.toString()
+        viewBinding.dialogAddFriendBody.text = activity.getString(R.string.add_friend_question, nickname)
+        viewBinding.dialogAddFriendCancel.setOnClickListener { dialog.dismiss() }
         viewBinding.dialogAddFriendAdd.setOnClickListener {
             dialog.dismiss()
             delegate.onAddClick(opponentId)
         }
-        viewBinding.dialogAddFriendCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 }

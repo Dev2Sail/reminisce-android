@@ -23,9 +23,7 @@ class FriendTagHeaderViewHolder(
         viewBinding.apply {
             cardCommonDetailHeaderTitle.text = content.title
             cardCommonDetailHeaderAction1.text = viewBinding.root.context.getString(R.string.header_action)
-            cardCommonDetailHeaderAction1.setOnClickListener {
-                delegate.onEditClick()
-            }
+            cardCommonDetailHeaderAction1.setOnClickListener { delegate.onEditClick() }
         }
     }
 }

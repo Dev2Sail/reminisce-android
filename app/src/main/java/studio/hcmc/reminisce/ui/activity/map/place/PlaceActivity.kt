@@ -49,7 +49,7 @@ class PlaceActivity : AppCompatActivity() {
     private fun loadLocations(value: String) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(this@PlaceActivity)
         val result = runCatching { LocationIO.listByUserIdAndTitle(user.id, value, Int.MAX_VALUE) }
-            .onSuccess { it ->
+            .onSuccess {
                 locations = it
                 for (vo in it) {
                     friends[vo.id] = FriendIO.listByUserIdAndLocationId(user.id, vo.id)
@@ -68,7 +68,11 @@ class PlaceActivity : AppCompatActivity() {
             val (year, month) = date.split("-")
             contents.add(PlaceAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
             for (location in locations.sortedByDescending { it.id }) {
-                contents.add(PlaceAdapter.DetailContent(location, tags[location.id].orEmpty(), friends[location.id].orEmpty()))
+                contents.add(PlaceAdapter.DetailContent(
+                    location,
+                    tags[location.id].orEmpty(),
+                    friends[location.id].orEmpty()
+                ))
             }
         }
     }
@@ -85,12 +89,14 @@ class PlaceActivity : AppCompatActivity() {
     }
 
     private val summaryDelegate = object : PlaceItemViewHolder.Delegate {
-        override fun onItemClick(locationId: Int, title: String) {
-            Intent(this@PlaceActivity, WriteDetailActivity::class.java).apply {
-                putExtra("locationId", locationId)
-                putExtra("title", title)
-                startActivity(this)
-            }
+        override fun onItemClick(locationId: Int, title: String) { moveToWriteDetail(locationId, title) }
+    }
+
+    private fun moveToWriteDetail(locationId: Int, title: String) {
+        Intent(this@PlaceActivity, WriteDetailActivity::class.java).apply {
+            putExtra("locationId", locationId)
+            putExtra("title", title)
+            startActivity(this)
         }
     }
 }
