@@ -7,7 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityWriteSelectFriendBinding
@@ -15,20 +18,29 @@ import studio.hcmc.reminisce.dto.location.LocationFriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationFriendIO
+import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
+import studio.hcmc.reminisce.vo.user.UserVO
 
 class WriteOptionFriendActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteSelectFriendBinding
-    private lateinit var friends: List<FriendVO>
+    private lateinit var adapter: WriteOptionsFriendAdapter
+    private lateinit var user: UserVO
 
     private val context = this
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
 
-    private val selectedFriendIds = HashSet<Int>()
+    private val friends = ArrayList<FriendVO>()
+    private val checkedOpponentIds = HashMap<Int /* opponentId */, Boolean>()
+
+    private val selectedOpponentIds = HashSet<Int>()
     private val preparePostIds = ArrayList<Int>()
     private val contents = ArrayList<WriteOptionsFriendAdapter.Content>()
+    private val mutex = Mutex()
+    private var hasMoreContents = true
+    private var lastLoadedAt = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,46 +53,97 @@ class WriteOptionFriendActivity : AppCompatActivity() {
         viewBinding.writeSelectFriendAppbar.appbarTitle.text = getText(R.string.card_home_tag_friend_title)
         viewBinding.writeSelectFriendAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { patchContents() }
-        prepareFriends()
-        prepareSavedFriends()
-    }
-
-    private fun prepareFriends() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(context)
-        val result = runCatching { FriendIO.listByUserId(user.id, Int.MAX_VALUE,false) }
-            .onSuccess { friends = it }
-            .onFailure { LocalLogger.e(it) }
-        if (result.isSuccess) {
-            prepareContents()
-            withContext(Dispatchers.Main) { onContentsReady() }
-        }
-    }
-
-    private fun prepareSavedFriends() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(context)
-        runCatching { FriendIO.listByUserIdAndLocationId(user.id, locationId) }
-            .onSuccess {
-                for (vo in it) {
-                    selectedFriendIds.add(vo.opponentId)
-                }
-            }.onFailure { LocalLogger.e(it) }
-    }
-
-    private fun prepareContents() {
-        for (friend in friends) {
-            contents.add(WriteOptionsFriendAdapter.DetailContent(friend.opponentId, friend.nickname!!))
-        }
-    }
-
-    private fun onContentsReady() {
         viewBinding.writeSelectFriendItems.layoutManager = LinearLayoutManager(this)
-        viewBinding.writeSelectFriendItems.adapter = WriteOptionsFriendAdapter(adapterDelegate, friendItemDelegate)
+        CoroutineScope(Dispatchers.IO).launch { loadContents() }
+    }
+
+    private suspend fun prepareUser(): UserVO {
+        if (!this::user.isInitialized) {
+            user = UserExtension.getUser(this)
+        }
+
+        return user
+    }
+
+    private suspend fun loadContents() = mutex.withLock {
+        val user = prepareUser()
+        val lastId = friends.lastOrNull()?.opponentId ?: Int.MAX_VALUE
+        val delay = System.currentTimeMillis() - lastLoadedAt - 2000
+        if (delay < 0) {
+            delay(-delay)
+        }
+
+        if (!hasMoreContents) {
+            return
+        }
+
+        try {
+            // userId의 모든 친구 목록
+            val fetched = FriendIO.listByUserId(user.id, lastId, false)
+            // 해당 location에 등록돼있는 friend
+            val saved = FriendIO.listByUserIdAndLocationId(user.id, locationId)
+            for (friend in fetched.sortedByDescending { it.opponentId }) {
+                friends.add(friend)
+                checkedOpponentIds[friend.opponentId] = false
+            }
+            for (friend in saved) {
+                checkedOpponentIds[friend.opponentId] = true
+                selectedOpponentIds.add(friend.opponentId)
+            }
+
+            hasMoreContents = fetched.size > 10
+            val preSize = contents.size
+            val size = prepareContents(fetched)
+            withContext(Dispatchers.Main) { onContentsReady(preSize, size) }
+            lastLoadedAt = System.currentTimeMillis()
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+            withContext(Dispatchers.Main) { onError() }
+        }
+    }
+
+    private fun onError() {
+        CommonError.onMessageDialog(this,  getString(R.string.dialog_error_common_list_body))
+    }
+
+    private fun prepareContents(fetched: List<FriendVO>): Int {
+        if (contents.lastOrNull() is WriteOptionsFriendAdapter.ProgressContent) {
+            contents.removeLast()
+        }
+
+        var size = 0
+        for (friend in fetched) {
+            val content = WriteOptionsFriendAdapter.DetailContent(friend.opponentId, friend.nickname!!)
+            contents.add(content)
+        }
+        size += fetched.size
+
+        if (hasMoreContents) {
+            contents.add(WriteOptionsFriendAdapter.ProgressContent)
+        }
+
+        return size
+    }
+
+    private fun onContentsReady(preSize: Int, size: Int) {
+        if (!this::adapter.isInitialized) {
+            viewBinding.writeSelectFriendItems.adapter = WriteOptionsFriendAdapter(
+                adapterDelegate,
+                friendItemDelegate
+            )
+            return
+        }
+
+        adapter.notifyItemRangeInserted(preSize, size)
     }
 
     private fun preparePost(): LocationFriendDTO.Post {
-        for (id in selectedFriendIds) {
-            preparePostIds.add(id)
+        for (opponent in checkedOpponentIds) {
+            if (opponent.value) {
+                preparePostIds.add(opponent.key)
+            }
         }
+
         val dto = LocationFriendDTO.Post().apply {
             this.locationId = context.locationId
             this.opponentIds = context.preparePostIds
@@ -91,17 +154,26 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     private fun patchContents() = CoroutineScope(Dispatchers.IO).launch {
         val dto = preparePost()
         val body = ArrayList<String>()
-        for (friend in friends) {
-            for (id in selectedFriendIds) {
-                if (friend.opponentId == id) {
-                    body.add(friend.nickname!!)
-                }
+        for (opponent in checkedOpponentIds) {
+            if (opponent.value) {
+                body.add(prepareBody(opponent.key, friends))
             }
         }
         LocalLogger.v("body ${body.joinToString { it }}")
         runCatching { LocationFriendIO.post(dto) }
             .onSuccess { toOptions(body.joinToString { it }) }
             .onFailure { LocalLogger.e(it) }
+    }
+
+    private fun prepareBody(target: Int, friends: List<FriendVO>): String {
+        val name = ""
+        for (friend in friends) {
+            if (friend.opponentId == target) {
+                return friend.nickname!!
+            }
+        }
+
+        return name
     }
 
     private fun toOptions(body: String) {
@@ -113,24 +185,27 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     }
 
     private val adapterDelegate = object : WriteOptionsFriendAdapter.Delegate {
+        override fun hasMoreContents() = hasMoreContents
+        override fun getMoreContents() { CoroutineScope(Dispatchers.IO).launch { loadContents() } }
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }
 
     private val friendItemDelegate = object : WriteOptionFriendItemViewHolder.Delegate {
         override fun onItemClick(opponentId: Int): Boolean {
-            if (!selectedFriendIds.add(opponentId)) {
-                selectedFriendIds.remove(opponentId)
+            if (checkedOpponentIds[opponentId]!!) {
+                checkedOpponentIds[opponentId] = false
 
                 return false
-            }
+            } else {
+                checkedOpponentIds[opponentId] = true
 
-            return true
+                return true
+            }
         }
 
-        override fun validate(opponentId: Int): Boolean {
-            return selectedFriendIds.contains(opponentId)
+        override fun isChecked(opponentId: Int): Boolean {
+            return checkedOpponentIds[opponentId]!!
         }
     }
 }
-// TODO 기존에 선택돼있던 친구 삭제가 안 됨

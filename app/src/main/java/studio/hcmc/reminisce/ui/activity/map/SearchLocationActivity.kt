@@ -51,7 +51,7 @@ class SearchLocationActivity : AppCompatActivity() {
         viewBinding.searchLocationField.editText!!.setOnEditorActionListener { _, actionId, event ->
             val input = viewBinding.searchLocationField.string
             if (actionId == EditorInfo.IME_ACTION_SEARCH || event.keyCode == KeyEvent.KEYCODE_SEARCH && event.action == KeyEvent.ACTION_DOWN) {
-                contents.removeAll {it is SearchLocationAdapter.Content}
+                contents.clear()
                 loadContentsByKakao(input)
                 return@setOnEditorActionListener true
             }

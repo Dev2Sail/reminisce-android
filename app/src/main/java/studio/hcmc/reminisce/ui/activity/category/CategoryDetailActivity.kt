@@ -358,13 +358,13 @@ class CategoryDetailActivity : AppCompatActivity() {
     }
 
     private fun findIndexInList(target: Int, list: ArrayList<LocationVO>): Int {
-        var index = -1
-        for (vo in list.withIndex()) {
-            if (vo.value.id == target) {
-               index = vo.index
+        var finalIndex = -1
+        for ((index, location) in list.withIndex()) {
+            if (location.id == target) {
+                finalIndex = index
             }
         }
 
-        return index
+        return finalIndex
     }
 }

@@ -55,7 +55,6 @@ class CategoryDetailAdapter(
         recyclerView.removeOnScrollListener(onScrollListener)
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when(viewType) {
         0 -> CategoryDetailHeaderViewHolder(parent, headerDelegate)
         1 -> CategoryDateViewHolder(parent)
@@ -74,7 +73,7 @@ class CategoryDetailAdapter(
         else -> unknownViewHolder(holder, position)
     }
 
-    override fun getItemViewType(position: Int) = when (adapterDelegate.getItem(position)) {
+    override fun getItemViewType(position: Int) = when(adapterDelegate.getItem(position)) {
         is HeaderContent -> 0
         is DateContent -> 1
         is DetailContent -> 2

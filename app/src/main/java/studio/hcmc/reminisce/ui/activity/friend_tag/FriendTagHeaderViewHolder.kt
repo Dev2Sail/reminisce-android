@@ -20,10 +20,8 @@ class FriendTagHeaderViewHolder(
     )
 
     fun bind(content: FriendTagAdapter.HeaderContent) {
-        viewBinding.apply {
-            cardCommonDetailHeaderTitle.text = content.title
-            cardCommonDetailHeaderAction1.text = viewBinding.root.context.getString(R.string.header_action)
-            cardCommonDetailHeaderAction1.setOnClickListener { delegate.onEditClick() }
-        }
+        viewBinding.cardCommonDetailHeaderTitle.text = content.title
+        viewBinding.cardCommonDetailHeaderAction1.text = viewBinding.root.context.getString(R.string.header_action)
+        viewBinding.cardCommonDetailHeaderAction1.setOnClickListener { delegate.onEditClick() }
     }
 }

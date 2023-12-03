@@ -19,10 +19,12 @@ import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
+import studio.hcmc.reminisce.vo.user.UserVO
 import java.sql.Date
 
 class ReportActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityReportBinding
+    private lateinit var user: UserVO
     private lateinit var friends: List<FriendVO>
     private lateinit var serviceAreas: List<LocationVO>
     private lateinit var beachList: List<LocationVO>
@@ -42,35 +44,20 @@ class ReportActivity : AppCompatActivity() {
         viewBinding.reportHeader.commonHeaderAction1.isGone = true
         viewBinding.reportHeader.commonHeaderTitle.text = getString(R.string.nav_main_report)
         loadContents()
+
     }
 
-    // 모든 변수는 서로에게 영향 끼치지 않음
-    private fun test() = CoroutineScope(Dispatchers.IO).async {
-        val user = UserExtension.getUser(this@ReportActivity)
-        runCatching { FriendIO.mostStoredInLocationByUserId(user.id) }
-    }
+    private suspend fun prepareUser(): UserVO {
+        if (!this::user.isInitialized) {
+            user = UserExtension.getUser(this)
+        }
 
-//    private suspend fun test1() = coroutineScope {
-//        val user = UserExtension.getUser(this@ReportActivity)
-//        // 개별적이니까 바로 await?
-//        friends = async { FriendIO.mostStoredInLocationByUserId(user.id) }.await()
-//        serviceAreas = async { LocationIO.serviceAreaListByUserId(user.id, Int.MAX_VALUE) }.await()
-//        beachList = async { LocationIO.beachListByUserId(user.id, Int.MAX_VALUE) }.await()
-//        val today = Date(System.currentTimeMillis()).toString()
-//        val aYearAgoToday = buildString {
-//            append(today.substring(0, 3))
-//            append(today[3].digitToInt() - 1)
-//            append(today.substring(4, 10))
-//        }
-//        val yearAgoDeferred = async { LocationIO.yearAgoTodayByUserIdAndDate(user.id, aYearAgoToday) }.await()
-//        for (vo in yearAgoDeferred) {
-//            yearAgoToday.add(vo)
-//        }
-//    }
+        return user
+    }
 
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
         val result = runCatching {
-            val user = UserExtension.getUser(this@ReportActivity)
+            val user = prepareUser()
             // 개별적이니까 바로 await?
             friends = async { FriendIO.mostStoredInLocationByUserId(user.id) }.await()
             serviceAreas = async { LocationIO.serviceAreaListByUserId(user.id, Int.MAX_VALUE) }.await()
@@ -85,7 +72,9 @@ class ReportActivity : AppCompatActivity() {
             if (yearAgoDeferred.await().isNotEmpty()) {
                 todayFlag = true
             }
-        }.onFailure { LocalLogger.e(it) }
+        }.onFailure {
+            LocalLogger.e(it)
+        }
         if (result.isSuccess) {
             withContext(Dispatchers.Main) { prepareContents() }
         }
@@ -102,7 +91,7 @@ class ReportActivity : AppCompatActivity() {
         val beachCnt = beachList.distinctBy { it.title }.size
         viewBinding.reportOceanBody.text = getString(R.string.report_ocean_body, beachCnt)
         viewBinding.reportOceanContainer.setOnClickListener {
-            moveToInternalDetail(true, serviceArea = false)
+            moveToInternalDetail(beach = true, serviceArea = false)
         }
 
         // 휴게소 : https://www.data.go.kr/data/15025446/standard.do#tab_layer_grid
@@ -161,11 +150,3 @@ class ReportActivity : AppCompatActivity() {
         }
     }
 }
-/*
-        try {
-            CoroutineScope(Dispatchers.IO).launch { test3() }
-        } catch (e: Throwable) {
-            LocalLogger.e(e)
-        }
-        prepareContents()
- */

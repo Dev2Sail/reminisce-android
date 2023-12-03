@@ -9,7 +9,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityFriendsBinding
@@ -17,6 +20,7 @@ import studio.hcmc.reminisce.dto.friend.FriendDTO
 import studio.hcmc.reminisce.ext.user.UserExtension
 import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.UserIO
+import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.util.navigationController
 import studio.hcmc.reminisce.vo.friend.FriendVO
@@ -25,11 +29,15 @@ import studio.hcmc.reminisce.vo.user.UserVO
 class FriendsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityFriendsBinding
     private lateinit var adapter: FriendsAdapter
+    private lateinit var user: UserVO
 
     private val context = this
     private val friends = ArrayList<FriendVO>()
     private val users = HashMap<Int /* userId */, UserVO>()
     private var contents = ArrayList<FriendsAdapter.Content>()
+    private val mutex = Mutex()
+    private var hasMoreContents = true
+    private var lastLoadedAt = 0L
 
     private val addFriendLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onAddFriendResult)
 
@@ -47,41 +55,82 @@ class FriendsActivity : AppCompatActivity() {
         viewBinding.friendsAppbar.appbarActionButton1.isVisible = false
         viewBinding.friendsAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.friendsSearch.setOnClickListener { launchAddFriend() }
-        loadContents()
+        viewBinding.friendsItems.layoutManager = LinearLayoutManager(this)
+
     }
 
-    private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(context)
-        val result = runCatching { FriendIO.listByUserId(user.id, Int.MAX_VALUE, false) }
-            .onSuccess { it ->
-                for (friend in it.sortedBy { it.nickname }) {
-                    friends.add(friend)
-                    users[friend.opponentId] = UserIO.getById(friend.opponentId)
-                }
-            }.onFailure { LocalLogger.e(it) }
-        if (result.isSuccess) {
-            prepareContents()
-            withContext(Dispatchers.Main) { onContentsReady() }
+    private suspend fun prepareUser(): UserVO {
+        if (!this::user.isInitialized) {
+            user = UserExtension.getUser(this)
+        }
+
+        return user
+    }
+
+    private suspend fun loadContents() = mutex.withLock {
+        val user = prepareUser()
+        val lastId = friends.lastOrNull()?.opponentId ?: Int.MAX_VALUE
+        val delay = System.currentTimeMillis() - lastLoadedAt - 2000
+        if (delay < 0) {
+            delay(-delay)
+        }
+
+        if (!hasMoreContents) {
+            return
+        }
+
+        try {
+            val fetchedFriends = FriendIO.listByUserId(user.id, lastId, false)
+            for (friend in fetchedFriends.sortedByDescending { it.opponentId }) {
+                friends.add(friend)
+                val opponent = UserIO.getById(friend.opponentId)
+                users[friend.opponentId] = opponent
+            }
+
+            hasMoreContents = fetchedFriends.size > 10
+            val preSize = contents.size
+            val size = prepareContents(fetchedFriends)
+            withContext(Dispatchers.Main) { onContentsReady(preSize, size) }
+            lastLoadedAt = System.currentTimeMillis()
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+            withContext(Dispatchers.Main) { onError() }
         }
     }
 
-    private fun loadMoreContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(context)
-        val lastId = friends.sortedByDescending { it.opponentId }[0].opponentId
-
+    private fun onError() {
+        CommonError.onMessageDialog(this,  getString(R.string.dialog_error_common_list_body))
     }
 
-    private fun prepareContents() {
-        friends.forEach { contents.add(FriendsAdapter.DetailContent(it)) }
+    private fun prepareContents(fetched: List<FriendVO>): Int {
+        if (contents.lastOrNull() is FriendsAdapter.ProgressContent) {
+            contents.removeLast()
+        }
+
+        var size = 0
+        fetched.forEach { contents.add(FriendsAdapter.DetailContent(it)) }
+        size += fetched.size
+
+        if (hasMoreContents) {
+            contents.add(FriendsAdapter.ProgressContent)
+        }
+
+        return size
     }
 
-    private fun onContentsReady() {
-        viewBinding.friendsItems.layoutManager = LinearLayoutManager(this)
-        adapter = FriendsAdapter(adapterDelegate, itemDelegate)
-        viewBinding.friendsItems.adapter = adapter
+    private fun onContentsReady(preSize: Int, size: Int) {
+        if (!this::adapter.isInitialized) {
+            adapter = FriendsAdapter(adapterDelegate, itemDelegate)
+            viewBinding.friendsItems.adapter = adapter
+            return
+        }
+
+        adapter.notifyItemRangeInserted(preSize, size)
     }
 
     private val adapterDelegate = object : FriendsAdapter.Delegate {
+        override fun hasMoreContents() = hasMoreContents
+        override fun getMoreContents() { CoroutineScope(Dispatchers.IO).launch { loadContents() } }
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }
@@ -168,5 +217,16 @@ class FriendsActivity : AppCompatActivity() {
                 contents.add(FriendsAdapter.DetailContent(it))
                 withContext(Dispatchers.Main) { adapter.notifyItemInserted(friends.size) }
             }.onFailure { LocalLogger.e(it) }
+    }
+
+    private fun findIndexInList(target: Int, list: List<FriendVO>): Int {
+        var finalIndex = -1
+        for ((index, friend) in list.withIndex()) {
+            if (friend.opponentId == target) {
+                finalIndex = index
+            }
+        }
+
+        return finalIndex
     }
 }

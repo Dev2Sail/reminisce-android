@@ -165,9 +165,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun moveToPlace(value: String) {
+    private fun moveToPlace(placeName: String) {
         Intent(this, PlaceActivity::class.java).apply {
-            putExtra("location", value)
+            putExtra("placeName", placeName)
             startActivity(this)
         }
     }

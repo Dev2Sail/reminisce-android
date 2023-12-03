@@ -30,9 +30,6 @@
             android:name=".ui.activity.map.place.PlaceActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.map.MapTestActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.activity.friend_tag.editable.FriendTagEditableDetailActivity"
             android:exported="false" />
         <activity

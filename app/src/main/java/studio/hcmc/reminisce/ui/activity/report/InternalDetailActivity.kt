@@ -5,10 +5,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityReportBeachDetailBinding
@@ -17,14 +20,17 @@ import studio.hcmc.reminisce.io.ktor_client.FriendIO
 import studio.hcmc.reminisce.io.ktor_client.LocationIO
 import studio.hcmc.reminisce.io.ktor_client.TagIO
 import studio.hcmc.reminisce.ui.activity.writer.detail.WriteDetailActivity
+import studio.hcmc.reminisce.ui.view.CommonError
 import studio.hcmc.reminisce.util.LocalLogger
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
+import studio.hcmc.reminisce.vo.user.UserVO
 
 class InternalDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityReportBeachDetailBinding
     private lateinit var adapter: InternalDetailAdapter
+    private lateinit var user: UserVO
 
     private val beachFlag by lazy { intent.getBooleanExtra("beach", false) }
     private val serviceAreaFlag by lazy { intent.getBooleanExtra("serviceArea", false) }
@@ -33,6 +39,9 @@ class InternalDetailActivity : AppCompatActivity() {
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<InternalDetailAdapter.Content>()
+    private val mutex = Mutex()
+    private var hasMoreContents = true
+    private var lastLoadedAt = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,61 +52,132 @@ class InternalDetailActivity : AppCompatActivity() {
 
     private fun initView() {
         viewBinding.reportDetailBeachAppbar.appbarBack.setOnClickListener { finish() }
+        viewBinding.reportDetailBeachItems.layoutManager = LinearLayoutManager(this)
+        viewBinding.reportDetailBeachAppbar.appbarTitle.text = getString(R.string.nav_main_report)
+
         if (beachFlag && !serviceAreaFlag) {
             viewBinding.reportDetailBeachAppbar.appbarTitle.text = getString(R.string.report_ocean)
-            loadContents(true)
         } else if (!beachFlag && serviceAreaFlag) {
             viewBinding.reportDetailBeachAppbar.appbarTitle.text = getString(R.string.report_service_area)
-            loadContents(false)
         }
         viewBinding.reportDetailBeachAppbar.appbarActionButton1.isVisible = false
+        CoroutineScope(Dispatchers.IO).launch { loadContents() }
     }
 
-    private fun loadContents(flag: Boolean) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@InternalDetailActivity)
-        val result = runCatching {
-            val locationDeferredWrapper = if (flag) {
-                async { LocationIO.beachListByUserId(user.id, Int.MAX_VALUE) }
-            } else {
-                async { LocationIO.serviceAreaListByUserId(user.id, Int.MAX_VALUE) }
-            }
+    private suspend fun prepareUser(): UserVO {
+        if (!this::user.isInitialized) {
+            user = UserExtension.getUser(this)
+        }
 
-            val locationDeferred = locationDeferredWrapper.await()
-            for (location in locationDeferred) {
+        return user
+    }
+
+    private suspend fun fetch(): List<LocationVO> {
+        val user = prepareUser()
+        val lastId = locations.lastOrNull()?.id ?: Int.MAX_VALUE
+        return when {
+            beachFlag && !serviceAreaFlag -> LocationIO.beachListByUserId(user.id, lastId)
+            !beachFlag && serviceAreaFlag -> LocationIO.serviceAreaListByUserId(user.id, lastId)
+            else -> { throw IOException() }
+        }
+    }
+
+    private suspend fun loadContents() = mutex.withLock {
+        val delay = System.currentTimeMillis() - lastLoadedAt - 2000
+        if (delay < 0) {
+            delay(-delay)
+        }
+
+        if (!hasMoreContents) {
+            return
+        }
+
+        try {
+            val fetched = fetch().sortedByDescending { it.id }
+            for (location in fetched) {
                 locations.add(location)
-                val tagsDeferred = async { TagIO.listByLocationId(location.id) }
-                val friendsDeferred = async { FriendIO.listByUserIdAndLocationId(user.id, location.id) }
-                tagInfo[location.id] = tagsDeferred.await()
-                friendInfo[location.id] = friendsDeferred.await()
+                tagInfo[location.id] = TagIO.listByLocationId(location.id)
+                friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
             }
-        }.onFailure { LocalLogger.e(it) }
-        if (result.isSuccess) {
-            prepareContents()
-            withContext(Dispatchers.Main) { onContentsReady() }
+
+            hasMoreContents = fetched.size > 10
+            val preSize = contents.size
+            val size = prepareContents(fetched)
+            withContext(Dispatchers.Main) { onContentsReady(preSize, size) }
+            lastLoadedAt = System.currentTimeMillis()
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+            withContext(Dispatchers.Main) { onError() }
         }
     }
 
-    private fun prepareContents() {
-        for ((date, locations) in locations.groupBy { it.createdAt.toString().substring(0, 7) }.entries) {
+    private fun onError() {
+        CommonError.onMessageDialog(this,  getString(R.string.dialog_error_common_list_body))
+    }
+
+    private fun prepareContents(fetched: List<LocationVO>): Int {
+        if (contents.lastOrNull() is InternalDetailAdapter.ProgressContent) {
+            contents.removeLast()
+        }
+
+        if (contents.isEmpty()) {
+            when {
+                beachFlag && !serviceAreaFlag -> contents.add(InternalDetailAdapter.HeaderContent(getString(R.string.report_ocean)))
+                !beachFlag && serviceAreaFlag -> contents.add(InternalDetailAdapter.HeaderContent(getString(R.string.report_service_area)))
+            }
+        }
+
+        val group = fetched.groupByTo(HashMap()) { it.createdAt.toString().substring(0, 7) }
+        var size = 0
+        val lastDetailContent = contents.lastOrNull() as? InternalDetailAdapter.DetailContent
+        if (lastDetailContent != null) {
+            val list = group.remove(lastDetailContent.location.createdAt.toString().substring(0, 7))
+            if (list != null) {
+                size += list.size
+                addDetailContents(list)
+            }
+        }
+
+        for ((date, locations) in group) {
             val (year, month) = date.split("-")
-            contents.add(InternalDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.trim('0'))))
-            for (location in locations.sortedByDescending { it.id }) {
-                contents.add(InternalDetailAdapter.DetailContent(
-                    location,
-                    tagInfo[location.id].orEmpty(),
-                    friendInfo[location.id].orEmpty()
-                ))
-            }
+            size++
+            contents.add(InternalDetailAdapter.DateContent(getString(R.string.card_date_separator, year, month.removePrefix("0"))))
+            size += locations.size
+            addDetailContents(locations)
+        }
+
+        if (hasMoreContents) {
+            contents.add(InternalDetailAdapter.ProgressContent)
+        }
+
+        return size
+    }
+
+    private fun addDetailContents(locations: List<LocationVO>) {
+        for (location in locations) {
+            val content = InternalDetailAdapter.DetailContent(
+                location = location,
+                tags = tagInfo[location.id].orEmpty(),
+                friends = friendInfo[location.id].orEmpty()
+            )
+
+            contents.add(content)
         }
     }
 
-    private fun onContentsReady() {
-        viewBinding.reportDetailBeachItems.layoutManager = LinearLayoutManager(this)
-        adapter = InternalDetailAdapter(adapterDelegate, summaryDelegate)
-        viewBinding.reportDetailBeachItems.adapter = adapter
+    private fun onContentsReady(preSize: Int, size: Int) {
+        if (!this::adapter.isInitialized) {
+            adapter = InternalDetailAdapter(adapterDelegate, summaryDelegate)
+            viewBinding.reportDetailBeachItems.adapter = adapter
+            return
+        }
+
+        adapter.notifyItemRangeInserted(preSize, size)
     }
 
     private val adapterDelegate = object : InternalDetailAdapter.Delegate {
+        override fun hasMoreContents() = hasMoreContents
+        override fun getMoreContents() { CoroutineScope(Dispatchers.IO).launch { loadContents() } }
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }

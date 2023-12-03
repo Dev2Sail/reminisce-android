@@ -12,7 +12,7 @@ class WriteOptionFriendItemViewHolder(
 ): ViewHolder(viewBinding.root) {
     interface Delegate {
         fun onItemClick(opponentId: Int): Boolean
-        fun validate(opponentId: Int): Boolean
+        fun isChecked(opponentId: Int): Boolean
     }
 
     constructor(parent: ViewGroup, delegate: Delegate): this(
@@ -23,7 +23,7 @@ class WriteOptionFriendItemViewHolder(
     fun bind(content: WriteOptionsFriendAdapter.DetailContent) {
         val (opponentId, nickname) = content
         viewBinding.writeSelectFriendTitle.text = nickname
-        viewBinding.writeSelectFriendIcon.isVisible = delegate.validate(opponentId)
+        viewBinding.writeSelectFriendIcon.isVisible = delegate.isChecked(opponentId)
         viewBinding.root.setOnClickListener {
             viewBinding.writeSelectFriendIcon.isVisible = delegate.onItemClick(opponentId)
         }
