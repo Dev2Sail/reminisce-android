@@ -23,6 +23,7 @@ class CategoryDetailAdapter(
     }
 
     sealed interface Content
+
     class HeaderContent(val title: String): Content
     class DateContent(val body: String? = null): Content
     data class DetailContent(

@@ -226,7 +226,7 @@ class CategoryDetailActivity : AppCompatActivity() {
     }
 
     private fun onPatchTitle(body: String) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(context)
+        val user = prepareUser()
         val dto = CategoryDTO.Patch().apply {
             title = body
         }
@@ -245,7 +245,7 @@ class CategoryDetailActivity : AppCompatActivity() {
     private val itemDelegate= object : CategoryDetailItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String, position: Int) {
             LocalLogger.v("summary click : locationId:$locationId, title:$title, position:$position")
-            launchEditWrite(locationId, title, position)
+            launchEditWrite(locationId, title)
         }
 
         override fun onItemLongClick(locationId: Int, position: Int) {
@@ -260,7 +260,11 @@ class CategoryDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun deleteContent(locationId: Int, position: Int, locationIndex: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun deleteContent(
+        locationId: Int,
+        position: Int,
+        locationIndex: Int
+    ) = CoroutineScope(Dispatchers.IO).launch {
         runCatching { LocationIO.delete(locationId) }
             .onSuccess {
                 locations.removeAt(locationIndex)
@@ -295,10 +299,9 @@ class CategoryDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun launchEditWrite(locationId: Int, title: String, position: Int) {
+    private fun launchEditWrite(locationId: Int, title: String) {
         val intent = Intent(this, WriteDetailActivity::class.java)
             .putExtra("locationId", locationId)
-            .putExtra("position", position)
             .putExtra("title", title)
         editWriteLauncher.launch(intent)
     }
@@ -307,32 +310,31 @@ class CategoryDetailActivity : AppCompatActivity() {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
             val locationId = activityResult.data?.getIntExtra("locationId", -1)
             val categoryId = activityResult.data?.getIntExtra("categoryId", -1)
-            val position = activityResult.data?.getIntExtra("position", -1)
-            patchLocation(locationId!!, position!!, findIndexInList(locationId, locations), categoryId!!)
+            patchLocation(locationId!!, findIndexInList(locationId, locations), categoryId!!)
         }
     }
 
     private fun patchLocation(
         locationId: Int,
-        position: Int,
         locationIndex: Int,
         categoryId: Int
     ) = CoroutineScope(Dispatchers.IO).launch {
         val user = UserExtension.getUser(context)
         runCatching { LocationIO.getById(locationId) }
-            .onSuccess {
-                locations[locationIndex] = it
-                friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                tagInfo[it.id] = TagIO.listByLocationId(it.id)
+            .onSuccess { location ->
+                locations[locationIndex] = location
+                friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
+                tagInfo[location.id] = TagIO.listByLocationId(location.id)
                 val content = CategoryDetailAdapter.DetailContent(
-                    it,
-                    tagInfo[it.id].orEmpty(),
-                    friendInfo[it.id].orEmpty()
+                    location,
+                    tagInfo[location.id].orEmpty(),
+                    friendInfo[location.id].orEmpty()
                 )
+                val position = contents.indexOfFirst { it is CategoryDetailAdapter.DetailContent && it.location.id == locationId }
                 contents[position] = content
                 withContext(Dispatchers.Main) {
                     adapter.notifyItemChanged(position)
-                    if (categoryId != it.categoryId) {
+                    if (categoryId != location.categoryId) {
                         viewBinding.categoryDetailAppbar.appbarBack.setOnClickListener { launchModifiedHome() }
                     }
                 }

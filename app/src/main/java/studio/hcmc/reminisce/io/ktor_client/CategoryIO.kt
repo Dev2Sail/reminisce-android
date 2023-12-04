@@ -58,7 +58,15 @@ object CategoryIO {
             .body()
     }
 
-    suspend fun listByUserId(userId: Int): List<CategoryVO> {
+    suspend fun listByUserId(userId: Int, lastId: Int): List<CategoryVO> {
+        return httpClient
+            .get("/category/list/all") {
+                parameter("userId", userId)
+                parameter("lastId", lastId)
+            }.body()
+    }
+
+    suspend fun allByUserId(userId: Int): List<CategoryVO> {
         return httpClient
             .get("/category/list/all") { parameter("userId", userId) }
             .body()

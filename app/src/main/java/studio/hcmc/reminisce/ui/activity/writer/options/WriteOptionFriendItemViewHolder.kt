@@ -27,5 +27,8 @@ class WriteOptionFriendItemViewHolder(
         viewBinding.root.setOnClickListener {
             viewBinding.writeSelectFriendIcon.isVisible = delegate.onItemClick(opponentId)
         }
+        viewBinding.writeSelectFriendIcon.setOnClickListener {
+            viewBinding.writeSelectFriendIcon.isVisible = delegate.onItemClick(opponentId)
+        }
     }
 }

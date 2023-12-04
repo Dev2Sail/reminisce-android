@@ -20,7 +20,11 @@ class WriteDetailOptionsViewHolder(
     fun  bind(content: WriteDetailAdapter.OptionsContent) {
         val (category, tags, friends) = content
         viewBinding.cardWriteDetailOptionsCategory.writeDetailItemIcon.setImageResource(R.drawable.round_folder_16)
-        viewBinding.cardWriteDetailOptionsCategory.writeDetailItemBody.text = category.title
+        viewBinding.cardWriteDetailOptionsCategory.writeDetailItemBody.text = when (category.title) {
+            "Default" -> viewBinding.root.context.getText(R.string.category_view_holder_title)
+            "new" -> viewBinding.root.context.getText(R.string.add_category_body)
+            else -> category.title
+        }
         if (tags != null) {
             prepareTag(tags)
         }
@@ -30,8 +34,8 @@ class WriteDetailOptionsViewHolder(
     }
 
     private fun prepareTag(tags: List<TagVO>) {
-        val tagText = tags?.withIndex()?.joinToString { it.value.body }
-        if (!tags.isNullOrEmpty()) {
+        val tagText = tags.withIndex().joinToString { it.value.body }
+        if (tags.isNotEmpty()) {
             viewBinding.cardWriteDetailOptionsTags.root.isVisible = true
             viewBinding.cardWriteDetailOptionsTags.writeDetailItemIcon.setImageResource(R.drawable.round_tag_16)
             viewBinding.cardWriteDetailOptionsTags.writeDetailItemBody.text = tagText
@@ -41,8 +45,8 @@ class WriteDetailOptionsViewHolder(
     }
 
     private fun prepareFriendTag(friends: List<FriendVO>) {
-        val friendText = friends?.joinToString { it.nickname!! }
-        if (!friends.isNullOrEmpty()) {
+        val friendText = friends.joinToString { it.nickname!! }
+        if (friends.isNotEmpty()) {
             viewBinding.cardWriteDetailOptionsFriends.root.isVisible = true
             viewBinding.cardWriteDetailOptionsFriends.writeDetailItemIcon.setImageResource(R.drawable.round_group_16)
             viewBinding.cardWriteDetailOptionsFriends.writeDetailItemBody.text = friendText

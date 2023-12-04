@@ -62,7 +62,7 @@ class HomeActivity : AppCompatActivity() {
         val result = runCatching {
             val user = UserExtension.getUser(context)
             listOf(
-                launch { categories.addAll(CategoryIO.listByUserId(user.id).sortedBy { it.sortOrder }) },
+                launch { categories.addAll(CategoryIO.allByUserId(user.id).sortedBy { it.sortOrder }) },
                 launch { tags.addAll(TagIO.listByUserId(user.id).sortedByDescending { it.id }) },
                 launch { friends.addAll(FriendIO.distinctListByUserId(user.id).sortedBy { it.nickname }) }
 //                launch { LocationFriendIO.listByUserId(user.id).mapTo(friendTagOpponentIds) { it.opponentId } }
@@ -200,8 +200,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val friendTagDelegate = object : FriendTagViewHolder.Delegate {
-        override fun onItemClick(opponentId: Int, nickname: String) {
-            launchFriendTagDetail(opponentId, nickname)
+        override fun onItemClick(opponentId: Int) {
+            launchFriendTagDetail(opponentId)
         }
 
         override fun onItemLongClick(opponentId: Int, friendIndex: Int, position: Int) {
@@ -248,10 +248,9 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun launchFriendTagDetail(opponentId: Int, nickname: String) {
+    private fun launchFriendTagDetail(opponentId: Int) {
         val intent = Intent(this, FriendTagDetailActivity::class.java)
             .putExtra("opponentId", opponentId)
-            .putExtra("nickname", nickname)
         friendDetailLauncher.launch(intent)
     }
 

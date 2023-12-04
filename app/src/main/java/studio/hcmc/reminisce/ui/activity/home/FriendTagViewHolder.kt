@@ -14,7 +14,7 @@ class FriendTagViewHolder(
     private val delegate: Delegate
 ) : ViewHolder(viewBinding.root) {
     interface Delegate {
-        fun onItemClick(opponentId: Int, nickname: String)
+        fun onItemClick(opponentId: Int)
         fun onItemLongClick(opponentId: Int, friendIdx: Int, position: Int)
     }
 
@@ -41,7 +41,7 @@ class FriendTagViewHolder(
         chipToAttach.isCheckable = false
         chipToAttach.isSelected = true
         chipToAttach.setOnClickListener {
-            delegate.onItemClick(friend.opponentId, friend.nickname!!)
+            delegate.onItemClick(friend.opponentId)
         }
         chipToAttach.setOnLongClickListener {
             delegate.onItemLongClick(friend.opponentId, index, bindingAdapterPosition)

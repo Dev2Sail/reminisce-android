@@ -3,6 +3,7 @@ package studio.hcmc.reminisce.ui.activity.friend_tag
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -39,7 +40,6 @@ class FriendTagDetailActivity : AppCompatActivity() {
     private lateinit var user: UserVO
 
     private val opponentId by lazy { intent.getIntExtra("opponentId", -1) }
-    private val nickname by lazy { intent.getStringExtra("nickname") }
 
     private val context = this
     private val locations = ArrayList<LocationVO>()
@@ -51,6 +51,8 @@ class FriendTagDetailActivity : AppCompatActivity() {
     private var lastLoadedAt = 0L
 
     private val friendTagEditableLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onModifiedResult)
+    private val writeDetailLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onWriteDetailResult)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityFriendTagDetailBinding.inflate(layoutInflater)
@@ -189,7 +191,7 @@ class FriendTagDetailActivity : AppCompatActivity() {
 
     private val itemDelegate = object : FriendTagItemViewHolder.Delegate {
         override fun onItemClick(locationId: Int, title: String) {
-            moveToWriteDetail(locationId, title)
+            launchWriteDetail(locationId, title)
         }
 
         override fun onItemLongClick(locationId: Int, position: Int) {
@@ -234,11 +236,21 @@ class FriendTagDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun moveToWriteDetail(locationId: Int, title: String) {
-        Intent(this, WriteDetailActivity::class.java).apply {
-            putExtra("locationId", locationId)
-            putExtra("title", title)
-            startActivity(this)
+    private fun launchWriteDetail(locationId: Int, title: String) {
+        Log.v("Reminisce", "launchWriteDetail($locationId, $title)")
+        val intent = Intent(this, WriteDetailActivity::class.java)
+            .putExtra("locationId", locationId)
+            .putExtra("title", title)
+        writeDetailLauncher.launch(intent)
+    }
+
+    private fun onWriteDetailResult(activityResult: ActivityResult) {
+        Log.v("Reminisce", "onWriteDetailResult: ${activityResult.data?.getBooleanExtra("isModified", false)}")
+        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
+            contents.clear()
+            hasMoreContents = true
+            lastLoadedAt = 0L
+            CoroutineScope(Dispatchers.IO).launch { loadContents() }
         }
     }
 

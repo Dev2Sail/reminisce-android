@@ -65,7 +65,7 @@ object LocationIO {
 
     suspend fun listByTagId(tagId: Int, lastId: Int): List<LocationVO> {
         return httpClient
-            .get("/location/list") {
+            .get("/location/tag/list") {
                 parameter("tagId", tagId)
                 parameter("lastId", lastId)
             }.body()

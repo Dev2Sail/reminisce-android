@@ -29,14 +29,12 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     private lateinit var adapter: WriteOptionsFriendAdapter
     private lateinit var user: UserVO
 
-    private val context = this
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
 
+    private val context = this
     private val friends = ArrayList<FriendVO>()
+    private val savedFriends = ArrayList<FriendVO>()
     private val checkedOpponentIds = HashMap<Int /* opponentId */, Boolean>()
-
-    private val selectedOpponentIds = HashSet<Int>()
-    private val preparePostIds = ArrayList<Int>()
     private val contents = ArrayList<WriteOptionsFriendAdapter.Content>()
     private val mutex = Mutex()
     private var hasMoreContents = true
@@ -52,7 +50,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     private fun initView() {
         viewBinding.writeSelectFriendAppbar.appbarTitle.text = getText(R.string.card_home_tag_friend_title)
         viewBinding.writeSelectFriendAppbar.appbarBack.setOnClickListener { finish() }
-        viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { patchContents() }
+        viewBinding.writeSelectFriendAppbar.appbarActionButton1.setOnClickListener { preparePatch() }
         viewBinding.writeSelectFriendItems.layoutManager = LinearLayoutManager(this)
         CoroutineScope(Dispatchers.IO).launch { loadContents() }
     }
@@ -88,7 +86,7 @@ class WriteOptionFriendActivity : AppCompatActivity() {
             }
             for (friend in saved) {
                 checkedOpponentIds[friend.opponentId] = true
-                selectedOpponentIds.add(friend.opponentId)
+                savedFriends.add(friend)
             }
 
             hasMoreContents = fetched.size > 10
@@ -138,27 +136,82 @@ class WriteOptionFriendActivity : AppCompatActivity() {
     }
 
     private fun preparePost(): LocationFriendDTO.Post {
+        val postIds = ArrayList<Int>()
         for (opponent in checkedOpponentIds) {
             if (opponent.value) {
-                preparePostIds.add(opponent.key)
+                postIds.add(opponent.key)
             }
         }
 
         val dto = LocationFriendDTO.Post().apply {
             this.locationId = context.locationId
-            this.opponentIds = context.preparePostIds
+            this.opponentIds = postIds
         }
         return dto
     }
 
-    private fun patchContents() = CoroutineScope(Dispatchers.IO).launch {
+    private fun prepareDeleteFriend(): List<Int> {
+        val removeIds = ArrayList<Int>()
+        for (id in checkedOpponentIds) {
+            if (!id.value) {
+                removeIds.add(findOpponentId(id.key, savedFriends))
+            }
+        }
+
+        return removeIds.filterNot { it == -1 }
+    }
+
+    private fun findOpponentId(target: Int, friends: List<FriendVO>): Int {
+        var friendIndex = -1
+        for (friend in friends) {
+            if (friend.opponentId == target) {
+                friendIndex = friend.opponentId
+            }
+        }
+
+        return friendIndex
+    }
+
+    private fun preparePatch() {
         val dto = preparePost()
+        val removeIds = prepareDeleteFriend()
+        when {
+            dto.opponentIds.isNotEmpty() && removeIds.isNotEmpty() -> {
+                consumeRemoveId(removeIds)
+                patchContents(dto)
+            }
+            dto.opponentIds.isNotEmpty() && removeIds.isEmpty() -> patchContents(dto)
+            dto.opponentIds.isEmpty() && removeIds.isNotEmpty() -> {
+                consumeRemoveId(removeIds)
+                toOptions(null)
+            }
+        }
+    }
+
+    private fun consumeRemoveId(opponentIds: List<Int>) {
+        for (opponentId in opponentIds) {
+            try {
+                CoroutineScope(Dispatchers.IO).launch {
+                    deleteFriend(opponentId)
+                }
+            } catch (e: Throwable) {
+                LocalLogger.e(e)
+            }
+        }
+    }
+
+    private suspend fun deleteFriend(opponentId: Int) {
+        LocationFriendIO.delete(locationId, opponentId)
+    }
+
+    private fun patchContents(dto: LocationFriendDTO.Post) = CoroutineScope(Dispatchers.IO).launch {
         val body = ArrayList<String>()
         for (opponent in checkedOpponentIds) {
             if (opponent.value) {
                 body.add(prepareBody(opponent.key, friends))
             }
         }
+        prepareDeleteFriend()
         LocalLogger.v("body ${body.joinToString { it }}")
         runCatching { LocationFriendIO.post(dto) }
             .onSuccess { toOptions(body.joinToString { it }) }
@@ -176,10 +229,11 @@ class WriteOptionFriendActivity : AppCompatActivity() {
         return name
     }
 
-    private fun toOptions(body: String) {
+    private fun toOptions(body: String?) {
         Intent()
             .putExtra("isAdded", true)
             .putExtra("body", body)
+            .putExtra("locationId", locationId)
             .setActivity(this, Activity.RESULT_OK)
         finish()
     }

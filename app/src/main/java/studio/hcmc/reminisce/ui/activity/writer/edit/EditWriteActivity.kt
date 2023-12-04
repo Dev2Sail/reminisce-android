@@ -30,7 +30,10 @@ class EditWriteActivity : AppCompatActivity() {
     private lateinit var location: LocationVO
 
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
-    private val position by lazy { intent.getIntExtra("position", -1) }
+    private val fromTag by lazy { intent.getBooleanExtra("fromTag", false) }
+    private val fromFriend by lazy { intent.getBooleanExtra("fromFriend", false) }
+
+    private val activityResult = Intent()
     private val writeOptions = HashMap<String, Any?>()
     private val searchLocationLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onSearchLocationResult)
     private val writeOptionsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onWriteOptionsResult)
@@ -39,6 +42,7 @@ class EditWriteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityEditWriteBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+        activityResult.putExtra("locationId", locationId)
         prepareLocation()
     }
 
@@ -104,7 +108,7 @@ class EditWriteActivity : AppCompatActivity() {
         runCatching { LocationIO.put(locationId, dto) }
             .onSuccess {
                 location = LocationIO.getById(locationId)
-                launchWriteOptions(location.id, position)
+                launchWriteOptions(location.id)
             }.onFailure { LocalLogger.e(it) }
     }
 
@@ -151,37 +155,48 @@ class EditWriteActivity : AppCompatActivity() {
         searchLocationLauncher.launch(intent)
     }
 
-    private fun launchWriteOptions(locationId: Int, position: Int) {
+    private fun launchWriteOptions(locationId: Int) {
         val intent = Intent(this, WriteOptionsActivity::class.java)
             .putExtra("locationId", locationId)
             .putExtra("categoryId", location.categoryId)
             .putExtra("visitedAt", writeOptions["visitedAt"].toString())
             .putExtra("place", writeOptions["place"].toString())
-            .putExtra("position", position)
+            .putExtra("fromTag", fromTag)
+            .putExtra("fromFriend", fromFriend)
         writeOptionsLauncher.launch(intent)
     }
 
     private fun onWriteOptionsResult(activityResult: ActivityResult) {
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
-            val locationId = activityResult.data?.getIntExtra("locationId", -1)
-            val position = activityResult.data?.getIntExtra("position", -1)
-            toWriteDetail(locationId!!, position!!)
+            this.activityResult.putExtra("isAdded", true)
+            this.activityResult.putExtra("isModified", true)
         }
+        if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
+            this.activityResult.putExtra("isAdded", true)
+            this.activityResult.putExtra("isModified", true)
+        }
+
+        this.activityResult.setActivity(this, Activity.RESULT_OK)
+        finish()
     }
 
-//    private fun launchAddedWriteDetail(locationId: Int) {
-//        Intent()
-//            .putExtra("isAdded", true)
-//            .putExtra("locationId", locationId)
-//            .setActivity(this, Activity.RESULT_OK)
-//        finish()
-//    }
-
-    private fun toWriteDetail(locationId: Int, position: Int) {
+    private fun toModifiedWriteDetail(locationId: Int, position: Int, fromTag: Boolean, fromFriend: Boolean) {
         Intent()
             .putExtra("isModified", true)
             .putExtra("locationId", locationId)
             .putExtra("position", position)
+            .putExtra("fromTag", fromTag)
+            .putExtra("fromFriend", fromFriend)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
+    }
+
+    private fun toAddedWriteDetail(locationId: Int, fromTag: Boolean, fromFriend: Boolean) {
+        Intent()
+            .putExtra("isAdded", true)
+            .putExtra("locationId", locationId)
+            .putExtra("fromTag", fromTag)
+            .putExtra("fromFriend", fromFriend)
             .setActivity(this, Activity.RESULT_OK)
         finish()
     }

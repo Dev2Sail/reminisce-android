@@ -7,7 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import studio.hcmc.reminisce.R
 import studio.hcmc.reminisce.databinding.ActivityTagEditableDetailBinding
@@ -21,21 +24,25 @@ import studio.hcmc.reminisce.util.setActivity
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
+import studio.hcmc.reminisce.vo.user.UserVO
 
 class TagEditableDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityTagEditableDetailBinding
     private lateinit var adapter: TagEditableAdapter
-    private lateinit var locations: List<LocationVO>
+    private lateinit var user: UserVO
 
-    private val context = this
     private val tagId by lazy { intent.getIntExtra("tagId", -1) }
     private val body by lazy { intent.getStringExtra("tagBody") }
 
     //friend nullable
+    private val locations = ArrayList<LocationVO>()
     private val friendInfo = HashMap<Int /* locationId */, List<FriendVO>>()
     private val tagInfo = HashMap<Int /* locationId */, List<TagVO>>()
     private val contents = ArrayList<TagEditableAdapter.Content>()
     private val selectedIds = HashSet<Int /* locationId */>()
+    private val mutex = Mutex()
+    private var hasMoreContents = true
+    private var lastLoadedAt = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,47 +56,89 @@ class TagEditableDetailActivity : AppCompatActivity() {
         viewBinding.tagEditableDetailAppbar.appbarBack.setOnClickListener { finish() }
         viewBinding.tagEditableDetailAppbar.appbarActionButton1.text = getString(R.string.dialog_remove)
         viewBinding.tagEditableDetailAppbar.appbarActionButton1.setOnClickListener { patchContents(selectedIds) }
-        loadContents()
+        viewBinding.tagEditableDetailItems.layoutManager = LinearLayoutManager(this)
+        CoroutineScope(Dispatchers.IO).launch { loadContents() }
     }
 
-    private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(context)
-        val result = runCatching { LocationIO.listByTagId(tagId, Int.MAX_VALUE) }
-            .onSuccess { it ->
-                locations = it
-                it.forEach {
-                    tagInfo[it.id] = TagIO.listByLocationId(it.id)
-                    friendInfo[it.id] = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-                }
-            }.onFailure { LocalLogger.e(it) }
+    private suspend fun prepareUser(): UserVO {
+        if(!this::user.isInitialized) {
+            user = UserExtension.getUser(this)
+        }
 
-        if (result.isSuccess) {
-            prepareContents()
-            withContext(Dispatchers.Main) { onContentsReady() }
-        } else { onError() }
+        return user
+    }
+
+    private suspend fun loadContents() = mutex.withLock {
+        val user = prepareUser()
+        val lastId = locations.lastOrNull()?.id ?: Int.MAX_VALUE
+        val delay = System.currentTimeMillis() - lastLoadedAt - 2000
+        if (delay < 0) {
+            delay(-delay)
+        }
+
+        if (!hasMoreContents) {
+            return
+        }
+
+        try {
+            val fetched = LocationIO.listByTagId(tagId, lastId)
+            for (location in fetched.sortedByDescending { it.id }) {
+                locations.add(location)
+                tagInfo[location.id] = TagIO.listByLocationId(location.id)
+                friendInfo[location.id] = FriendIO.listByUserIdAndLocationId(user.id, location.id)
+            }
+            hasMoreContents = fetched.size >= 10
+            val preSize = contents.size
+            val size = prepareContents(fetched)
+            withContext(Dispatchers.Main) { onContentsReady(preSize, size) }
+            lastLoadedAt = System.currentTimeMillis()
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+            withContext(Dispatchers.Main) { onError() }
+        }
     }
 
     private fun onError() {
         CommonError.onMessageDialog(this, getString(R.string.dialog_error_common_list_body))
     }
 
-    private fun prepareContents() {
-        for (location in locations.sortedByDescending { it.id }) {
-            contents.add(TagEditableAdapter.DetailContent(
+    private fun prepareContents(fetched: List<LocationVO>): Int {
+        if (contents.lastOrNull() is TagEditableAdapter.ProgressContent) {
+            contents.removeLast()
+        }
+
+        var size = 0
+        for (location in fetched) {
+            val content = TagEditableAdapter.DetailContent(
                 location,
                 tagInfo[location.id].orEmpty(),
                 friendInfo[location.id].orEmpty()
-            ))
+            )
+
+            contents.add(content)
         }
+        size += fetched.size
+
+        if (hasMoreContents) {
+            contents.add(TagEditableAdapter.ProgressContent)
+        }
+
+        return size
     }
 
-    private fun onContentsReady() {
-        viewBinding.tagEditableDetailItems.layoutManager = LinearLayoutManager(this)
-        adapter = TagEditableAdapter(adapterDelegate, summaryDelegate)
-        viewBinding.tagEditableDetailItems.adapter = adapter
+    private fun onContentsReady(preSize: Int, size: Int) {
+        if (!this::adapter.isInitialized) {
+            adapter = TagEditableAdapter(adapterDelegate, summaryDelegate)
+            viewBinding.tagEditableDetailItems.adapter = adapter
+            return
+        }
+
+        adapter.notifyItemRangeInserted(preSize, size)
     }
 
     private val adapterDelegate = object : TagEditableAdapter.Delegate {
+        override fun hasMoreContents() = hasMoreContents
+        override fun getMoreContents() { CoroutineScope(Dispatchers.IO).launch { loadContents() } }
         override fun getItemCount() = contents.size
         override fun getItem(position: Int) = contents[position]
     }

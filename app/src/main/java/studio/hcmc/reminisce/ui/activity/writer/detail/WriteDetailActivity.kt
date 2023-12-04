@@ -26,43 +26,51 @@ import studio.hcmc.reminisce.vo.category.CategoryVO
 import studio.hcmc.reminisce.vo.friend.FriendVO
 import studio.hcmc.reminisce.vo.location.LocationVO
 import studio.hcmc.reminisce.vo.tag.TagVO
+import studio.hcmc.reminisce.vo.user.UserVO
 
 class WriteDetailActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityWriteDetailBinding
     private lateinit var adapter: WriteDetailAdapter
+    private lateinit var user: UserVO
     private lateinit var location: LocationVO
     private lateinit var categoryInfo: CategoryVO
     private lateinit var tagInfo: List<TagVO>
     private lateinit var friendInfo: List<FriendVO>
 
     private val locationId by lazy { intent.getIntExtra("locationId", -1) }
-    private val title by lazy { intent.getStringExtra("title") }
-    private val position by lazy { intent.getIntExtra("position", -1) }
 
+    private val activityResult = Intent()
     private val contents = ArrayList<WriteDetailAdapter.Content>()
-    private val writeOptionsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onWriteOptionsResult)
     private val editWriteLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::onEditWriteResult)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityWriteDetailBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+        activityResult.putExtra("locationId", locationId)
         initView()
     }
 
     private fun initView() {
-        viewBinding.writeDetailAppbar.appbarTitle.text = title
         viewBinding.writeDetailAppbar.appbarActionButton1.text = getString(R.string.header_action)
-        viewBinding.writeDetailAppbar.appbarActionButton1.setOnClickListener {
-            testLaunchEditWrite()
-//            launchEditWrite()
+        viewBinding.writeDetailAppbar.appbarActionButton1.setOnClickListener { launchEditWrite() }
+        viewBinding.writeDetailAppbar.appbarBack.setOnClickListener {
+            setResult(RESULT_OK, activityResult)
+            finish()
         }
-        viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { finish() }
         loadContents()
     }
 
+    private suspend fun prepareUser(): UserVO {
+        if (!this::user.isInitialized) {
+            user = UserExtension.getUser(this)
+        }
+
+        return user
+    }
+
     private fun loadContents() = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@WriteDetailActivity)
+        val user = prepareUser()
         val result = runCatching { LocationIO.getById(locationId) }
             .onSuccess {
                 location = it
@@ -96,22 +104,23 @@ class WriteDetailActivity : AppCompatActivity() {
         override fun getItem(position: Int) = contents[position]
     }
 
-    private fun patchContent(locationId: Int) = CoroutineScope(Dispatchers.IO).launch {
-        val user = UserExtension.getUser(this@WriteDetailActivity)
-        val result = runCatching { LocationIO.getById(locationId) }
-            .onSuccess {
-                location = it
-                categoryInfo = CategoryIO.getById(it.categoryId)
-                tagInfo = TagIO.listByLocationId(it.id)
-                friendInfo = FriendIO.listByUserIdAndLocationId(user.id, it.id)
-            }.onFailure { LocalLogger.e(it) }
-        if (result.isSuccess) {
+    private suspend fun patchContent() {
+        val user = prepareUser()
+        try {
+            val fetched = LocationIO.getById(locationId)
+            location = fetched
+            categoryInfo = CategoryIO.getById(location.categoryId)
+            tagInfo = TagIO.listByLocationId(location.id)
+            friendInfo = FriendIO.listByUserIdAndLocationId(user.id, location.id)
             prepareContents()
             withContext(Dispatchers.Main) {
                 viewBinding.writeDetailAppbar.appbarTitle.text = location.title
                 onContentsReady()
             }
-        } else { onError() }
+        } catch (e: Throwable) {
+            LocalLogger.e(e)
+            withContext(Dispatchers.Main) { onError() }
+        }
     }
 
     private fun toAddedCategoryDetail() {
@@ -132,50 +141,47 @@ class WriteDetailActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun toModifiedTagDetail() {
+        Intent()
+            .putExtra("isModified", true)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
+    }
+
+    private fun toModifiedFriendDetail() {
+        Intent()
+            .putExtra("isModified", true)
+            .setActivity(this, Activity.RESULT_OK)
+        finish()
+    }
+
     private fun launchEditWrite() {
         val intent = Intent(this, EditWriteActivity::class.java)
             .putExtra("locationId", location.id)
-            .putExtra("position", position)
-        writeOptionsLauncher.launch(intent)
-    }
-
-    private fun testLaunchEditWrite() {
-        val intent = Intent(this, EditWriteActivity::class.java)
-            .putExtra("locationId", location.id)
-            .putExtra("position", position)
         editWriteLauncher.launch(intent)
     }
 
     private fun onEditWriteResult(activityResult: ActivityResult) {
+        var shouldPatch = false
         if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
-            val locationId = intent.getIntExtra("locationId", -1)
-            contents.removeAll { it is WriteDetailAdapter.Content }
-            patchContent(locationId!!)
-            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { toAddedCategoryDetail() }
+            this.activityResult.putExtra("isAdded", true)
+            this.activityResult.putExtra("isModified", true)
+            shouldPatch = true
         }
         if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
-            val position = activityResult.data?.getIntExtra("position", -1)
-            val locationId = activityResult.data?.getIntExtra("locationId", -1)
-            contents.removeAll { it is WriteDetailAdapter.Content }
-            patchContent(locationId!!)
-            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { toModifiedCategoryDetail(position!!) }
+            this.activityResult.putExtra("isAdded", true)
+            this.activityResult.putExtra("isModified", true)
+            shouldPatch = true
+        }
+        if (shouldPatch) {
+            clearAndPatch()
         }
     }
 
-    // 안 넘어옴
-    private fun onWriteOptionsResult(activityResult: ActivityResult) {
-        if (activityResult.data?.getBooleanExtra("isAdded", false) == true) {
-            val locationId = intent.getIntExtra("locationId", -1)
-            contents.removeAll { it is WriteDetailAdapter.Content }
-            patchContent(locationId!!)
-            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { toAddedCategoryDetail() }
-        }
-        if (activityResult.data?.getBooleanExtra("isModified", false) == true) {
-            val position = activityResult.data?.getIntExtra("position", -1)
-            val locationId = activityResult.data?.getIntExtra("locationId", -1)
-            contents.removeAll { it is WriteDetailAdapter.Content }
-            patchContent(locationId!!)
-            viewBinding.writeDetailAppbar.appbarBack.setOnClickListener { toModifiedCategoryDetail(position!!) }
-        }
+    private fun clearAndPatch() {
+        contents.clear()
+        CoroutineScope(Dispatchers.IO).launch { patchContent() }
     }
+
 }
+// 편집 -> 저장 -> options -> options tag || options category || options tag -> options -> writedetail
